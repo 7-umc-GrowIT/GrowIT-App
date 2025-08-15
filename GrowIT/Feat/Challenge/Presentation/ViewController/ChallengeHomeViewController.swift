@@ -94,16 +94,7 @@ class ChallengeHomeViewController: UIViewController {
     
     @objc private func moveChallengeVerfiyVC(_ notification: Notification) {
         if let userInfo = notification.userInfo, let challenge = userInfo["challenge"] as? UserChallenge{
-            let nextVC = ChallengeVerifyViewController(
-                viewModel: ChallengeVerifyViewModel(
-                    challenge: challenge,
-                    useCase: ChallengeVerifyUseCaseImpl(
-                        repository: ChallengeVerifyRepositoryImpl(
-                            dataSource: ChallengeVerifyDataSourceImpl()
-                        )
-                    )
-                )
-            )
+            let nextVC = ChallengeVerifyViewController()
             
             navigationController?.pushViewController(nextVC, animated: true)
         }

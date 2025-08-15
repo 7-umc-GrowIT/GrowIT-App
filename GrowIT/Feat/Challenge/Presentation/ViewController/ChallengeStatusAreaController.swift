@@ -273,17 +273,7 @@ extension ChallengeStatusAreaController: ChallengeVerifyModalDelegate {
     func didRequestVerification() {
         if let challenge = selectedChallenge {
             self.dismiss(animated: true, completion: {
-                let nextVC = ChallengeVerifyViewController(
-                    viewModel: ChallengeVerifyViewModel(
-                        challenge: challenge,
-                        useCase: ChallengeVerifyUseCaseImpl(
-                            repository: ChallengeVerifyRepositoryImpl(
-                                dataSource: ChallengeVerifyDataSourceImpl()
-                            )
-                        )
-                    )
-                    
-                )
+                let nextVC = ChallengeVerifyViewController()
                 
                 self.navigationController?.pushViewController(
                     nextVC, animated: true

@@ -228,15 +228,7 @@ extension ChallengeHomeAreaController: ChallengeVerifyModalDelegate {
     }
     
     func didRequestVerification() {
-        let verifyVC = ChallengeVerifyViewController(
-            viewModel: ChallengeVerifyViewModel(
-                challenge: nil, useCase: ChallengeVerifyUseCaseImpl(
-                    repository: ChallengeVerifyRepositoryImpl(
-                        dataSource: ChallengeVerifyDataSourceImpl()
-                    )
-                )
-            )
-        )
+        let verifyVC = ChallengeVerifyViewController()
         navigationController?.pushViewController(verifyVC, animated: true)
     }
 }
