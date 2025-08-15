@@ -118,7 +118,13 @@ Temporary Items
 # API Keys and Secrets
 Config.plist
 GoogleService-Info.plist
-*.json
+config.json
+secrets.json
+GoogleService-Info.json
+!**/*.xcassets/**/*.json
+!**/*.colorset/Contents.json
+!**/*.imageset/Contents.json
+!**/*.appiconset/Contents.json
 *.pem
 *.p12
 *.mobileprovision
