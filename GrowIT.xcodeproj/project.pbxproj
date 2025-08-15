@@ -7,20 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D697E2CD2288495290345803 /* Pods_GrowIT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19E0F9951FC20E5A1F2A454D /* Pods_GrowIT.framework */; };
+		8E315642FFD76A27864B4503 /* Pods_GrowIT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E5FE784C20AD320301F51CDE /* Pods_GrowIT.framework */; };
+		D1721EEF2E4EFB1100C38E69 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EEE2E4EFB1100C38E69 /* SnapKit */; };
+		D1721EF22E4EFB2900C38E69 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EF12E4EFB2900C38E69 /* Moya */; };
+		D1721EF52E4EFB3700C38E69 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EF42E4EFB3700C38E69 /* Then */; };
+		D1721EF82E4EFB4700C38E69 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EF72E4EFB4700C38E69 /* Lottie */; };
+		D1721EFB2E4EFB5A00C38E69 /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EFA2E4EFB5A00C38E69 /* NVActivityIndicatorView */; };
+		D1721EFE2E4EFB8900C38E69 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EFD2E4EFB8900C38E69 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		19E0F9951FC20E5A1F2A454D /* Pods_GrowIT.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GrowIT.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		57E1426F7486490795969F12 /* Pods-GrowIT.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowIT.debug.xcconfig"; path = "Target Support Files/Pods-GrowIT/Pods-GrowIT.debug.xcconfig"; sourceTree = "<group>"; };
-		7B3A2060840EA6A6D37AF05F /* Pods-GrowIT.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowIT.release.xcconfig"; path = "Target Support Files/Pods-GrowIT/Pods-GrowIT.release.xcconfig"; sourceTree = "<group>"; };
+		603E9C9F671E4FCDA48549D7 /* Pods-GrowIT.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowIT.release.xcconfig"; path = "Target Support Files/Pods-GrowIT/Pods-GrowIT.release.xcconfig"; sourceTree = "<group>"; };
+		A45C483FEB5A826BD876A439 /* Pods-GrowIT.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GrowIT.debug.xcconfig"; path = "Target Support Files/Pods-GrowIT/Pods-GrowIT.debug.xcconfig"; sourceTree = "<group>"; };
 		D122A1D02E4E3D010055E22D /* GrowIT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GrowIT.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5FE784C20AD320301F51CDE /* Pods_GrowIT.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GrowIT.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D122C0302E4E56590055E22D /* Exceptions for "GrowIT" folder in "GrowIT" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D122A1CF2E4E3D010055E22D /* GrowIT */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D122A1D22E4E3D010055E22D /* GrowIT */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				D122C0302E4E56590055E22D /* Exceptions for "GrowIT" folder in "GrowIT" target */,
 			);
 			path = GrowIT;
 			sourceTree = "<group>";
@@ -32,17 +49,23 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D697E2CD2288495290345803 /* Pods_GrowIT.framework in Frameworks */,
+				D1721EF82E4EFB4700C38E69 /* Lottie in Frameworks */,
+				D1721EFE2E4EFB8900C38E69 /* Kingfisher in Frameworks */,
+				D1721EFB2E4EFB5A00C38E69 /* NVActivityIndicatorView in Frameworks */,
+				D1721EEF2E4EFB1100C38E69 /* SnapKit in Frameworks */,
+				D1721EF22E4EFB2900C38E69 /* Moya in Frameworks */,
+				D1721EF52E4EFB3700C38E69 /* Then in Frameworks */,
+				8E315642FFD76A27864B4503 /* Pods_GrowIT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		93E6877C1714B21FA93DAD6B /* Frameworks */ = {
+		92863B982EA4D3AE310EFC97 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				19E0F9951FC20E5A1F2A454D /* Pods_GrowIT.framework */,
+				E5FE784C20AD320301F51CDE /* Pods_GrowIT.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -53,7 +76,7 @@
 				D122A1D22E4E3D010055E22D /* GrowIT */,
 				D122A1D12E4E3D010055E22D /* Products */,
 				ED2339F282CFA53155D0C493 /* Pods */,
-				93E6877C1714B21FA93DAD6B /* Frameworks */,
+				92863B982EA4D3AE310EFC97 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -68,10 +91,9 @@
 		ED2339F282CFA53155D0C493 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				57E1426F7486490795969F12 /* Pods-GrowIT.debug.xcconfig */,
-				7B3A2060840EA6A6D37AF05F /* Pods-GrowIT.release.xcconfig */,
+				A45C483FEB5A826BD876A439 /* Pods-GrowIT.debug.xcconfig */,
+				603E9C9F671E4FCDA48549D7 /* Pods-GrowIT.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -82,11 +104,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D122A1E32E4E3D020055E22D /* Build configuration list for PBXNativeTarget "GrowIT" */;
 			buildPhases = (
-				5EFE852204A6229B6834D5CB /* [CP] Check Pods Manifest.lock */,
+				D3E7E99620590C17DCAB9544 /* [CP] Check Pods Manifest.lock */,
 				D122A1CC2E4E3D010055E22D /* Sources */,
 				D122A1CD2E4E3D010055E22D /* Frameworks */,
 				D122A1CE2E4E3D010055E22D /* Resources */,
-				BFAFD0FE6A8387FE4F3EA4A8 /* [CP] Embed Pods Frameworks */,
+				7670CE96D13910F08E7CEF35 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -124,6 +146,14 @@
 			);
 			mainGroup = D122A1C72E4E3D010055E22D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D1721EED2E4EFB1100C38E69 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				D1721EF02E4EFB2900C38E69 /* XCRemoteSwiftPackageReference "Moya" */,
+				D1721EF32E4EFB3700C38E69 /* XCRemoteSwiftPackageReference "Then" */,
+				D1721EF62E4EFB4700C38E69 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				D1721EF92E4EFB5A00C38E69 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
+				D1721EFC2E4EFB8900C38E69 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D122A1D12E4E3D010055E22D /* Products */;
 			projectDirPath = "";
@@ -145,7 +175,28 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5EFE852204A6229B6834D5CB /* [CP] Check Pods Manifest.lock */ = {
+		7670CE96D13910F08E7CEF35 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GrowIT/Pods-GrowIT-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GrowIT/Pods-GrowIT-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GrowIT/Pods-GrowIT-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D3E7E99620590C17DCAB9544 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -167,23 +218,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BFAFD0FE6A8387FE4F3EA4A8 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GrowIT/Pods-GrowIT-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GrowIT/Pods-GrowIT-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GrowIT/Pods-GrowIT-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -199,19 +233,21 @@
 /* Begin XCBuildConfiguration section */
 		D122A1E42E4E3D020055E22D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 57E1426F7486490795969F12 /* Pods-GrowIT.debug.xcconfig */;
+			baseConfigurationReference = A45C483FEB5A826BD876A439 /* Pods-GrowIT.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NZZ4F7L72Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GrowIT/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -219,6 +255,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.GrowIT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -231,19 +268,21 @@
 		};
 		D122A1E52E4E3D020055E22D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B3A2060840EA6A6D37AF05F /* Pods-GrowIT.release.xcconfig */;
+			baseConfigurationReference = 603E9C9F671E4FCDA48549D7 /* Pods-GrowIT.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NZZ4F7L72Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GrowIT/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -251,6 +290,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.GrowIT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -298,7 +338,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -361,7 +401,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -402,6 +442,90 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D1721EED2E4EFB1100C38E69 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		D1721EF02E4EFB2900C38E69 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+		D1721EF32E4EFB3700C38E69 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+		D1721EF62E4EFB4700C38E69 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
+		D1721EF92E4EFB5A00C38E69 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ninjaprox/NVActivityIndicatorView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.0;
+			};
+		};
+		D1721EFC2E4EFB8900C38E69 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D1721EEE2E4EFB1100C38E69 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1721EED2E4EFB1100C38E69 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		D1721EF12E4EFB2900C38E69 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1721EF02E4EFB2900C38E69 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		D1721EF42E4EFB3700C38E69 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1721EF32E4EFB3700C38E69 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
+		};
+		D1721EF72E4EFB4700C38E69 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1721EF62E4EFB4700C38E69 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+		D1721EFA2E4EFB5A00C38E69 /* NVActivityIndicatorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1721EF92E4EFB5A00C38E69 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			productName = NVActivityIndicatorView;
+		};
+		D1721EFD2E4EFB8900C38E69 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1721EFC2E4EFB8900C38E69 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D122A1C82E4E3D010055E22D /* Project object */;
 }
