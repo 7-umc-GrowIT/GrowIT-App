@@ -1,0 +1,4 @@
+# Xcode 프로젝트 자동 병합 규칙
+*.pbxproj binary merge=union
+*.xcworkspace binary merge=union
+*.xcscheme binary merge=union
