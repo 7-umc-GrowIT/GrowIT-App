@@ -95,7 +95,6 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let terms):
-                    print("서버에서 받은 약관 데이터: \(terms)")
                     
                     // 필수 약관과 선택 약관으로 분리
                     self?.termsList = terms.filter { $0.type.uppercased() == "MANDATORY" }
@@ -106,9 +105,6 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
                     
                     // 약관 내용 저장 (약관 확인 뷰에서 사용)
                     self?.termsContentMap = terms.reduce(into: [:]) { $0[$1.termId] = $1.content }
-                    
-                    print("필수 약관 필터링 결과: \(self?.termsList ?? [])")
-                    print("선택 약관 필터링 결과: \(self?.optionalTermsList ?? [])")
                     
                     // 약관 동의 상태 초기화
                     self?.setupTermsView()
@@ -188,13 +184,7 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
         let agreedList = (termsList + optionalTermsList).map { term in
             UserTermDTO(termId: term.termId, agreed: agreedTerms[term.termId] ?? false)
         }
-        
-        print("필수 약관: \(termsList.map { "\($0.termId): \($0.title)" })")
-        print("선택 약관: \(optionalTermsList.map { "\($0.termId): \($0.title)" })")
-        print("agreedTerms 상태: \(agreedTerms)")
-        
         completionHandler?(agreedList)
-        navigationController?.popViewController(animated: true)
     }
     
     @objc private func prevVC() {

@@ -6,8 +6,6 @@
 //
 
 import UIKit
-import KakaoSDKCommon
-import KakaoSDKAuth
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,19 +13,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - kakaologin
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-            
-            KakaoSDK.initSDK(appKey: "ad38f7a54ae0b83d104d8fcb239aebea")
-            
             return true
         }
-        
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        if AuthApi.isKakaoTalkLoginUrl(url) {
-            print("✅ AppDelegate: 카카오 로그인 URL 감지")
-            return AuthController.handleOpenUrl(url: url)
-        }
-        return true  // handleAuthorizationCode 호출 제거
-    }
 
     // MARK: UISceneSession Lifecycle
 

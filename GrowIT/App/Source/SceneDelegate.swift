@@ -28,16 +28,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        if let url = URLContexts.first?.url {
-            if AuthApi.isKakaoTalkLoginUrl(url) {
-                AuthController.handleOpenUrl(url: url)
-            }
-
-            KakaoLoginManager.shared.handleAuthorizationCode(from: url)
-        }
+        
     }
     
-      
     
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
@@ -49,6 +42,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        
+        // 개발용: 앱이 활성화될 때마다 로그아웃 처리 (디버깅용)
+        // 주석을 해제하면 앱을 열 때마다 로그인 화면으로 이동
+        // TokenManager.shared.clearTokens()
     }
     
     func sceneWillResignActive(_ scene: UIScene) {

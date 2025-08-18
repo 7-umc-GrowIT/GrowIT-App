@@ -9,12 +9,14 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kakaoad38f7a54ae0b83d104d8fcb239aebea</string>
+				<string>$(KAKAO_URLSCHEMES)</string>
 			</array>
 		</dict>
 	</array>
 	<key>Google_Speech_API_Key</key>
 	<string>AIzaSyArKR4aSUzQaK504AlT1WXtyWfuWK0S2LQ</string>
+	<key>KAKAO_URLSCHEMES</key>
+	<string>$(KAKAO_URLSCHEMES)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -28,6 +30,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>REST_API_KEY</key>
+	<string>$(REST_API_KEY)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-Bold.otf</string>
