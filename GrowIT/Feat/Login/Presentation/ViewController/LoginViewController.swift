@@ -12,8 +12,7 @@ import SnapKit
 class LoginViewController: UIViewController {
     
     let authService = AuthService()
-    // 싱글톤 인스턴스 사용
-    let kakaoLoginManager = KakaoLoginManager.shared
+    private lazy var kakaoLoginHelper = KakaoLoginHelper()
     
     private lazy var loginView = LoginView()
     
@@ -54,112 +53,106 @@ class LoginViewController: UIViewController {
     }
     
     
+    // 카카오 로그인 버튼
     @objc func kakaoLoginTapped() {
-        
-        kakaoLoginManager.loginWithKakao { [weak self] result in
+        // 1. 카카오 인가 코드 요청
+        kakaoLoginHelper.getKakaoAuthorize { [weak self] result in
             guard let self = self else { return }
             
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let authCode):
-                    self.handleKakaoLogin(with: authCode)
-                    
-                case .failure(let error):
-                    print("카카오 로그인 실패: \(error.localizedDescription)")
-                }
+            switch result {
+            case .success(let code):
+                // 2. 서버 로그인 요청
+                self.loginWithServer(code)
+            case .failure(let error):
+                print("카카오 로그인 실패: \(error.localizedDescription)")
             }
         }
     }
-    
-    private func handleKakaoLogin(with authCode: String) {
-        authService.loginKakao(code: authCode) { [weak self] response in
-            guard let self = self else {
-                return
-            }
+
+    // MARK: - 서버 요청 로직
+    // 인가 코드를 서버에 전달하여 로그인 요청
+    private func loginWithServer(_ code: String) {
+        authService.loginKakao(code: code) { [weak self] response in
+            guard let self = self else { return }
             
             DispatchQueue.main.async {
                 switch response {
                 case .success(let loginResponse):
-                    print("서버 로그인 성공: \(loginResponse)")
-                    
-                    if loginResponse.result.signupRequired {
-                        guard let oauthUserInfo = loginResponse.result.oauthUserInfo else {
-                            print("회원가입에 필요한 사용자 정보가 없습니다")
-                            return
-                        }
-                        
-                        let termsVC = KakaoTermsAgreeViewController(oauthUserInfo: oauthUserInfo)
-                        termsVC.completionHandler = { [weak self] agreedTerms in
-                            guard let self = self else { return }
-                            
-                            self.authService.signupWithKakao(
-                                oauthUserInfo: oauthUserInfo,
-                                userTerms: agreedTerms
-                            ) { signupResponse in
-                                DispatchQueue.main.async {
-                                    switch signupResponse {
-                                    case .success(let signupResult):
-                                        
-                                        if let tokens = signupResult.result.tokens {
-                                            TokenManager.shared.saveTokens(
-                                                accessToken: tokens.accessToken,
-                                                refreshToken: tokens.refreshToken
-                                            )
-                                            self.navigateToMainScreen()
-                                        } else {
-                                            print("회원가입 후에도 토큰이 없음")
-                                        }
-                                        
-                                    case .failure(let error):
-                                        print("회원가입 실패: \(error.localizedDescription)")
-                                    }
-                                }
-                            }
-                        }
-                        self.navigationController?.pushViewController(termsVC, animated: true)
-                    } else {
-                        print("로그인 성공 토큰 저장")
-                        
-                        if let tokens = loginResponse.result.tokens {
-                            TokenManager.shared.saveTokens(
-                                accessToken: tokens.accessToken,
-                                refreshToken: tokens.refreshToken
-                            )
-                            self.navigateToMainScreen()
-                        } else {
-                            print("로그인 성공했지만 토큰이 없음, 추가 확인 필요")
-                        }
-                    }
-                    
+                    print("🌳 그로우잇 서버 로그인 성공: \(loginResponse)")
+                    self.handleLoginResponse(loginResponse)
                 case .failure(let error):
                     print("서버 로그인 실패: \(error.localizedDescription)")
-                    
-                    if error.localizedDescription.contains("인가 코드가 유효한지 확인하세요") {
-                        print("인가 코드 만료됨 retry")
-                        self.retryKakaoLogin()
-                    }
                 }
             }
         }
+    }
+
+    /// 로그인 응답 처리
+    /// - 회원가입이 필요한 경우: 약관 동의 화면으로 이동
+    /// - 회원가입 불필요: 토큰 저장 후 메인 화면 이동
+    private func handleLoginResponse(_ loginResponse: KakaoLoginResponse) {
+        if loginResponse.result.signupRequired {
+            // 회원가입 필요 (true)
+            showTermsAgree(oauthUserInfo: loginResponse.result.oauthUserInfo)
+        } else {
+            // 회원가입 불필요 → 바로 로그인 완료 처리, 토큰 저장 (false)
+            saveTokensAndNavigate(
+                accessToken: loginResponse.result.tokens?.accessToken,
+                refreshToken: loginResponse.result.tokens?.refreshToken
+            )
+        }
+    }
+
+    /// 약관 동의 화면 표시
+    private func showTermsAgree(oauthUserInfo: KakaoUserInfo?) {
+        guard let oauthUserInfo = oauthUserInfo else {
+            print("회원가입에 필요한 사용자 정보가 없습니다")
+            return
+        }
+        
+        let termsVC = KakaoTermsAgreeViewController(oauthUserInfo: oauthUserInfo)
+        termsVC.completionHandler = { [weak self] agreedTerms in
+            guard let self = self else { return }
+            self.signupWithKakao(oauthUserInfo: oauthUserInfo, userTerms: agreedTerms)
+        }
+        navigationController?.pushViewController(termsVC, animated: true)
+    }
+
+    /// 회원가입 요청
+    private func signupWithKakao(oauthUserInfo: KakaoUserInfo, userTerms: [UserTermDTO]) {
+        authService.signupWithKakao(oauthUserInfo: oauthUserInfo, userTerms: userTerms) { [weak self] signupResponse in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                switch signupResponse {
+                case .success(let signupResult):
+                    // 토큰 저장
+                    TokenManager.shared.saveTokens(
+                        accessToken: signupResult.result.accessToken,
+                        refreshToken: signupResult.result.refreshToken
+                    )
+                    // 그로 생성 화면으로 이동
+                    self.navigateToGroCreation()
+                case .failure(let error):
+                    print("회원가입 실패: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    /// 토큰 저장 후 메인 화면 이동
+    private func saveTokensAndNavigate(accessToken: String?, refreshToken: String?) {
+        guard let accessToken = accessToken, let refreshToken = refreshToken else {
+            print("토큰이 없습니다")
+            return
+        }
+        
+        TokenManager.shared.saveTokens(
+            accessToken: accessToken,
+            refreshToken: refreshToken
+        )
+        navigateToMainScreen()
     }
     
-    // 인가 코드가 만료되었을 때 다시 로그인하는 함수 추가
-    private func retryKakaoLogin() {
-        kakaoLoginManager.loginWithKakao { [weak self] result in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let newAuthCode):
-                    print("새로운 인가 코드 획득: \(newAuthCode)")
-                    self.handleKakaoLogin(with: newAuthCode)
-                    
-                case .failure(let error):
-                    print("카카오 로그인 재시도 실패: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
     
     private func checkUserLoginStatus() {
         if let accessToken = TokenManager.shared.getAccessToken() {
@@ -171,9 +164,21 @@ class LoginViewController: UIViewController {
     }
     
     private func navigateToMainScreen() {
-        let homeVC = HomeViewController()
-        // 현재 네비게이션 컨트롤러의 뷰 컨트롤러 스택을 교체
-        navigationController?.setViewControllers([homeVC], animated: true)
+        let tabBar = CustomTabBarController(initialIndex: 1)
+        let nav = UINavigationController(rootViewController: tabBar)
+        if let window = UIApplication.shared.windows.first {
+            window.rootViewController = nav
+            window.makeKeyAndVisible()
+        } else {
+            // 폴백: 현재 내비 스택 교체
+            navigationController?.setViewControllers([tabBar], animated: true)
+        }
+    }
+    
+    private func navigateToGroCreation() {
+        let groCreationVC = GroSetBackgroundViewController()
+        navigationController?.pushViewController(groCreationVC, animated: true)
     }
     
 }
+

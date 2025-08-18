@@ -9,13 +9,16 @@ import Foundation
 import Moya
 
 enum AuthorizationEndpoints {
-    case postVerification(data: EmailVerifyRequest)
-    case postEmailSignUp(data: EmailSignUpRequest)
-    case postSocialSignUp(data: SocialSignUpRequest)
-    case postReissueToken(data: ReissueTokenRequest)
+    // Post
+    case postVerification(data: EmailVerifyRequest) // 이메일 인증번호 확인 api
+    case postEmailSignUp(data: EmailSignUpRequest) // 이메일 회원가입 api
+    case postSocialSignUp(data: SocialSignUpRequest) // 소셜 간편 가입 api
+    case postReissueToken(data: ReissueTokenRequest) // 토큰 재발급 api
     case postKakaoLogin(code: String)
     case postEmailLogin(data: EmailLoginRequest)
-    case postSendEmailVerification(type: String, data: SendEmailVerifyRequest)
+    case postSendEmailVerification(type: String, data: SendEmailVerifyRequest) // 인증 메일 전송 api
+   
+    // Patch
     case patchSignOut
     case fetchSignUpTerms
 }

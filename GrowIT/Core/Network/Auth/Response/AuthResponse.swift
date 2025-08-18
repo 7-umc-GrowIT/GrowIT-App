@@ -43,6 +43,14 @@ struct KakaoLoginResult: Codable {
     let oauthUserInfo: KakaoUserInfo?
 }
 
+// 카카오 회원가입 전용 응답 구조체
+struct KakaoSignUpResponse: Codable {
+    let isSuccess: Bool
+    let code: String
+    let message: String
+    let result: TokenData
+}
+
 struct KakaoUserInfo: Codable {
     let id: Int
     let email: String

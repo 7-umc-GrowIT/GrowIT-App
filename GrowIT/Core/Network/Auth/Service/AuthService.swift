@@ -32,7 +32,8 @@ final class AuthService: NetworkManager {
         request(target: .postVerification(data: data), decodingType: VerifyResponse.self, completion: completion)
     }
     
-    func signupWithKakao(oauthUserInfo: KakaoUserInfo, userTerms: [UserTermDTO], completion: @escaping (Result<KakaoLoginResponse, Error>) -> Void) {
+    // 소셜 간편 가입
+    func signupWithKakao(oauthUserInfo: KakaoUserInfo, userTerms: [UserTermDTO], completion: @escaping (Result<KakaoSignUpResponse, Error>) -> Void) {
         let url = URL(string: "\(Constants.API.authURL)/signup/social")!
         
         var request = URLRequest(url: url)
@@ -63,18 +64,20 @@ final class AuthService: NetworkManager {
                 return
             }
             
-            print("서버 응답 코드: \(httpResponse.statusCode)")
+            // 서버 응답 데이터를 로그로 출력
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("서버 응답 데이터: \(responseString)")
+            }
             
             if httpResponse.statusCode == 200 {
                 do {
-                    let signupResponse = try JSONDecoder().decode(KakaoLoginResponse.self, from: data)
+                    let signupResponse = try JSONDecoder().decode(KakaoSignUpResponse.self, from: data)
                     completion(.success(signupResponse))
                 } catch {
                     completion(.failure(error))
                 }
             } else {
                 let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
-                print("회원가입 실패: \(errorMessage)")
                 completion(.failure(NSError(domain: "", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])))
             }
         }
