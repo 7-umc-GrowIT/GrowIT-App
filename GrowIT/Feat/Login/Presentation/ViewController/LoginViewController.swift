@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import SnapKit
+import AuthenticationServices
 
 class LoginViewController: UIViewController {
     
@@ -29,22 +30,16 @@ class LoginViewController: UIViewController {
         self.view = loginView
         self.navigationController?.isNavigationBarHidden = true
         setupActions()
-        //checkUserLoginStatus()
     }
     
     private func setupActions() {
         loginView.emailLoginButton.addTarget(self, action: #selector(emailLoginBtnTap), for: .touchUpInside)
         loginView.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
+        loginView.appleLoginButton.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
     }
     
     
     //MARK: - Action
-    
-    // 뒤로 가기 버튼 함수
-    @objc func emailLoginBtnTap() {
-        let emailLoginVC = EmailLoginViewController()
-        navigationController?.pushViewController(emailLoginVC, animated: true)
-    }
     
     func navigateToEmailLogin() {
         let emailLoginVC = EmailLoginViewController()
@@ -52,9 +47,16 @@ class LoginViewController: UIViewController {
         self.navigationController?.pushViewController(emailLoginVC, animated: true)
     }
     
+    // 이메일 로그인 버튼
+    @objc
+    func emailLoginBtnTap() {
+        let emailLoginVC = EmailLoginViewController()
+        navigationController?.pushViewController(emailLoginVC, animated: true)
+    }
     
     // 카카오 로그인 버튼
-    @objc func kakaoLoginTapped() {
+    @objc
+    func kakaoLoginTapped() {
         // 1. 카카오 인가 코드 요청
         kakaoLoginHelper.getKakaoAuthorize { [weak self] result in
             guard let self = self else { return }
@@ -69,6 +71,18 @@ class LoginViewController: UIViewController {
         }
     }
 
+    // 애플 로그인 버튼
+    @objc
+    func appleLoginTapped() {
+        let provider = ASAuthorizationAppleIDProvider()
+        let request = provider.createRequest()
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        controller.performRequests()
+    }
+    
     // MARK: - 서버 요청 로직
     // 인가 코드를 서버에 전달하여 로그인 요청
     private func loginWithServer(_ code: String) {
@@ -182,3 +196,39 @@ class LoginViewController: UIViewController {
     
 }
 
+// MARK: - extension
+extension LoginViewController: ASAuthorizationControllerPresentationContextProviding {
+    // 인증창을 보여주기 위한 메서드 (인증창을 보여 줄 화면을 설정)
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        self.view.window ?? UIWindow()
+    }
+}
+
+extension LoginViewController: ASAuthorizationControllerDelegate {
+    // 로그인 실패 시
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: any Error) {
+        print("로그인 실패", error.localizedDescription)
+    }
+    
+    // Apple ID 로그인에 성공한 경우, 사용자의 인증 정보를 확인하고 필요한 작업을 수행합니다
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        switch authorization.credential {
+        case let appleIdCredential as ASAuthorizationAppleIDCredential:
+            
+            guard let authorizationCodeData = appleIdCredential.authorizationCode,
+                  let authorizationCodeString = String(data: authorizationCodeData, encoding: .utf8) else {
+                print("Authorization Code 변환 실패")
+                return
+            }
+            
+            print("Apple ID 로그인에 성공하였습니다.")
+            print("authorizationCode: \(authorizationCodeString)")
+            
+            // 여기에 로그인 성공 후 수행할 작업을 추가하세요.
+            
+            
+        default: break
+            
+        }
+    }
+}
