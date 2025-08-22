@@ -32,4 +32,21 @@ class NavigationManager {
         titleLabel.textAlignment = .center
         navigationItem.titleView = titleLabel
     }
+    
+    // MARK: - 네비게이션 바 하단 라인 추가
+    func addBottomLine(to navigationBar: UINavigationBar) {
+        // 이미 추가된 라인이 있으면 중복 추가 방지
+        if navigationBar.viewWithTag(9999) != nil { return }
+        
+        let line = UIView()
+        line.backgroundColor = UIColor.black.withAlphaComponent(0.05)
+        line.translatesAutoresizingMaskIntoConstraints = false
+        line.tag = 9999
+        navigationBar.addSubview(line)
+        line.snp.makeConstraints {
+                    $0.height.equalTo(1)
+                    $0.leading.trailing.equalToSuperview()
+                    $0.bottom.equalToSuperview()
+        }
+    }
 }
