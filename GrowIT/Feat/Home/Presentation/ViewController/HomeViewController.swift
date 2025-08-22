@@ -16,6 +16,7 @@ class HomeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
     
@@ -26,13 +27,10 @@ class HomeViewController: UIViewController {
         setNotification()
         callGetCredit()
         
-        navigationController?.navigationBar.isHidden = true
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-        //setupGradientView()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -129,12 +127,17 @@ class HomeViewController: UIViewController {
     
     private lazy var homeview = HomeView().then {
         $0.topNavBar.itemShopBtn.addTarget(self, action: #selector(goToItemShop), for: .touchUpInside)
-        $0.topNavBar.settingBtn.addTarget(self, action: #selector(logout), for: .touchUpInside)
+        $0.topNavBar.settingBtn.addTarget(self, action: #selector(goToMypage), for: .touchUpInside)
     }
     
     @objc private func goToItemShop() {
         let itemShopVC = GroViewController()
         navigationController?.pushViewController(itemShopVC, animated: false)
+    }
+    
+    @objc private func goToMypage() {
+        let nextVC = MypageViewController()
+        navigationController?.pushViewController(nextVC, animated: true)
     }
     
     @objc private func logout(){

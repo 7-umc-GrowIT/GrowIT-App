@@ -117,6 +117,11 @@ extension UIFont {
         return createFont(name: AppFontName.sExtraBold, size: 22, lineHeight: 1.5)
     }
     
+    // bannerFont
+    public class func bannerFont() -> UIFont {
+        return createFont(name: AppFontName.sExtraBold, size: 18, lineHeight: 1.5)
+    }
+    
     // Sub Body 1 Font
     public class func subBody1() -> UIFont {
         return createFont(name: AppFontName.pBold, size: 14, lineHeight: 1.5)
