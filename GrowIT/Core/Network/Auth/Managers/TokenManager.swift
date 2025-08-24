@@ -5,40 +5,76 @@
 //  Created by 강희정 on 2/1/25.
 //
 
+import Security
 import Foundation
 
 final class TokenManager {
     static let shared = TokenManager()
-    
     private init() {}
 
-    private let accessTokenKey = "accessToken"
-    private let refreshTokenKey = "refreshToken"
+    private let service = "com.growit.auth"
 
-    /// Access Token 저장
+    // MARK: - Save
     func saveTokens(accessToken: String, refreshToken: String) {
-        UserDefaults.standard.set(accessToken, forKey: accessTokenKey)
-        UserDefaults.standard.set(refreshToken, forKey: refreshTokenKey)
-        // print("🔒 AccessToken 저장됨: \(accessToken)")
-        // print("🔒 RefreshToken 저장됨: \(refreshToken)")
-    }
-    
-    /// Access Token만 저장하는 메서드 추가
-    func saveAccessToken(_ accessToken: String) {
-        UserDefaults.standard.set(accessToken, forKey: accessTokenKey)
-        // print("🔒 AccessToken 저장됨: \(accessToken)")
+        saveKeychain(key: "accessToken", value: accessToken)
+        saveKeychain(key: "refreshToken", value: refreshToken)
     }
 
+    func saveAccessToken(_ accessToken: String) {
+        saveKeychain(key: "accessToken", value: accessToken)
+    }
+
+    // MARK: - Get
     func getAccessToken() -> String? {
-        return UserDefaults.standard.string(forKey: accessTokenKey)
+        return loadKeychain(key: "accessToken")
     }
 
     func getRefreshToken() -> String? {
-        return UserDefaults.standard.string(forKey: refreshTokenKey)
+        return loadKeychain(key: "refreshToken")
     }
 
+    // MARK: - Clear
     func clearTokens() {
-        UserDefaults.standard.removeObject(forKey: accessTokenKey)
-        UserDefaults.standard.removeObject(forKey: refreshTokenKey)
+        deleteKeychain(key: "accessToken")
+        deleteKeychain(key: "refreshToken")
+    }
+
+    // MARK: - Keychain Helpers
+    private func saveKeychain(key: String, value: String) {
+        let data = value.data(using: .utf8)!
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data
+        ]
+        SecItemDelete(query as CFDictionary) // 기존 값 제거
+        SecItemAdd(query as CFDictionary, nil)
+    }
+
+    private func loadKeychain(key: String) -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: kCFBooleanTrue!,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var dataTypeRef: AnyObject?
+        if SecItemCopyMatching(query as CFDictionary, &dataTypeRef) == noErr,
+           let data = dataTypeRef as? Data,
+           let value = String(data: data, encoding: .utf8) {
+            return value
+        }
+        return nil
+    }
+
+    private func deleteKeychain(key: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key
+        ]
+        SecItemDelete(query as CFDictionary)
     }
 }
