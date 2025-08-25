@@ -184,13 +184,7 @@ class EmailVerificationViewController: UIViewController {
                         disabledTitleColor: .gray400
                     )
                     
-                    // 토스트 메시지 표시
-                    let toastImage = UIImage(named: "Style=Mail") ?? UIImage()
-                    CustomToast(containerWidth: 225).show(
-                        image: toastImage,
-                        message: "인증번호를 발송했어요",
-                        font: UIFont.heading3SemiBold()
-                    )
+                    ToastSecond.show(image: UIImage(named: "Style=Mail") ?? UIImage(), message: "인증번호를 발송했어요", font: .heading3SemiBold(), in: self.view)
                     
                 case .failure(let error):
                     print("인증 메일 전송 실패: \(error)")
