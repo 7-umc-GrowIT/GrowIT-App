@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class HomeViewController: UIViewController {
     let groService = GroService()
@@ -140,17 +141,6 @@ class HomeViewController: UIViewController {
         navigationController?.pushViewController(nextVC, animated: true)
     }
     
-    @objc private func logout(){
-        TokenManager.shared.clearTokens()
-        let nextVC = LoginViewController()
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = nextVC
-            window.makeKeyAndVisible()
-            
-            // 뷰 컨트롤러 전환 시 애니메이션을 제공합니다.
-            UIView.transition(with: window, duration: 0.1, options: .transitionCrossDissolve, animations: nil, completion: nil)
-        }
-    }
         
     //MARK: Notification
     private func setNotification() {

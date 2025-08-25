@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class LogoutModalViewController: UIViewController {
     //MARK: -Views
@@ -17,7 +18,7 @@ class LogoutModalViewController: UIViewController {
             $0.mainButton.addTarget(self, action: #selector(didTapLogout), for: .touchUpInside)
             $0.subButton.addTarget(self, action: #selector(didTapCancleButton), for: .touchUpInside)
         }
-
+    
     //MARK: - init
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,14 +28,27 @@ class LogoutModalViewController: UIViewController {
     //MARK: - Functional
     //MARK: Event
     @objc private func didTapLogout(){
-        TokenManager.shared.clearTokens()
+        TokenManager.shared.clearTokens()  // 토큰 삭제
+        GroImageCacheManager.shared.clearAll() //  DTO 캐시 삭제
+        // 🧹 이미지 캐시 삭제
+        ImageCache.default.clearMemoryCache()
+        ImageCache.default.clearDiskCache {
+            print("🗑️ Kingfisher 디스크 캐시 초기화 완료")
+        }
+        
+        // 로그인 화면으로 전환
         let nextVC = LoginViewController()
         if let window = UIApplication.shared.windows.first {
             window.rootViewController = nextVC
             window.makeKeyAndVisible()
             
-            // 뷰 컨트롤러 전환 시 애니메이션을 제공합니다.
-            UIView.transition(with: window, duration: 0.1, options: .transitionCrossDissolve, animations: nil, completion: nil)
+            UIView.transition(
+                with: window,
+                duration: 0.1,
+                options: .transitionCrossDissolve,
+                animations: nil,
+                completion: nil
+            )
         }
     }
     
