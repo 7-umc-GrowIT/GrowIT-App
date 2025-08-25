@@ -154,16 +154,25 @@ class EmailVerificationViewController: UIViewController {
     }
     
     @objc private func sendCodeButtonTapped() {
-        guard let emailText = emailVerificationView.emailTextField.textField.text, !emailText.isEmpty else {
+        view.endEditing(true)
+        
+        guard let emailText = emailVerificationView.emailTextField.textField.text,
+              !emailText.isEmpty else {
             print("이메일 입력 필요")
             return
         }
         
-        self.view.endEditing(true)
-        
         email = emailText
-        
         let request = SendEmailVerifyRequest(email: emailText)
+        
+        // 👉 버튼 누르자마자 비활성화
+        emailVerificationView.sendCodeButton.setButtonState(
+            isEnabled: false,
+            enabledColor: .black,
+            disabledColor: .gray100,
+            enabledTitleColor: .white,
+            disabledTitleColor: .gray400
+        )
         
         authService.email(type: "SIGNUP", data: request) { result in
             DispatchQueue.main.async {
@@ -171,27 +180,28 @@ class EmailVerificationViewController: UIViewController {
                 case .success(let response):
                     print("인증 메일 전송 성공 이메일: \(response.email)")
                     print("응답 메시지: \(response.message)")
-
+                    
                     self.isEmailFieldDisabled = true
                     self.emailVerificationView.emailTextField.setTextFieldInteraction(enabled: false)
                     
-                    // 인증번호 보내기 버튼 비활성화
-                    self.emailVerificationView.sendCodeButton.setButtonState(
-                        isEnabled: false,
-                        enabledColor: .black,
-                        disabledColor: .gray100,
-                        enabledTitleColor: .white,
-                        disabledTitleColor: .gray400
+                    ToastSecond.show(
+                        image: UIImage(named: "Style=Mail") ?? UIImage(),
+                        message: "인증번호를 발송했어요",
+                        font: .heading3SemiBold(),
+                        in: self.view
                     )
-                    
-                    ToastSecond.show(image: UIImage(named: "Style=Mail") ?? UIImage(), message: "인증번호를 발송했어요", font: .heading3SemiBold(), in: self.view)
                     
                 case .failure(let error):
                     print("인증 메일 전송 실패: \(error)")
+                    
+                    if case .serverError(let statusCode, let message) = error,
+                       statusCode == 409 {
+                        // 👉 이미 가입된 이메일일 때 에러 처리
+                        self.emailVerificationView.emailTextField.setError(message: "이미 가입된 이메일입니다.")
+                    }
                 }
             }
         }
-        
     }
     
     @objc private func certificationButtonTapped() {
