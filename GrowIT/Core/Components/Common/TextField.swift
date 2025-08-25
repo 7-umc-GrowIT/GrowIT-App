@@ -83,6 +83,7 @@ class CustomTextField: UIView {
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 12.0, height: 0.0))
         textField.leftViewMode = .always
         textField.autocorrectionType = .no
+        textField.autocapitalizationType = .none
         textField.translatesAutoresizingMaskIntoConstraints = false
         
         // Clear Button 설정
