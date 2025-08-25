@@ -37,18 +37,17 @@ class LogoutModalViewController: UIViewController {
         }
         
         // 로그인 화면으로 전환
-        let nextVC = LoginViewController()
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = nextVC
+        let loginVC = LoginViewController()
+        let nav = UINavigationController(rootViewController: loginVC)
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
+            window.rootViewController = nav
             window.makeKeyAndVisible()
-            
-            UIView.transition(
-                with: window,
-                duration: 0.1,
-                options: .transitionCrossDissolve,
-                animations: nil,
-                completion: nil
-            )
+            UIView.transition(with: window,
+                              duration: 0.1,
+                              options: .transitionCrossDissolve,
+                              animations: nil,
+                              completion: nil)
         }
     }
     
