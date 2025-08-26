@@ -76,14 +76,6 @@ class HomeViewController: UIViewController {
 
     
     private func updateCharacterViewImage(with data: GroGetResponseDTO) {
-        // 얼굴 이미지 업데이트
-        if let groImageUrl = URL(string: data.gro.groImageUrl) {
-            homeview.characterArea.groFaceImageView.kf.setImage(with: groImageUrl, options: [.transition(.fade(0.3)), .cacheOriginalImage])
-        } else {
-            print("얼굴 이미지 URL이 유효하지 않음")
-        }
-
-        // 카테고리별 이미지 뷰 매핑
         let categoryImageViews: [String: UIImageView] = [
             "BACKGROUND": homeview.characterArea.backgroundImageView,
             "OBJECT": homeview.characterArea.groObjectImageView,
@@ -91,16 +83,55 @@ class HomeViewController: UIViewController {
             "HEAD_ACCESSORY": homeview.characterArea.groAccImageView
         ]
         
-        // 기존 이미지 초기화 (이미 착용한 아이템 제거)
-        for (_, imageView) in categoryImageViews {
-            imageView.image = nil
+        let shouldAnimate = isFirstAppear   // 처음 진입일 때만 true
+
+        let group = DispatchGroup()
+        var loadedImages: [String: (UIImageView, UIImage)] = [:]
+
+        // 얼굴
+        if let faceUrl = URL(string: data.gro.groImageUrl) {
+            group.enter()
+            KingfisherManager.shared.retrieveImage(with: faceUrl) { result in
+                if case .success(let value) = result {
+                    loadedImages["FACE"] = (self.homeview.characterArea.groFaceImageView, value.image)
+                }
+                group.leave()
+            }
         }
 
+        // 아이템들
         for item in data.equippedItems {
-            if let imageView = categoryImageViews[item.category], let imageUrl = URL(string: item.itemImageUrl) {
-                imageView.kf.setImage(with: imageUrl, options: [.transition(.fade(0.3)), .cacheOriginalImage])
+            if let imageView = categoryImageViews[item.category],
+               let url = URL(string: item.itemImageUrl) {
+                group.enter()
+                KingfisherManager.shared.retrieveImage(with: url) { result in
+                    if case .success(let value) = result {
+                        loadedImages[item.category] = (imageView, value.image)
+                    }
+                    group.leave()
+                }
+            }
+        }
+
+        group.notify(queue: .main) {
+            if shouldAnimate {
+                // 최초 로딩일 때만 페이드인
+                for (_, pair) in loadedImages {
+                    let (imageView, image) = pair
+                    imageView.alpha = 0.0
+                    imageView.image = image
+                }
+                UIView.animate(withDuration: 0.8) {
+                    for (_, pair) in loadedImages {
+                        pair.0.alpha = 1.0
+                    }
+                }
+                self.isFirstAppear = false   // 이후부턴 애니메이션 X
             } else {
-                print("잘못된 카테고리: \(item.category) 또는 유효하지 않은 URL")
+                // 그냥 즉시 반영
+                for (_, pair) in loadedImages {
+                    pair.0.image = pair.1
+                }
             }
         }
     }
