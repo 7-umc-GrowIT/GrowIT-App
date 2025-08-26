@@ -265,13 +265,7 @@ class EmailVerificationViewController: UIViewController {
             disabledTitleColor: .gray400
         )
         
-        // 토스트 메시지 표시
-        let toastImage = UIImage(named: "Style=check") ?? UIImage()
-        CustomToast(containerWidth: 258).show(
-            image: toastImage,
-            message: "인증번호 인증을 완료했어요",
-            font: UIFont.heading3SemiBold()
-        )
+        ToastSecond.show(image: UIImage(named: "Style=check") ?? UIImage(), message: "인증번호 인증을 완료했어요", font: .heading3SemiBold(), in: self.view)
         
         // 버튼 상태 업데이트
         self.emailVerificationView.nextButton.setButtonState(

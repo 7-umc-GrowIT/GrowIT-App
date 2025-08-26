@@ -9,7 +9,7 @@ import UIKit
 
 class GradientButton: UIButton {
     private lazy var treeIcon = UIImageView().then {
-        $0.image = UIImage(named: "GrowIT_Tree")?.withRenderingMode(.alwaysTemplate)
+        $0.image = UIImage(named: "GrowIt_Tree")?.withRenderingMode(.alwaysTemplate)
         $0.tintColor = .grayColor400
         $0.contentMode = .scaleAspectFill
         $0.snp.makeConstraints {
