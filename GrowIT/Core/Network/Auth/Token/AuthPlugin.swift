@@ -7,6 +7,8 @@
 
 import Foundation
 import Moya
+import Kingfisher
+import UIKit
 
 /// 모든 API 요청에 자동으로 Authorization 헤더를 추가하는 Moya 플러그인
 final class AuthPlugin: PluginType {
@@ -44,8 +46,44 @@ final class AuthPlugin: PluginType {
         switch result {
         case .success(let response) where response.statusCode == 401:
             guard let endpoint = target as? AuthorizationEndpoints else { return result }
+            
+            // ✅ 로그인/회원가입 관련 API는 토큰 처리 X
+            switch endpoint {
+            case .postEmailLogin, .postEmailSignUp, .postKakaoLogin, .postSendEmailVerification:
+                return result
+            default:
+                break
+            }
+
+            // ✅ 이미 로그아웃된 상태면 그냥 무시
+            if TokenManager.shared.getAccessToken() == nil && TokenManager.shared.getRefreshToken() == nil {
+                print("이미 로그아웃 상태 → 추가 처리 안 함")
+                return result
+            }
+
             guard let refreshToken = TokenManager.shared.getRefreshToken() else {
-                print("⚠️ RefreshToken 없음 → 자동 재발급 불가")
+                print("⚠️ RefreshToken 없음 → 자동 로그아웃 처리")
+                TokenManager.shared.clearTokens()
+                GroImageCacheManager.shared.clearAll()
+                ImageCache.default.clearMemoryCache()
+                ImageCache.default.clearDiskCache {
+                    print("🗑️ Kingfisher 디스크 캐시 초기화 완료")
+                }
+
+                DispatchQueue.main.async {
+                    let loginVC = LoginViewController()
+                    let nav = UINavigationController(rootViewController: loginVC)
+                    if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = scene.windows.first {
+                        window.rootViewController = nav
+                        window.makeKeyAndVisible()
+                        UIView.transition(with: window,
+                                          duration: 0.1,
+                                          options: .transitionCrossDissolve,
+                                          animations: nil,
+                                          completion: nil)
+                    }
+                }
                 return result
             }
             
