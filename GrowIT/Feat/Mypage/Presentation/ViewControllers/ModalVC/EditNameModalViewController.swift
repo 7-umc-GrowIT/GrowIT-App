@@ -38,6 +38,7 @@ class EditNameModalViewController: UIViewController {
             case.success(let data):
                 print("Success: \(data)")
                 self.onNicknameChanged?(self.groName)
+                NotificationCenter.default.post(name: .nicknameChanged, object: nil)
                 //중복, 이전과동일닉네임
             case.failure(let error):
                 print("Error: \(error)")
