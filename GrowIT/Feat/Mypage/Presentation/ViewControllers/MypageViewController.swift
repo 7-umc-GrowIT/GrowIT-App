@@ -8,7 +8,8 @@
 import UIKit
 
 class MypageViewController: UIViewController {
-    
+    // MARK: - Properties
+    let userService = UserService()
     var categoryToEquippedId: [String: Int] = [:]
 
     //MARK: - Data
@@ -41,9 +42,55 @@ class MypageViewController: UIViewController {
         setupNavigationBar()
         setupTableView()
         loadGroImage()
+        callGetMypage()
         
         // 개발 중: 프로필 영역만 노출
         mypageView.hideForDevelopment()
+    }
+    
+    // MARK: - NetWork
+    func callGetMypage() {
+        userService.getMypage(completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                mypageView.nicknameLabel.text = data.name
+                print(data.name)
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
+    }
+   
+    //MARK: - Functional
+    //MARK: Event
+    @objc
+    private func prevVC() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    @objc
+    private func goToEditProfile() {
+        let myAccountVC = MyAccountViewController()
+        navigationController?.pushViewController(myAccountVC, animated: true)
+    }
+    
+    @objc
+    func didTapResetData() {
+        let resetDataVC = ResetDataModalViewController()
+        resetDataVC.modalPresentationStyle = .pageSheet
+        if let sheet = resetDataVC.sheetPresentationController {
+            //지원할 크기 지정
+            if #available(iOS 16.0, *) {
+                sheet.detents = [
+                    .custom{ context in
+                        0.28 * context.maximumDetentValue
+                    }
+                ]
+            } else { sheet.detents = [.medium()] }
+            sheet.prefersGrabberVisible = true
+        }
+        present(resetDataVC, animated: true, completion: nil)
     }
     
     //MARK: - Setup UI
@@ -99,37 +146,6 @@ class MypageViewController: UIViewController {
                 imageView.kf.setImage(with: URL(string: item.itemImageUrl), options: [.transition(.fade(0.3)), .cacheOriginalImage])
             }
         }
-    }
-    
-    //MARK: - Functional
-    //MARK: Event
-    @objc
-    private func prevVC() {
-        navigationController?.popViewController(animated: true)
-    }
-    
-    @objc
-    private func goToEditProfile() {
-        let myAccountVC = MyAccountViewController()
-        navigationController?.pushViewController(myAccountVC, animated: true)
-    }
-    
-    @objc
-    func didTapResetData() {
-        let resetDataVC = ResetDataModalViewController()
-        resetDataVC.modalPresentationStyle = .pageSheet
-        if let sheet = resetDataVC.sheetPresentationController {
-            //지원할 크기 지정
-            if #available(iOS 16.0, *) {
-                sheet.detents = [
-                    .custom{ context in
-                        0.28 * context.maximumDetentValue
-                    }
-                ]
-            } else { sheet.detents = [.medium()] }
-            sheet.prefersGrabberVisible = true
-        }
-        present(resetDataVC, animated: true, completion: nil)
     }
 }
 

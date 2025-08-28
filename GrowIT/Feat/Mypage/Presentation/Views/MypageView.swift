@@ -44,7 +44,7 @@ class MypageView: UIView {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    private lazy var nicknameLabel = AppLabel(text: "샤샤",
+    public lazy var nicknameLabel = AppLabel(text: "",
                                          font: .subHeading2(),
                                          textColor: .gray900)
     
