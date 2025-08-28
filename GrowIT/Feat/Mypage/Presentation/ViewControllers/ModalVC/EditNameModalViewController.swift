@@ -11,7 +11,8 @@ class EditNameModalViewController: UIViewController {
     // MARK: - Properties
     let groService = GroService()
     var isValidName: Bool = false
-    var groName: String?
+    var groName: String = ""
+    var onNicknameChanged: ((String) -> Void)?
     
     //MARK: -Views
     private lazy var editnameModalView = EditNameModalView().then {
@@ -31,11 +32,12 @@ class EditNameModalViewController: UIViewController {
     
     // MARK: - NetWork
     func callPatchGroChangeNickname() {
-        groService.patchGroChangeNickname(data: GroChangeNicknameRequestDTO(name: groName ?? ""), completion: { [weak self] result in
+        groService.patchGroChangeNickname(data: GroChangeNicknameRequestDTO(name: groName), completion: { [weak self] result in
             guard let self = self else { return }
             switch result {
             case.success(let data):
                 print("Success: \(data)")
+                self.onNicknameChanged?(self.groName)
                 //중복, 이전과동일닉네임
             case.failure(let error):
                 print("Error: \(error)")
@@ -54,7 +56,7 @@ class EditNameModalViewController: UIViewController {
     @objc
     private func textFieldsDidChange() {
         groName = editnameModalView.nickNameTextField.textField.text ?? ""
-        isValidName = groName!.count >= 2 && groName!.count <= 8
+        isValidName = groName.count >= 2 && groName.count <= 8
         
         if !isValidName {
             editnameModalView.nickNameTextField.setError(message: "닉네임은 2~8자 이내로 작성해야 합니다")

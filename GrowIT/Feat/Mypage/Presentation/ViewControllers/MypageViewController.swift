@@ -30,6 +30,7 @@ class MypageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        callGetMypage()
     }
     
     override func viewDidLoad() {
@@ -42,7 +43,6 @@ class MypageViewController: UIViewController {
         setupNavigationBar()
         setupTableView()
         loadGroImage()
-        callGetMypage()
         
         // 개발 중: 프로필 영역만 노출
         mypageView.hideForDevelopment()
