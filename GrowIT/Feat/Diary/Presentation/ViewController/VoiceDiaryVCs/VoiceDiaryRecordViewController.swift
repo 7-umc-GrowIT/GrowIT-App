@@ -39,7 +39,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     private var audioLevelTimer: Timer?
     private var speechDetected = false
     private var silenceThreshold: Float = -40.0  // dB 임계값
-    private var silenceDuration: TimeInterval = 2.0  // 침묵 지속 시간 (초)
+    private var silenceDuration: TimeInterval = 1.0  // 침묵 지속 시간 (초)
     private var currentSilenceDuration: TimeInterval = 0.0
     
     private let diaryService = DiaryService()
@@ -172,7 +172,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         updateConversationUI(state: .listening)
         
         // 잠시 후 자동으로 첫 번째 녹음 시작
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
             self.startAutoRecording()
         }
     }
@@ -201,7 +201,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
                 font: .heading3SemiBold()
             )
             // 대화 재시작
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
                 self.startConversation()
             }
         } else {
@@ -333,7 +333,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         } else {
             print("자동 녹음 실패")
             // 대화 계속 진행
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
                 self.startAutoRecording()
             }
         }
@@ -481,7 +481,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     // MARK: - Welcome Message
     
     private func playWelcomeMessage() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() ) {
             self.playRandomWelcomeMessage()
         }
     }

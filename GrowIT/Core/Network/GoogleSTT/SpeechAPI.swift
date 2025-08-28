@@ -49,12 +49,12 @@ extension SpeechAPI: TargetType {
                 "input": ["text": text],
                 "voice": [
                     "languageCode": "ko-KR",
-                    "name": "ko-KR-Wavenet-B",  // Despina 음성
+                    "name": "ko-KR-Chirp3-HD-Despina",  // Despina 음성
                     "ssmlGender": "FEMALE"       // Despina는 여성 음성
                 ],
                 "audioConfig": [
                     "audioEncoding": "MP3",
-                    "speakingRate": 1.0,        // 속도 (0.25~4.0)
+                    "speakingRate": 1.1,        // 속도 (0.25~4.0)
                     "volumeGainDb": 0.0          // 볼륨 (-96.0~16.0)
                 ]
             ]
