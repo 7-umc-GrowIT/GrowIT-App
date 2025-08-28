@@ -142,42 +142,33 @@ final class AuthService: NetworkManager {
             case .success(let response):
                 do {
                     let decodedResponse = try JSONDecoder().decode(LoginResponse.self, from: response.data)
-                    print("로그인 성공")
-
-                    // ✅ Keychain에 토큰 저장
-                    TokenManager.shared.saveTokens(
-                        accessToken: decodedResponse.result.accessToken,
-                        refreshToken: decodedResponse.result.refreshToken
-                    )
-
-                    completion(.success(decodedResponse))
-
+                    print("로그인 응답: \(decodedResponse)")
+                    
+                    if decodedResponse.isSuccess, let tokenData = decodedResponse.result {
+                        // ✅ 성공 시에만 토큰 저장
+                        TokenManager.shared.saveTokens(
+                            accessToken: tokenData.accessToken,
+                            refreshToken: tokenData.refreshToken
+                        )
+                        print("로그인 성공 & 토큰 저장 완료")
+                        completion(.success(decodedResponse))
+                    } else {
+                        print("로그인 실패: \(decodedResponse.message)")
+                        completion(.failure(.serverError(statusCode: 400, message: decodedResponse.message)))
+                    }
                     
                 } catch {
                     print("로그인 응답 디코딩 실패: \(error)")
-                    
-                    if let decodingError = error as? DecodingError {
-                        switch decodingError {
-                        case .keyNotFound(let key, _):
-                            print("키 없음: \(key.stringValue)")
-                        case .typeMismatch(let type, let context):
-                            print("타입 불일치: \(type), \(context.debugDescription)")
-                        case .valueNotFound(let type, let context):
-                            print("값 없음: \(type), \(context.debugDescription)")
-                        default:
-                            print("기타 디코딩 오류: \(error.localizedDescription)")
-                        }
-                    }
-                    
                     completion(.failure(.decodingError))
                 }
                 
             case .failure(let error):
                 print("네트워크 요청 실패: \(error.localizedDescription)")
+                completion(.failure(.networkError(message: error.localizedDescription)))
             }
         }
     }
-    
+
     
     /// 이메일 인증 요청
     func email(type: String, data: SendEmailVerifyRequest, completion: @escaping (Result<EmailVerifyResponse, NetworkError>) -> Void) {

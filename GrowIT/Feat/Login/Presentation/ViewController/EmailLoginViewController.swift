@@ -132,21 +132,27 @@ class EmailLoginViewController: UIViewController {
                 switch result {
                 case .success(let response):
                     if response.isSuccess {
-                        let tokenData = response.result
-                        print("로그인 성공")
+                        if let tokenData = response.result {
+                            print("로그인 성공")
 
-                        // ✅ Keychain에 토큰 저장
-                        TokenManager.shared.saveTokens(
-                            accessToken: tokenData.accessToken,
-                            refreshToken: tokenData.refreshToken
-                        )
+                            // ✅ Keychain에 토큰 저장
+                            TokenManager.shared.saveTokens(
+                                accessToken: tokenData.accessToken,
+                                refreshToken: tokenData.refreshToken
+                            )
 
-                        print("AccessToken 저장됨")
-                        print("RefreshToken 저장됨")
+                            print("AccessToken 저장됨")
+                            print("RefreshToken 저장됨")
 
-                        self.moveToNextScreen()
+                            self.moveToNextScreen()
+                        } else {
+                            print("로그인 실패: 서버 응답에 result 없음")
+                            self.emailLoginView.pwdTextField.setError(message: response.message)
+                        }
+                    } else {
+                        print("로그인 실패: \(response.message)")
+                        self.emailLoginView.pwdTextField.setError(message: response.message)
                     }
-
 
                 case .failure(let error):
                     print("로그인 요청 실패: \(error.localizedDescription)")
@@ -154,7 +160,6 @@ class EmailLoginViewController: UIViewController {
                 }
             }
         }
-
     }
     
     @objc private func dismissKeyboard() {
