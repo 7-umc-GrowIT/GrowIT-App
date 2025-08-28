@@ -76,7 +76,7 @@ class VoiceDiaryDateSelectViewController: UIViewController, JDiaryCalendarContro
             v.warningLabel.isHidden = false
         }
         
-       
+        
     }
     
     // MARK: Setup Delegate
@@ -103,7 +103,25 @@ class VoiceDiaryDateSelectViewController: UIViewController, JDiaryCalendarContro
         if voiceDiaryDateSelectView.dateSelectLabel.text == "일기 날짜를 선택해 주세요" {
             updateDateSelectionUI(isValid: false)
         } else {
-            let nextVC = VoiceDiaryRecordViewController()
+            let nextVC = VoiceDiaryRecordViewController(
+                speechToTextUseCase: SpeechToTextUseCase(
+                    googleSpeechRepository: GoogleSpeechRepositoryImpl(
+                        dataSource: GoogleSpeechDataSourceImpl()
+                    )
+                ),
+                getSTTResponseUseCase: GetSTTResponseUseCase(
+                    diaryVoiceRepository: DiaryVoiceRepositoryImpl(
+                        dataSource: DiaryVoiceDataSourceImpl(
+                            diaryService: DiaryService()
+                        )
+                    )
+                ),
+                textToSpeechUseCase: TextToSpeechUseCase(
+                    googleSpeechRepository: GoogleSpeechRepositoryImpl(
+                        dataSource: GoogleSpeechDataSourceImpl()
+                    )
+                )
+            )
             nextVC.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(nextVC, animated: true)
         }
