@@ -20,7 +20,7 @@ class EditNameModalView: UIView {
     
     public lazy var changeButton = AppButton(title: "닉네임 변경하기").then {
         $0.setButtonState(
-            isEnabled: true,
+            isEnabled: false,
             enabledColor: .black,
             disabledColor: .gray100,
             enabledTitleColor: .white,

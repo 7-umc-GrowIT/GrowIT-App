@@ -38,9 +38,9 @@ extension UserEndpoint: TargetType {
             return "/credits/total"
         case .getMypage:
             return "/mypage"
-        case .postPaymentCredits(let data):
+        case .postPaymentCredits:
             return "/credits/payment"
-        case .patchPassword(let data):
+        case .patchPassword:
             return "/password"
         case .patchUserWithdraw:
             return ""
