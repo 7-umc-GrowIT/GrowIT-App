@@ -63,6 +63,7 @@ struct RecommendedChallenge: Decodable {
     let content: String
     let time: Int
     let type: String
+    let completed: Bool
 }
 
 extension RecommendedChallenge {
@@ -72,5 +73,6 @@ extension RecommendedChallenge {
         self.content = dto.content
         self.time = dto.time
         self.type = dto.dtype
+        self.completed = dto.completed
     }
 }
