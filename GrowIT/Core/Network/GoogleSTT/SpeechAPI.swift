@@ -47,8 +47,16 @@ extension SpeechAPI: TargetType {
         case .synthesizeSpeech(let text, let apiKey):
             let parameters: [String: Any] = [
                 "input": ["text": text],
-                "voice": ["languageCode": "ko-KR", "ssmlGender": "NEUTRAL"],
-                "audioConfig": ["audioEncoding": "MP3"]
+                "voice": [
+                    "languageCode": "ko-KR",
+                    "name": "ko-KR-Wavenet-B",  // Despina 음성
+                    "ssmlGender": "FEMALE"       // Despina는 여성 음성
+                ],
+                "audioConfig": [
+                    "audioEncoding": "MP3",
+                    "speakingRate": 1.0,        // 속도 (0.25~4.0)
+                    "volumeGainDb": 0.0          // 볼륨 (-96.0~16.0)
+                ]
             ]
             return .requestCompositeParameters(bodyParameters: parameters, bodyEncoding: JSONEncoding.default, urlParameters: ["key": apiKey])
         }

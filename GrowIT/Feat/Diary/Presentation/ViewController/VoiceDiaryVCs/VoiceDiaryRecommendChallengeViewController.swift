@@ -135,7 +135,7 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     
     // MARK: Setup APIs
     private func callPostVoiceDiary() {
-        diaryService.postVoiceDiary(data: DiaryVoiceRequestDTO(
+        diaryService.postVoiceDiary(data: DiaryVoiceDTO(
             chat: ""),
                                     completion: { [weak self] result in
             guard let self = self else { return }
