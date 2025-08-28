@@ -8,16 +8,20 @@
 import UIKit
 
 class MyAccountViewController: UIViewController {
+    // MARK: Properties
+    let navigationBarManager = NavigationManager()
+    let userService = UserService()
+    let groName: String = ""
+    
     //MARK: - Data
-    private let tableviewData: [[(main: String, sub: String)]] = [
+    private var tableviewData: [[(main: String, sub: String)]] = [
         // 섹션 1 : 회원정보 변경
         [("닉네임", "샤샤"), ("비밀번호 변경", "변경하기")],
         // 섹션 2 : 이용약관
         [("개인정보 처리방침", ""),("서비스 이용약관", "")]
     ]
     
-    // MARK: Properties
-    let navigationBarManager = NavigationManager()
+    // MARK: - Views
     private lazy var myAccountView = MyAccountView().then {
         $0.logoutButton.addTarget(self, action: #selector(didTapLogout), for: .touchUpInside)
         $0.withdrawButton.addTarget(self, action: #selector(didTapWithdraw), for: .touchUpInside)
@@ -27,6 +31,7 @@ class MyAccountViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        callGetMypage()
     }
     
     override func viewDidLoad() {
@@ -40,12 +45,43 @@ class MyAccountViewController: UIViewController {
         setupTableView()
     }
     
+    // MARK: - NetWork
+    func callGetMypage() {
+        userService.getMypage(completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                print(data.name)
+                self.tableviewData[0][0].1 = data.name
+                DispatchQueue.main.async {
+                    self.myAccountView.myAccounttableView.reloadRows(
+                        at: [IndexPath(row: 0, section: 0)],
+                        with: .automatic
+                    )
+                }
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
+    }
+    
     //MARK: - Functional
     //MARK: Event
     @objc
     func didTapChangeNickname() {
         let editNameVC = EditNameModalViewController()
         editNameVC.modalPresentationStyle = .pageSheet
+        
+        // 닉네임 변경 시 테이블 즉시 반영
+        editNameVC.onNicknameChanged = { [weak self] newName in
+            guard let self = self else { return }
+            self.tableviewData[0][0].1 = newName
+            self.myAccountView.myAccounttableView.reloadRows(
+                at: [IndexPath(row: 0, section: 0)],
+                with: .automatic
+            )
+        }
+        
         if let sheet = editNameVC.sheetPresentationController {
             //지원할 크기 지정
             if #available(iOS 16.0, *) {
