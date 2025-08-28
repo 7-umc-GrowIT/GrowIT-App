@@ -17,6 +17,7 @@ enum AuthorizationEndpoints {
     case postKakaoLogin(code: String)
     case postEmailLogin(data: EmailLoginRequest)
     case postSendEmailVerification(type: String, data: SendEmailVerifyRequest) // 인증 메일 전송 api
+    case postLogout
    
     // Patch
     case patchSignOut
@@ -47,6 +48,8 @@ extension AuthorizationEndpoints: TargetType {
             return "/login"
         case .postSendEmailVerification:
             return "/email"
+        case .postLogout:
+            return "/logout"
         case .patchSignOut:
             return "/signout"
         case .fetchSignUpTerms:
@@ -89,6 +92,8 @@ extension AuthorizationEndpoints: TargetType {
             return .requestPlain
         case .postSocialSignUp(data: let data):
             return .requestJSONEncodable(data)
+        case .postLogout:
+            return .requestPlain
         }
     }
     

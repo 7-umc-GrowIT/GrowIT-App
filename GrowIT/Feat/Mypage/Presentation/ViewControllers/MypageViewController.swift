@@ -11,6 +11,7 @@ class MypageViewController: UIViewController {
     // MARK: - Properties
     let userService = UserService()
     var categoryToEquippedId: [String: Int] = [:]
+    let navigationBarManager = NavigationManager()
 
     //MARK: - Data
     private let tableviewData: [[(main: String, sub: String)]] = [
@@ -20,8 +21,7 @@ class MypageViewController: UIViewController {
         [("푸시 알림 활성화/비활성화", ""),("고객센터", ""),("데이터 초기화", "")]
     ]
     
-    // MARK: Properties
-    let navigationBarManager = NavigationManager()
+    // MARK: - View
     private lazy var mypageView = MypageView().then {
         $0.editProfileButton.addTarget(self, action: #selector(goToEditProfile), for: .touchUpInside)
     }
@@ -43,6 +43,7 @@ class MypageViewController: UIViewController {
         setupNavigationBar()
         setupTableView()
         loadGroImage()
+        setNotification()
         
         // 개발 중: 프로필 영역만 노출
         mypageView.hideForDevelopment()

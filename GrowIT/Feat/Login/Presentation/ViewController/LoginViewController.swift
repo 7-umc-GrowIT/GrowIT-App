@@ -10,12 +10,15 @@ import Foundation
 import SnapKit
 
 class LoginViewController: UIViewController {
-    
+    // MARK: - Properties
     let authService = AuthService()
     private lazy var kakaoLoginHelper = KakaoLoginHelper()
+    private var shouldShowLogoutToast = false
     
+    // MARK: - View
     private lazy var loginView = LoginView()
     
+    //MARK: - init
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.isNavigationBarHidden = true
     }
@@ -29,29 +32,41 @@ class LoginViewController: UIViewController {
         self.view = loginView
         self.navigationController?.isNavigationBarHidden = true
         setupActions()
-        //checkUserLoginStatus()
     }
     
-    private func setupActions() {
-        loginView.emailLoginButton.addTarget(self, action: #selector(emailLoginBtnTap), for: .touchUpInside)
-        loginView.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if UserDefaults.standard.bool(forKey: "shouldShowLogoutToast") {
+               ToastSecond.show(
+                   image: UIImage(named: "toast_Icon") ?? UIImage(),
+                   message: "로그아웃을 완료했어요",
+                   font: .heading3SemiBold(),
+                   in: self.view
+               )
+               UserDefaults.standard.set(false, forKey: "shouldShowLogoutToast")
+           }
     }
-    
-    
-    //MARK: - Action
-    
-    // 뒤로 가기 버튼 함수
-    @objc func emailLoginBtnTap() {
-        let emailLoginVC = EmailLoginViewController()
-        navigationController?.pushViewController(emailLoginVC, animated: true)
-    }
-    
+
+    //MARK: - Functional
     func navigateToEmailLogin() {
         let emailLoginVC = EmailLoginViewController()
         // EmailLoginViewController를 네비게이션 컨트롤러에서 푸시
         self.navigationController?.pushViewController(emailLoginVC, animated: true)
     }
     
+    //MARK: Action
+    private func setupActions() {
+        loginView.emailLoginButton.addTarget(self, action: #selector(emailLoginBtnTap), for: .touchUpInside)
+        loginView.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
+    }
+    
+    // 뒤로 가기 버튼 함수
+    @objc
+    func emailLoginBtnTap() {
+        let emailLoginVC = EmailLoginViewController()
+        navigationController?.pushViewController(emailLoginVC, animated: true)
+    }
     
     // 카카오 로그인 버튼
     @objc func kakaoLoginTapped() {
