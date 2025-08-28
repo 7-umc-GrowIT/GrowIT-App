@@ -44,7 +44,10 @@ class LogoutModalViewController: UIViewController {
                 ImageCache.default.clearDiskCache {
                     print("🗑️ Kingfisher 디스크 캐시 초기화 완료")
                 }
-
+                
+                // 네트워크 요청 취소
+                self.authService.provider.session.cancelAllRequests()
+                
                 // 로그인 화면으로 전환
                 let loginVC = LoginViewController()
                 let nav = UINavigationController(rootViewController: loginVC)

@@ -15,7 +15,7 @@ struct LoginResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: TokenData
+    let result: TokenData?
 }
 
 struct SignUpResponse: Decodable {
