@@ -138,6 +138,13 @@ class MyAccountViewController: UIViewController {
         navigationController?.pushViewController(nextVC, animated: true)
     }
     
+    @objc
+    func changePwdBtnTap() {
+        let changePwdVC = ChangePasswordViewController()
+        changePwdVC.shouldShowExitModal = false
+        navigationController?.pushViewController(changePwdVC, animated: true)
+    }
+    
     //MARK: - Setup UI
     private func setupNavigationBar() {
         navigationBarManager.addBackButton(
@@ -197,9 +204,9 @@ extension MyAccountViewController: UITableViewDataSource, UITableViewDelegate {
         case (0, 0):
             didTapChangeNickname()
         case (0, 1):
-            
+            changePwdBtnTap()
         case (1, 0):
-            
+            print("멀랑ㅋ")
         case (1, 1):
             didTapTermsOfService()
         default:

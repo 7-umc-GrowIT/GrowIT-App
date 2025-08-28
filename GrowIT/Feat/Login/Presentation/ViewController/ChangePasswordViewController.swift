@@ -16,6 +16,7 @@ class ChangePasswordViewController: UIViewController {
     private let navigationBarManager = NavigationManager()
     private var isEmailFieldDisabled = false
     private var isCodeFieldDisabled = false
+    var shouldShowExitModal: Bool = true /// 뒤로가기 시 에러 모달을 띄울지 여부
     
     private var userService: UserService {
         return UserService()
@@ -242,10 +243,20 @@ class ChangePasswordViewController: UIViewController {
     
     // MARK: - Actions
     @objc private func prevVC() {
-        let changePwdErrorVC = ChangePasswordErrorViewController()
-        let navController = UINavigationController(rootViewController: changePwdErrorVC)
-        navController.modalPresentationStyle = .pageSheet
-        presentPageSheet(viewController: navController, detentFraction: 0.37)
+        if shouldShowExitModal {
+            let changePwdErrorVC = ChangePasswordErrorViewController()
+            let navController = UINavigationController(rootViewController: changePwdErrorVC)
+            navController.modalPresentationStyle = .pageSheet
+            presentPageSheet(viewController: navController, detentFraction: 0.37)
+        }
+        else {
+            // 그냥 pop 또는 dismiss
+            if let nav = navigationController {
+                nav.popViewController(animated: true)
+            } else {
+                dismiss(animated: true, completion: nil)
+            }
+        }
     }
     
     private func updatePasswordMatchState() {
