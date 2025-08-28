@@ -65,15 +65,14 @@ class MypageTableViewCell: UITableViewCell {
     }
     
     //MARK: - Configure
-    func configure(mainText: String, subText: String) {
+    func configure(mainText: String, subText: String, hasArrow: Bool = true) {
         mainLabel.text = mainText
         subLabel.text = subText
         
-        // subText가 비어있으면 스택뷰를 숨김 
-        if subText.isEmpty {
-            subStackView.isHidden = true
-        } else {
-            subStackView.isHidden = false
-        }
+        // subText가 비어있으면 subLabel 숨김
+        subLabel.isHidden = subText.isEmpty
+        
+        // 화살표 표시 여부
+        rightArrow.isHidden = !hasArrow
     }
 }
