@@ -268,7 +268,13 @@ final class AuthService: NetworkManager {
         }
     }
 
-
-
+    /// 로그아웃
+    func postAuthLogout(completion: @escaping (Result<postLogoutResponseDTO, NetworkError>) -> Void) {
+        request(
+            target: .postLogout,
+            decodingType: postLogoutResponseDTO.self,
+            completion: completion
+        )
+    }
 }
 
