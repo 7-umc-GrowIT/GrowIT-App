@@ -9,9 +9,39 @@ import UIKit
 
 class MypageView: UIView {
     //MARK: - Components
-    private lazy var profileImage = UIImageView().then {
-        $0.image = UIImage(named: "GrowIT_Profile")
+    public lazy var profileView = UIView().then {
         $0.contentMode = .scaleAspectFill
+        $0.backgroundColor = .clear
+        $0.frame = CGRect(x: 0, y: 0, width: 108, height: 108)
+        $0.clipsToBounds = true
+        $0.layer.cornerRadius = 54
+    }
+    
+    var backgroundImageView = UIImageView().then {
+        $0.image = UIImage(named: "GrowIT_Background_Star") /// 그로 디폴트 이미지
+        $0.contentMode = .scaleAspectFill
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+
+    var groFaceImageView = UIImageView().then {
+        $0.image = UIImage(named: "GrowIT_Gro") /// 그로 디폴트 이미지
+        $0.contentMode = .scaleAspectFit
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    var groFlowerPotImageView = UIImageView().then {
+        $0.contentMode = .scaleAspectFit
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    var groAccImageView = UIImageView().then {
+        $0.contentMode = .scaleAspectFit
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    var groObjectImageView = UIImageView().then {
+        $0.contentMode = .scaleAspectFit
+        $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
     private lazy var nicknameLabel = AppLabel(text: "샤샤",
@@ -66,7 +96,15 @@ class MypageView: UIView {
     
     //MARK: - SetUI
     private func setView() {
-        addSubviews([profileImage, nicknameLabel, editProfileButton, subscrView, myPagetableView, copyrightLabel])
+        addSubviews([profileView, nicknameLabel, editProfileButton, subscrView, myPagetableView, copyrightLabel])
+        
+        profileView.addSubviews([
+            backgroundImageView,
+            groFlowerPotImageView,
+            groFaceImageView,
+            groAccImageView,
+            groObjectImageView
+        ])
     }
     
     override func layoutSubviews() {
@@ -76,24 +114,33 @@ class MypageView: UIView {
     }
     
     private func setConstraints() {
-        profileImage.snp.makeConstraints {
+        profileView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(32)
             $0.leading.equalToSuperview().inset(24)
             $0.width.height.equalTo(108)
         }
         
+        [backgroundImageView, groFaceImageView, groFlowerPotImageView, groAccImageView, groObjectImageView].forEach {
+            $0.snp.makeConstraints {
+                // 그로 프로필용 확대
+                $0.width.height.equalToSuperview().multipliedBy(1.65)
+                $0.centerX.equalToSuperview()
+                $0.centerY.equalToSuperview().offset(profileView.bounds.height * 0.12)
+            }
+        }
+        
         nicknameLabel.snp.makeConstraints {
-            $0.top.equalTo(profileImage.snp.top).offset(4)
-            $0.leading.equalTo(profileImage.snp.trailing).offset(24)
+            $0.top.equalTo(profileView.snp.top).offset(4)
+            $0.leading.equalTo(profileView.snp.trailing).offset(24)
         }
         
         editProfileButton.snp.makeConstraints {
             $0.top.equalTo(nicknameLabel.snp.bottom).offset(4)
-            $0.leading.equalTo(profileImage.snp.trailing).offset(24)
+            $0.leading.equalTo(profileView.snp.trailing).offset(24)
         }
         
         subscrView.snp.makeConstraints {
-            $0.top.equalTo(profileImage.snp.bottom).offset(24)
+            $0.top.equalTo(profileView.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(24)
             $0.height.equalTo(112)
         }

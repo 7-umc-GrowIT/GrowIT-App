@@ -8,6 +8,9 @@
 import UIKit
 
 class MypageViewController: UIViewController {
+    
+    var categoryToEquippedId: [String: Int] = [:]
+
     //MARK: - Data
     private let tableviewData: [[(main: String, sub: String)]] = [
         // 섹션 1 : 구독 내역
@@ -21,7 +24,7 @@ class MypageViewController: UIViewController {
     private lazy var mypageView = MypageView().then {
         $0.editProfileButton.addTarget(self, action: #selector(goToEditProfile), for: .touchUpInside)
     }
-
+    
     //MARK: - init
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -34,9 +37,10 @@ class MypageViewController: UIViewController {
         mypageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-
+        
         setupNavigationBar()
         setupTableView()
+        loadGroImage()
         
         // 개발 중: 프로필 영역만 노출
         mypageView.hideForDevelopment()
@@ -67,6 +71,34 @@ class MypageViewController: UIViewController {
         mypageView.myPagetableView.dataSource = self
         mypageView.myPagetableView.register(MypageTableViewCell.self, forCellReuseIdentifier: MypageTableViewCell.identifier)
         mypageView.myPagetableView.rowHeight = 66
+    }
+    
+    private func loadGroImage() {
+        GroImageCacheManager.shared.fetchGroImage { [weak self] data in
+            guard let self = self, let data = data else { return }
+            self.setupProfileGroImage(with: data)
+        }
+    }
+    
+    private func setupProfileGroImage(with data: GroGetResponseDTO) {
+        mypageView.groFaceImageView.kf.setImage(with: URL(string: data.gro.groImageUrl), options: [.transition(.fade(0.3)), .cacheOriginalImage])
+        
+        let categoryImageViews: [String: UIImageView] = [
+            "BACKGROUND": mypageView.backgroundImageView,
+            "OBJECT": mypageView.groObjectImageView,
+            "PLANT": mypageView.groFlowerPotImageView,
+            "HEAD_ACCESSORY": mypageView.groAccImageView
+        ]
+        
+        categoryToEquippedId = data.equippedItems.reduce(into: [String: Int]()) { dict, item in
+            dict[item.category] = item.id
+        }
+        
+        for item in data.equippedItems {
+            if let imageView = categoryImageViews[item.category] {
+                imageView.kf.setImage(with: URL(string: item.itemImageUrl), options: [.transition(.fade(0.3)), .cacheOriginalImage])
+            }
+        }
     }
     
     //MARK: - Functional
