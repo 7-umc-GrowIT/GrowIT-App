@@ -12,12 +12,14 @@ enum UserEndpoint {
     // Get
     case getCredits
     case getTotalCredits
+    case getMypage
     
     // Post
     case postPaymentCredits(data: UserPostRequestDTO)
     
     // Patch
     case patchPassword(data: UserPatchRequestDTO)
+    case patchUserWithdraw
 }
 
 extension UserEndpoint: TargetType {
@@ -34,10 +36,14 @@ extension UserEndpoint: TargetType {
             return "/credits"
         case .getTotalCredits:
             return "/credits/total"
+        case .getMypage:
+            return "/mypage"
         case .postPaymentCredits(let data):
             return "/credits/payment"
         case .patchPassword(let data):
             return "/password"
+        case .patchUserWithdraw:
+            return ""
         }
     }
     
@@ -45,7 +51,7 @@ extension UserEndpoint: TargetType {
         switch self {
         case .postPaymentCredits:
             return .post
-        case .patchPassword:
+        case .patchPassword, .patchUserWithdraw:
             return .patch
         default:
             return .get
@@ -54,12 +60,15 @@ extension UserEndpoint: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .getCredits, .getTotalCredits:
+        case .getCredits, .getTotalCredits, .getMypage:
             return .requestPlain
         case .postPaymentCredits(let data):
             return .requestJSONEncodable(data)
         case .patchPassword(let data):
             return .requestJSONEncodable(data)
+            // BE API 개발 진행중 (임시로 적어둔 상태)
+        case .patchUserWithdraw:
+            return .requestPlain
         }
     }
     
