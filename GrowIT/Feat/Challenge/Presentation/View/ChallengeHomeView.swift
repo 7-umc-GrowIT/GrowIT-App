@@ -8,192 +8,7 @@
 import UIKit
 import Then
 import SnapKit
-import SwiftUI
-import Combine
 
-struct ChallengeHomeScreen: View {
-    @State private var selectedTapIndex: Int = 0
-    
-    var body: some View {
-        VStack(spacing: 0){
-            VStack{
-                ChallengeNavBar()
-                ChallengeTabBar(
-                    selectedIndex: $selectedTapIndex,
-                    onTap: { index in
-                        selectedTapIndex = index
-                    }
-                )
-            }
-            Rectangle()
-                .fill(.black.opacity(0.1))
-                .frame(height: 1)
-            
-            // 선택된 탭에 따라 다른 뷰 표시
-            TabContentView(selectedIndex: selectedTapIndex)
-        }
-        
-        .frame(maxWidth: .infinity, alignment: .top)
-        
-    }
-}
-
-// MARK: - 상단 네비게이션 바
-struct ChallengeNavBar: View {
-    var body: some View {
-        HStack{
-            DefaultLabel(title: "챌린지", color: .gray900, font: .title1Bold)
-            Spacer()
-            Button(action:{
-                
-            }){
-                Image("setting")
-                    .resizable()
-                    .frame(width: 38, height: 38)
-            }
-        }
-        .padding(.vertical, 13.5)
-        .padding(.horizontal, 24)
-    }
-}
-
-// MARK: - 탭 바(홈, 챌린지 현황)
-struct ChallengeTabBar: View {
-    @Binding var selectedIndex: Int
-    let onTap: (Int) -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // 탭 버튼들
-            HStack(spacing: 24) {
-                TabItemView(
-                    title: "홈",
-                    isSelected: selectedIndex == 0,
-                    onTap: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            selectedIndex = 0
-                        }
-                        onTap(0)
-                    }
-                )
-                
-                TabItemView(
-                    title: "챌린지 현황",
-                    isSelected: selectedIndex == 1,
-                    onTap: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            selectedIndex = 1
-                        }
-                        onTap(1)
-                    }
-                )
-            }
-            .padding(.horizontal, 24)
-            
-            // 🎯 슬라이딩 밑줄 (별도 처리)
-            SlidingUnderline(selectedIndex: selectedIndex)
-                .frame(height: 2)
-        }
-    }
-}
-
-// 밑줄 없는 탭 아이템
-struct TabItemView: View {
-    let title: String
-    let isSelected: Bool
-    let onTap: () -> Void
-    
-    var body: some View {
-        DefaultLabel(
-            title: title,
-            color: isSelected ? .primary600 : .gray400,
-            font: isSelected ? .heading2Bold : .heading2SemiBold
-        )
-        .padding(.vertical, 15)
-        .onTapGesture {
-            onTap()
-        }
-    }
-}
-
-// 🎯 슬라이딩 밑줄 컴포넌트
-struct SlidingUnderline: View {
-    let selectedIndex: Int
-    @State private var homeWidth: CGFloat = 0
-    @State private var statusWidth: CGFloat = 0
-    
-    var body: some View {
-        HStack(spacing: 24) {
-            // 홈 영역 (너비 측정용)
-            Text("홈")
-                .styled(.heading2Bold)
-                .opacity(0) // 투명하게 해서 측정만
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear.onAppear {
-                            homeWidth = geometry.size.width
-                        }
-                    }
-                )
-            
-            // 챌린지 현황 영역 (너비 측정용)
-            Text("챌린지 현황")
-                .styled(.heading2Bold)
-                .opacity(0) // 투명하게 해서 측정만
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear.onAppear {
-                            statusWidth = geometry.size.width
-                        }
-                    }
-                )
-            
-            Spacer()
-        }
-        .overlay(alignment: .leading) {
-            // 🎯 실제 슬라이딩 밑줄
-            Rectangle()
-                .fill(.primary600)
-                .frame(
-                    width: selectedIndex == 0 ? homeWidth : statusWidth,
-                    height: 2
-                )
-                .offset(
-                    x: selectedIndex == 0 ? 0 : homeWidth + 24 // 24는 spacing
-                )
-                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedIndex)
-        }
-        .padding(.horizontal, 24)
-    }
-}
-
-// MARK: - 탭 콘텐츠 뷰
-struct TabContentView: View {
-    let selectedIndex: Int
-    
-    var body: some View {
-        VStack {
-            switch selectedIndex {
-            case 0:
-                ChallengeHomeAreaView() // 🎯 홈 탭 뷰
-                    .transition(.opacity)
-            case 1:
-                ChallengeStatusAreaView() // 🎯 챌린지 현황 뷰
-                    .transition(.opacity)
-            default:
-                EmptyView()
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .animation(.easeInOut(duration: 0.3), value: selectedIndex)
-    }
-}
-
-struct ChallengeHomePreviews: PreviewProvider {
-    static var previews: some View {
-        ChallengeHomeScreen()
-    }
-}
 class ChallengeHomeView: UIView {
     
     override init(frame: CGRect) {
@@ -315,3 +130,191 @@ class ChallengeHomeView: UIView {
     }
     
 }
+
+//import SwiftUI
+//import Combine
+//
+//struct ChallengeHomeScreen: View {
+//    @State private var selectedTapIndex: Int = 0
+//
+//    var body: some View {
+//        VStack(spacing: 0){
+//            VStack{
+//                ChallengeNavBar()
+//                ChallengeTabBar(
+//                    selectedIndex: $selectedTapIndex,
+//                    onTap: { index in
+//                        selectedTapIndex = index
+//                    }
+//                )
+//            }
+//            Rectangle()
+//                .fill(.black.opacity(0.1))
+//                .frame(height: 1)
+//
+//            // 선택된 탭에 따라 다른 뷰 표시
+//            TabContentView(selectedIndex: selectedTapIndex)
+//        }
+//
+//        .frame(maxWidth: .infinity, alignment: .top)
+//
+//    }
+//}
+//
+//// MARK: - 상단 네비게이션 바
+//struct ChallengeNavBar: View {
+//    var body: some View {
+//        HStack{
+//            DefaultLabel(title: "챌린지", color: .gray900, font: .title1Bold)
+//            Spacer()
+//            Button(action:{
+//
+//            }){
+//                Image("setting")
+//                    .resizable()
+//                    .frame(width: 38, height: 38)
+//            }
+//        }
+//        .padding(.vertical, 13.5)
+//        .padding(.horizontal, 24)
+//    }
+//}
+//
+//// MARK: - 탭 바(홈, 챌린지 현황)
+//struct ChallengeTabBar: View {
+//    @Binding var selectedIndex: Int
+//    let onTap: (Int) -> Void
+//
+//    var body: some View {
+//        VStack(alignment: .leading, spacing: 0) {
+//            // 탭 버튼들
+//            HStack(spacing: 24) {
+//                TabItemView(
+//                    title: "홈",
+//                    isSelected: selectedIndex == 0,
+//                    onTap: {
+//                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+//                            selectedIndex = 0
+//                        }
+//                        onTap(0)
+//                    }
+//                )
+//
+//                TabItemView(
+//                    title: "챌린지 현황",
+//                    isSelected: selectedIndex == 1,
+//                    onTap: {
+//                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+//                            selectedIndex = 1
+//                        }
+//                        onTap(1)
+//                    }
+//                )
+//            }
+//            .padding(.horizontal, 24)
+//
+//            // 🎯 슬라이딩 밑줄 (별도 처리)
+//            SlidingUnderline(selectedIndex: selectedIndex)
+//                .frame(height: 2)
+//        }
+//    }
+//}
+//
+//// 밑줄 없는 탭 아이템
+//struct TabItemView: View {
+//    let title: String
+//    let isSelected: Bool
+//    let onTap: () -> Void
+//
+//    var body: some View {
+//        DefaultLabel(
+//            title: title,
+//            color: isSelected ? .primary600 : .gray400,
+//            font: isSelected ? .heading2Bold : .heading2SemiBold
+//        )
+//        .padding(.vertical, 15)
+//        .onTapGesture {
+//            onTap()
+//        }
+//    }
+//}
+//
+//// 🎯 슬라이딩 밑줄 컴포넌트
+//struct SlidingUnderline: View {
+//    let selectedIndex: Int
+//    @State private var homeWidth: CGFloat = 0
+//    @State private var statusWidth: CGFloat = 0
+//
+//    var body: some View {
+//        HStack(spacing: 24) {
+//            // 홈 영역 (너비 측정용)
+//            Text("홈")
+//                .styled(.heading2Bold)
+//                .opacity(0) // 투명하게 해서 측정만
+//                .background(
+//                    GeometryReader { geometry in
+//                        Color.clear.onAppear {
+//                            homeWidth = geometry.size.width
+//                        }
+//                    }
+//                )
+//
+//            // 챌린지 현황 영역 (너비 측정용)
+//            Text("챌린지 현황")
+//                .styled(.heading2Bold)
+//                .opacity(0) // 투명하게 해서 측정만
+//                .background(
+//                    GeometryReader { geometry in
+//                        Color.clear.onAppear {
+//                            statusWidth = geometry.size.width
+//                        }
+//                    }
+//                )
+//
+//            Spacer()
+//        }
+//        .overlay(alignment: .leading) {
+//            // 🎯 실제 슬라이딩 밑줄
+//            Rectangle()
+//                .fill(.primary600)
+//                .frame(
+//                    width: selectedIndex == 0 ? homeWidth : statusWidth,
+//                    height: 2
+//                )
+//                .offset(
+//                    x: selectedIndex == 0 ? 0 : homeWidth + 24 // 24는 spacing
+//                )
+//                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedIndex)
+//        }
+//        .padding(.horizontal, 24)
+//    }
+//}
+//
+//// MARK: - 탭 콘텐츠 뷰
+//struct TabContentView: View {
+//    let selectedIndex: Int
+//
+//    var body: some View {
+//        VStack {
+//            switch selectedIndex {
+//            case 0:
+//                ChallengeHomeAreaView() // 🎯 홈 탭 뷰
+//                    .transition(.opacity)
+//            case 1:
+//                ChallengeStatusAreaView() // 🎯 챌린지 현황 뷰
+//                    .transition(.opacity)
+//            default:
+//                EmptyView()
+//            }
+//        }
+//        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//        .animation(.easeInOut(duration: 0.3), value: selectedIndex)
+//    }
+//}
+//
+//struct ChallengeHomePreviews: PreviewProvider {
+//    static var previews: some View {
+//        ChallengeHomeScreen()
+//    }
+//}
+
