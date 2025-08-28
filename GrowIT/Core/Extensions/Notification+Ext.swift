@@ -11,4 +11,5 @@ extension Notification.Name {
     static let purchaseCompleted = Notification.Name("purchaseCompleted")
     static let creditUpdated = Notification.Name("creditUpdated")
     static let groImageUpdated = Notification.Name("groImageUpdated")
+    static let nicknameChanged = Notification.Name("nicknameChanged")
 }

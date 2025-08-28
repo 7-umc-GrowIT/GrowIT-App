@@ -93,6 +93,18 @@ class MypageViewController: UIViewController {
         present(resetDataVC, animated: true, completion: nil)
     }
     
+    //MARK: Notification
+    private func setNotification() {
+        let Notification = NotificationCenter.default
+        
+        Notification.addObserver(self, selector: #selector(didCompleteChangeNickname), name: .purchaseCompleted, object: nil)
+    }
+    
+    @objc
+    func didCompleteChangeNickname() {
+        ToastSecond.show(image: UIImage(named: "toast_Icon") ?? UIImage(), message: "닉네임을 변경했어요", font: .heading3SemiBold(), in: self.view)
+    }
+    
     //MARK: - Setup UI
     private func setupNavigationBar() {
         navigationBarManager.addBackButton(
