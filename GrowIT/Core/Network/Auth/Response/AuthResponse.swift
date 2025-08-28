@@ -84,3 +84,5 @@ struct ReissueResponse: Decodable {
 struct AccessTokenData: Codable {
     let accessToken: String
 }
+
+struct postLogoutResponseDTO: Codable { }

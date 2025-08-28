@@ -8,6 +8,11 @@
 import UIKit
 
 class MypageViewController: UIViewController {
+    // MARK: - Properties
+    let userService = UserService()
+    var categoryToEquippedId: [String: Int] = [:]
+    let navigationBarManager = NavigationManager()
+
     //MARK: - Data
     private let tableviewData: [[(main: String, sub: String)]] = [
         // 섹션 1 : 구독 내역
@@ -16,16 +21,16 @@ class MypageViewController: UIViewController {
         [("푸시 알림 활성화/비활성화", ""),("고객센터", ""),("데이터 초기화", "")]
     ]
     
-    // MARK: Properties
-    let navigationBarManager = NavigationManager()
+    // MARK: - View
     private lazy var mypageView = MypageView().then {
         $0.editProfileButton.addTarget(self, action: #selector(goToEditProfile), for: .touchUpInside)
     }
-
+    
     //MARK: - init
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        callGetMypage()
     }
     
     override func viewDidLoad() {
@@ -34,41 +39,30 @@ class MypageViewController: UIViewController {
         mypageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-
+        
         setupNavigationBar()
         setupTableView()
+        loadGroImage()
+        setNotification()
         
         // 개발 중: 프로필 영역만 노출
         mypageView.hideForDevelopment()
     }
     
-    //MARK: - Setup UI
-    private func setupNavigationBar() {
-        navigationBarManager.addBackButton(
-            to: navigationItem,
-            target: self,
-            action: #selector(prevVC),
-            tintColor: .black
-        )
-        
-        navigationBarManager.setTitle(
-            to: navigationItem,
-            title: "마이페이지",
-            textColor: .black
-        )
-        
-        if let navBar = navigationController?.navigationBar {
-            navigationBarManager.addBottomLine(to: navBar)
-        }
+    // MARK: - NetWork
+    func callGetMypage() {
+        userService.getMypage(completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                mypageView.nicknameLabel.text = data.name
+                print(data.name)
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
     }
-    
-    private func setupTableView() {
-        mypageView.myPagetableView.delegate = self
-        mypageView.myPagetableView.dataSource = self
-        mypageView.myPagetableView.register(MypageTableViewCell.self, forCellReuseIdentifier: MypageTableViewCell.identifier)
-        mypageView.myPagetableView.rowHeight = 66
-    }
-    
+   
     //MARK: - Functional
     //MARK: Event
     @objc
@@ -98,6 +92,73 @@ class MypageViewController: UIViewController {
             sheet.prefersGrabberVisible = true
         }
         present(resetDataVC, animated: true, completion: nil)
+    }
+    
+    //MARK: Notification
+    private func setNotification() {
+        let Notification = NotificationCenter.default
+        
+        Notification.addObserver(self, selector: #selector(didCompleteChangeNickname), name: .purchaseCompleted, object: nil)
+    }
+    
+    @objc
+    func didCompleteChangeNickname() {
+        ToastSecond.show(image: UIImage(named: "toast_Icon") ?? UIImage(), message: "닉네임을 변경했어요", font: .heading3SemiBold(), in: self.view)
+    }
+    
+    //MARK: - Setup UI
+    private func setupNavigationBar() {
+        navigationBarManager.addBackButton(
+            to: navigationItem,
+            target: self,
+            action: #selector(prevVC),
+            tintColor: .black
+        )
+        
+        navigationBarManager.setTitle(
+            to: navigationItem,
+            title: "마이페이지",
+            textColor: .black
+        )
+        
+        if let navBar = navigationController?.navigationBar {
+            navigationBarManager.addBottomLine(to: navBar)
+        }
+    }
+    
+    private func setupTableView() {
+        mypageView.myPagetableView.delegate = self
+        mypageView.myPagetableView.dataSource = self
+        mypageView.myPagetableView.register(MypageTableViewCell.self, forCellReuseIdentifier: MypageTableViewCell.identifier)
+        mypageView.myPagetableView.rowHeight = 66
+    }
+    
+    private func loadGroImage() {
+        GroImageCacheManager.shared.fetchGroImage { [weak self] data in
+            guard let self = self, let data = data else { return }
+            self.setupProfileGroImage(with: data)
+        }
+    }
+    
+    private func setupProfileGroImage(with data: GroGetResponseDTO) {
+        mypageView.groFaceImageView.kf.setImage(with: URL(string: data.gro.groImageUrl), options: [.transition(.fade(0.3)), .cacheOriginalImage])
+        
+        let categoryImageViews: [String: UIImageView] = [
+            "BACKGROUND": mypageView.backgroundImageView,
+            "OBJECT": mypageView.groObjectImageView,
+            "PLANT": mypageView.groFlowerPotImageView,
+            "HEAD_ACCESSORY": mypageView.groAccImageView
+        ]
+        
+        categoryToEquippedId = data.equippedItems.reduce(into: [String: Int]()) { dict, item in
+            dict[item.category] = item.id
+        }
+        
+        for item in data.equippedItems {
+            if let imageView = categoryImageViews[item.category] {
+                imageView.kf.setImage(with: URL(string: item.itemImageUrl), options: [.transition(.fade(0.3)), .cacheOriginalImage])
+            }
+        }
     }
 }
 
