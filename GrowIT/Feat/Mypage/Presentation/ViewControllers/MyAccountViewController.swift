@@ -132,6 +132,12 @@ class MyAccountViewController: UIViewController {
         present(nextVC, animated: true, completion: nil)
     }
     
+    @objc
+    func didTapTermsOfService() {
+        let nextVC = TermsOfServiceViewController()
+        navigationController?.pushViewController(nextVC, animated: true)
+    }
+    
     //MARK: - Setup UI
     private func setupNavigationBar() {
         navigationBarManager.addBackButton(
@@ -187,10 +193,19 @@ extension MyAccountViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        print("섹션 \(indexPath.section), 행 \(indexPath.row)")
-        if indexPath.section == 0, indexPath.row == 0 {
+        switch (indexPath.section, indexPath.row) {
+        case (0, 0):
             didTapChangeNickname()
+        case (0, 1):
+            
+        case (1, 0):
+            
+        case (1, 1):
+            didTapTermsOfService()
+        default:
+            break
         }
+
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
