@@ -22,6 +22,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     private let speechToTextUseCase: SpeechToTextUseCase
     private let getSTTResponseUseCase: GetSTTResponseUseCase
     private let textToSpeechUseCase: TextToSpeechUseCase
+    private let postVoiceDiaryDateUseCase: PostVoiceDiaryDateUseCase
     
     private var audioRecorder: AVAudioRecorder?
     private var audioPlayer: AVAudioPlayer?
@@ -46,10 +47,13 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     
     init(speechToTextUseCase: SpeechToTextUseCase,
          getSTTResponseUseCase: GetSTTResponseUseCase,
-         textToSpeechUseCase: TextToSpeechUseCase) {
+         textToSpeechUseCase: TextToSpeechUseCase,
+         postVoiceDiaryDateUseCase: PostVoiceDiaryDateUseCase) {
         self.speechToTextUseCase = speechToTextUseCase
         self.getSTTResponseUseCase = getSTTResponseUseCase
         self.textToSpeechUseCase = textToSpeechUseCase
+        self.postVoiceDiaryDateUseCase = postVoiceDiaryDateUseCase
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -93,12 +97,26 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        cleanupOnViewDisappear()
+    }
+    
+    // 화면이 사라질 때 완전 정리
+    private func cleanupOnViewDisappear() {
         stopConversation()
+        voiceDiaryRecordView.stopConversationTimer() // 타이머 완전 정지
+        voiceDiaryRecordView.onRemainingTimeChanged = nil // 콜백 제거
     }
     
     private func observeRemainingTime() {
         voiceDiaryRecordView.onRemainingTimeChanged = { [weak self] remainingTime in
             guard let self = self else { return }
+            
+            // 현재 화면이 활성 상태인지 확인
+            guard self.isViewLoaded && self.view.window != nil else {
+                print("화면이 비활성 상태 - 토스트 표시 안함")
+                return
+            }
+            
             if remainingTime == 30 {
                 CustomToast(containerWidth: 239).show(
                     image: UIImage(named: "warningIcon") ?? UIImage(),
@@ -205,13 +223,21 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
                 self.startConversation()
             }
         } else {
+            let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""
             let nextVC = VoiceDiaryLoadingViewController()
             nextVC.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(nextVC, animated: true)
             
-            callPostVoiceDiaryDate { content, diaryId, date in
-                DispatchQueue.main.async {
-                    nextVC.navigateToNextScreen(with: content, diaryId: diaryId, date: date)
+            Task{
+                do{
+                    let diary = try await postVoiceDiaryDateUseCase.execute(date: date)
+                    
+                    await MainActor.run {
+                        nextVC.navigateToNextScreen(with: diary.content, diaryId: diary.id, date: diary.date)
+
+                    }
+                } catch {
+                    print("요약된 일기 가져오기 실패: \(error)")
                 }
             }
         }
@@ -349,7 +375,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         }
         
         // 오디오 데이터가 너무 작으면 무시 (0.5초 미만)
-        if audioData.count < 8000 { // 대략 0.5초 분량
+        if audioData.count < 8000 {
             print("오디오 데이터가 너무 작음 - 무시")
             restartListening()
             return
@@ -357,57 +383,41 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         
         isProcessingAudio = true
         
-        Task {
+        // 단일 Task로 전체 프로세스 처리
+        Task { @MainActor in
             do {
+                // 1단계: STT 처리
+                print("STT 시작...")
                 let recognizedText = try await speechToTextUseCase.execute(audioData: audioData)
+                print("변환된 텍스트: \(recognizedText)")
                 
-                await MainActor.run {
-                    print("변환된 텍스트: \(recognizedText)")
-                    
-                    // 의미있는 텍스트인지 확인 (3글자 이상)
-                    let trimmedText = recognizedText.trimmingCharacters(in: .whitespacesAndNewlines)
-                                    
-                    if trimmedText.isEmpty || trimmedText.count < 2 {
-                        print("유효한 발화 없음 - 녹음 계속")
-                        self.isProcessingAudio = false
-                        self.restartListening()
-                    } else {
-                        // 2단계: 유효한 텍스트가 있을 때만 서버에 전송
-                        print("서버에 전송: \(trimmedText)")
-                        Task {
-                            do {
-                                // getSTTResponseUseCase.execute를 사용해 서버 응답 받기
-                                let responseText = try await self.getSTTResponseUseCase.execute(chat: trimmedText)
-                                
-                                await MainActor.run {
-                                    print("서버 응답: \(responseText)")
-                                    self.conversationTurnCount += 1
-                                    self.isProcessingAudio = false
-                                    
-                                    // 3단계: TTS로 응답 재생
-                                    Task {
-                                        await self.synthesizeSpeech(text: responseText)
-                                    }
-                                }
-                            } catch {
-                                await MainActor.run {
-                                    print("서버 통신 실패: \(error.localizedDescription)")
-                                    self.isProcessingAudio = false
-                                    self.restartListening()
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch {
-                await MainActor.run {
-                    print("STT 변환 실패: \(error.localizedDescription)")
+                // 의미있는 텍스트인지 확인
+                let trimmedText = recognizedText.trimmingCharacters(in: .whitespacesAndNewlines)
+                
+                if trimmedText.isEmpty || trimmedText.count < 2 {
+                    print("유효한 발화 없음 - 녹음 계속")
+                    self.isProcessingAudio = false
                     self.restartListening()
+                    return
                 }
-            }
-            
-            await MainActor.run {
-                self.isProcessingAudio = false
+                
+                // 2단계: 서버 통신
+                print("서버 통신 시작: \(trimmedText)")
+                let responseText = try await getSTTResponseUseCase.execute(chat: trimmedText)
+                print("서버 응답: \(responseText)")
+                
+                // 상태 업데이트
+                conversationTurnCount += 1
+                isProcessingAudio = false
+                
+                // 3단계: TTS 처리
+                print("TTS 시작...")
+                await synthesizeSpeech(text: responseText)
+                
+            } catch {
+                print("오디오 처리 실패: \(error.localizedDescription)")
+                isProcessingAudio = false
+                restartListening()
             }
         }
     }
@@ -422,27 +432,20 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     
     // MARK: - TTS and Audio Playback
     
-    private func synthesizeSpeech(text: String) async { // TTS 변환
+    private func synthesizeSpeech(text: String) async {
         isSpeaking = true
-        updateConversationUI(state: .responding)
         
         do {
+            print("TTS 변환 중...")
             let data = try await textToSpeechUseCase.execute(text: text)
+            print("TTS 변환 완료, 재생 시작")
             
-            await MainActor.run {
-                self.playAudio(data: data)
-            }
-        } catch let error as TextToSpeechError {
-            await MainActor.run {
-                print("TTS 변환 실패: \(error.localizedDescription)")
-                // TTS 실패해도 대화는 계속
-                self.finishSpeaking()
-            }
+            // 메인 스레드에서 오디오 재생
+            playAudio(data: data)
+            
         } catch {
-            await MainActor.run {
-                print("TTS 알 수 없는 오류: \(error.localizedDescription)")
-                self.finishSpeaking()
-            }
+            print("TTS 변환 실패: \(error.localizedDescription)")
+            finishSpeaking()
         }
     }
     
@@ -580,25 +583,10 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         present(alert, animated: true)
     }
     
-    private func callPostVoiceDiaryDate(completion: @escaping (String, Int, String) -> Void) {
+    private func callPostVoiceDiaryDate() async throws -> Diary{
         let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""
-        diaryService.postVoiceDiaryDate(
-            data: DiaryVoiceDateRequestDTO(date: date),
-            completion: { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success(let data):
-                    print("일기 생성 성공: \(data)")
-                    DispatchQueue.main.async {
-                        completion(data.content, data.diaryId, date)
-                    }
-                case .failure(let error):
-                    print("일기 생성 실패: \(error)")
-                    DispatchQueue.main.async {
-                        self.navigationController?.popToRootViewController(animated: true)
-                    }
-                }
-            })
+        
+        return try await postVoiceDiaryDateUseCase.execute(date: date)
     }
 }
 

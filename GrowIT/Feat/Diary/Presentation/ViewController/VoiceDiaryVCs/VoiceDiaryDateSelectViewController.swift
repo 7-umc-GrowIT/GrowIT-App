@@ -120,6 +120,13 @@ class VoiceDiaryDateSelectViewController: UIViewController, JDiaryCalendarContro
                     googleSpeechRepository: GoogleSpeechRepositoryImpl(
                         dataSource: GoogleSpeechDataSourceImpl()
                     )
+                ),
+                postVoiceDiaryDateUseCase: PostVoiceDiaryDateUseCase(
+                    repository: DiaryVoiceRepositoryImpl(
+                        dataSource: DiaryVoiceDataSourceImpl(
+                            diaryService: DiaryService()
+                        )
+                    )
                 )
             )
             nextVC.hidesBottomBarWhenPushed = true
