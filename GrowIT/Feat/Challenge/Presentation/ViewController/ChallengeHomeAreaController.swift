@@ -13,7 +13,7 @@ import Combine
 class ChallengeHomeAreaController: UIViewController {
     private let challengeHomeArea = ChallengeHomeArea()
     private let pageControl = UIPageControl()
-    private var todayChallenges: [RecommendedChallenge] = []
+    private var todayChallenges: [RecommendedChallengeDTO] = []
     private var selectedIndex = 0
     
     private var viewModel: ChallengeHomeViewModel!
