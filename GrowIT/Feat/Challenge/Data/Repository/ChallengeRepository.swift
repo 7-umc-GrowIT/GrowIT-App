@@ -25,7 +25,7 @@ final class ChallengeRepositoryImpl: ChallengeRepository {
     }
     
     func fetchChallenges(type: ChallengeType, completed: Bool, page: Int) -> AnyPublisher<StatusChallenge, Error> {
-        dataSource.fetchChallengeStatus(dtype: type.rawValue, completed: completed, page: page)
+        dataSource.fetchChallengeStatus(challengeType: type.rawValue, completed: "\(completed)", page: page)
             .map { dto in
                 // content([UserChallengeDTO])만 순회
                 let challenges = dto.content.map { UserChallenge(dto: $0) }

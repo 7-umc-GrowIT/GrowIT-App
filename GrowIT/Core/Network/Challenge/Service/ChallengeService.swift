@@ -53,12 +53,12 @@ final class ChallengeService: NetworkManager {
     }
     
     /// Fetch Challenge Status API
-    func fetchChallengeStatus(dtype: String, completed: Bool, page: Int, completion: @escaping (Result<ChallengeStatusResponseDTO, NetworkError>) -> Void){
-        request(target: .getAllChallenges(dtype: dtype, completed: completed, page: page), decodingType: ChallengeStatusResponseDTO.self, completion: completion)
+    func fetchChallengeStatus(challengeType: String, completed: String, page: Int, completion: @escaping (Result<ChallengeStatusResponseDTO, NetworkError>) -> Void){
+        request(target: .getAllChallenges(challengeType: challengeType, completed: completed, page: page), decodingType: ChallengeStatusResponseDTO.self, completion: completion)
     }
     
-    func postSelectedChallenge(data: [ChallengeSelectRequestDTO], completion: @escaping (Result<ChallengeSelectResponseDTO, NetworkError>) -> Void) {
-        request(target: .postSelectChallenge(data: data), decodingType: ChallengeSelectResponseDTO.self, completion: completion)
+    func postSelectedChallenge(data: [ChallengeSelectRequestDTO], completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        requestStatusCode(target: .postSelectChallenge(data: data), completion: completion)
     }
     
 }

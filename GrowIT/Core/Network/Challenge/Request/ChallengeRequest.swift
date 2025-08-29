@@ -14,7 +14,7 @@ struct ChallengeRequestDTO: Codable {
 
 struct ChallengeSelectRequestDTO: Codable {
     let challengeIds: [Int]
-    let dtype: String
+    let challengeType: String
     let date: String
 }
 

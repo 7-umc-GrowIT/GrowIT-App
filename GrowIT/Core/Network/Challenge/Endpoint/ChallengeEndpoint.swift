@@ -11,7 +11,7 @@ import Moya
 enum ChallengeEndpoint {
     // Get
     case getChallengeById(challengeId: Int)
-    case getAllChallenges(dtype: String, completed: Bool, page: Int)
+    case getAllChallenges(challengeType: String, completed: String, page: Int)
     case getSummaryChallenge
     
     // Post
@@ -39,8 +39,8 @@ extension ChallengeEndpoint: TargetType {
             return "/\(challengeId)"
         case.getSummaryChallenge:
             return "/summary"
-        case.postSelectChallenge(let challengeId):
-            return "/\(challengeId)/select"
+        case.postSelectChallenge:
+            return "/challenges/select"
         case.postProveChallenge(let challengeId, _):
             return "/\(challengeId)/prove"
         case.deleteChallengeById(let challengeId):
@@ -73,7 +73,7 @@ extension ChallengeEndpoint: TargetType {
             return .requestPlain
         case .postProveChallenge(_, let data), .patchChallengeById(_, let data):
             return .requestJSONEncodable(data)
-        case .getAllChallenges(dtype: let dtype, completed: let completed, page: let page):
+        case .getAllChallenges(challengeType: let dtype, completed: let completed, page: let page):
             return .requestParameters(
                 parameters: ["dtype": dtype, "completed": completed, "page": page],
                 encoding: URLEncoding.queryString)
