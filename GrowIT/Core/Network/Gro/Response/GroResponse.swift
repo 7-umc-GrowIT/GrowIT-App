@@ -30,7 +30,3 @@ struct EquippedItem: Decodable {
     let category: String
     let itemImageUrl: String
 }
-
-struct GroPatchResponseDTO: Decodable {
-    let name: String
-}

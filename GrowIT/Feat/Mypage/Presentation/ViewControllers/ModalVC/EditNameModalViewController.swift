@@ -35,11 +35,10 @@ class EditNameModalViewController: UIViewController {
         groService.patchGroChangeNickname(data: GroChangeNicknameRequestDTO(name: groName), completion: { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case.success(let data):
-                print("Success: \(data)")
-                self.onNicknameChanged?(self.groName)
-                NotificationCenter.default.post(name: .nicknameChanged, object: nil)
-                //중복, 이전과동일닉네임
+            case.success:
+                self.onNicknameChanged?(self.groName) // 계정뷰 이름 변경
+                NotificationCenter.default.post(name: .nicknameChanged, object: nil) // 토스트
+                DispatchQueue.main.async { self.dismiss(animated: true, completion: nil) }
             case.failure(let error):
                 print("Error: \(error)")
             }
@@ -51,7 +50,6 @@ class EditNameModalViewController: UIViewController {
     @objc
     func didTapChangeButton() {
         callPatchGroChangeNickname()
-        self.dismiss(animated: true, completion: nil)
     }
     
     @objc

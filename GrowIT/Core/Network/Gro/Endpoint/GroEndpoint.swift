@@ -53,8 +53,8 @@ extension GroEndpoint: TargetType {
             return .requestPlain
         case .postGroCreate(let data):
             return .requestJSONEncodable(data)
-        case .patchGroChangeNickname:
-            return .requestPlain
+        case .patchGroChangeNickname(let data):
+            return .requestJSONEncodable(data)
         }
     }
     
