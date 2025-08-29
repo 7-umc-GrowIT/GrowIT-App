@@ -204,7 +204,7 @@ class GroViewController: UIViewController, ItemListDelegate {
     
     @objc
     private func didTapEraseButton() {
-        let defaultFlowerPotId = 1
+        let defaultFlowerPotId = 10
         let categoriesToClear = ["OBJECT", "HEAD_ACCESSORY", "PLANT"]
         
         categoriesToClear.forEach { category in
