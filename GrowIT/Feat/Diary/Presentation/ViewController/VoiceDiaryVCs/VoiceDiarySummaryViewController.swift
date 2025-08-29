@@ -16,7 +16,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
     let diaryId: Int
     let date: String
     
-    private var recommendedChallenges: [RecommendedChallenge] = []
+    private var recommendedChallenges: [RecommendedDiaryChallengeDTO] = []
     private var emotionKeywords: [EmotionKeyword] = []
     
     let diaryService = DiaryService()
