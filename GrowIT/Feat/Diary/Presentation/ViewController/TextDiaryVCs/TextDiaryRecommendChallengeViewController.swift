@@ -155,13 +155,29 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
     
     func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
         let date = UserDefaults.standard.string(forKey: "TextDate") ?? ""
-        return challengeViews.enumerated()
+        
+        // 선택된 챌린지들 필터링
+        let selectedChallenges = challengeViews.enumerated()
             .filter { index, challengeView in
                 index < recommendedChallenges.count && challengeView.button.isSelectedState()
             }
-            .map { index, challengeView in
-                let challenge = recommendedChallenges[index]
-                return ChallengeSelectRequestDTO(challengeIds: [challenge.id], challengeType: challenge.challengeType, date: date)
+            .map { index, _ in
+                recommendedChallenges[index]
             }
+        
+        // 챌린지 타입별로 그룹핑
+        let groupedChallenges = Dictionary(grouping: selectedChallenges) { challenge in
+            challenge.challengeType
+        }
+        
+        // 각 그룹을 DTO로 변환
+        return groupedChallenges.map { (challengeType, challenges) in
+            let challengeIds = challenges.map { $0.id }
+            return ChallengeSelectRequestDTO(
+                challengeIds: challengeIds,
+                challengeType: challengeType,
+                date: date
+            )
+        }
     }
 }

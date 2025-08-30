@@ -15,17 +15,13 @@ final class ChallengeService: NetworkManager {
     
     init(provider: MoyaProvider<ChallengeEndpoint>? = nil) {
         let plugins: [PluginType] = [
-            // NetworkLoggerPlugin(configuration: .init(logOptions: [.requestMethod, .successResponseBody])),
+            NetworkLoggerPlugin(configuration: .init(logOptions: [.requestBody, .requestMethod, .requestHeaders, .successResponseBody, .errorResponseBody])),
             AuthPlugin()
         ]
         
         self.provider = provider ?? MoyaProvider<ChallengeEndpoint>(plugins: plugins)
     }
-    /// Post Select Challenge API
-//    func postSelectChallenge(challengeId: Int, completion: @escaping (Result<ChallengeSelectResponseDTO, NetworkError>) -> Void) {
-//        request(target: .postSelectChallenge(challengeId: challengeId), decodingType: ChallengeSelectResponseDTO.self, completion: completion)
-//    }
-    
+
     /// Post Prove Challenge API
     func postProveChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<ChallengeDTO, NetworkError>) -> Void) {
         request(target: .postProveChallenge(challengeId: challengeId, data: data), decodingType: ChallengeDTO.self, completion: completion)
@@ -60,5 +56,4 @@ final class ChallengeService: NetworkManager {
     func postSelectedChallenge(data: [ChallengeSelectRequestDTO], completion: @escaping (Result<Void, NetworkError>) -> Void) {
         requestStatusCode(target: .postSelectChallenge(data: data), completion: completion)
     }
-    
 }

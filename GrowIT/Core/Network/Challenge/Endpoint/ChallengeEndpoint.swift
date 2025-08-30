@@ -15,7 +15,7 @@ enum ChallengeEndpoint {
     case getSummaryChallenge
     
     // Post
-    case postSelectChallenge(data: ChallengeSelectRequestListDTO)
+    case postSelectChallenge(data: [ChallengeSelectRequestDTO])
     case postProveChallenge(challengeId: Int, data: ChallengeRequestDTO)
     
     // Delete
@@ -40,7 +40,7 @@ extension ChallengeEndpoint: TargetType {
         case.getSummaryChallenge:
             return "/summary"
         case.postSelectChallenge:
-            return "/challenges/select"
+            return "/select"
         case.postProveChallenge(let challengeId, _):
             return "/\(challengeId)/prove"
         case.deleteChallengeById(let challengeId):
@@ -68,6 +68,7 @@ extension ChallengeEndpoint: TargetType {
     public var task: Moya.Task {
         switch self {
         case .postSelectChallenge(let data):
+           
             return .requestJSONEncodable(data)
         case .deleteChallengeById(_), .getChallengeById(_), .getSummaryChallenge:
             return .requestPlain
