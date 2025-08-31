@@ -39,3 +39,5 @@ struct UserGetMypageResponseDTO: Decodable {
     let userId: Int
     let name: String
 }
+
+struct UserDeleteResponseDTO: Decodable { }
