@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 class DiaryAllViewController: UIViewController, UITableViewDelegate {
     
@@ -18,8 +19,11 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
+        
         setupUI()
         setupDelegate()
+        //setupCustomTitle()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -27,6 +31,7 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
         callGetAllDiaries()
         setupNavigationBar()
         setupActions()
+    
     }
     
     //MARK: - Setup Navigation Bar
@@ -40,9 +45,44 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
         
         navigationBarManager.setTitle(
             to: navigationItem,
-            title: "직접 일기 작성하기",
+            title: "나의 일기 기록",
             textColor: .black
         )
+    }
+    
+    private func setupCustomTitle() {
+        // 기본 타이틀은 비우고
+        self.title = ""
+        
+        // 커스텀 타이틀 뷰를 메인 뷰에 추가
+        let titleContainer = UIView()
+        titleContainer.backgroundColor = .white
+        
+        let titleLabel = UILabel()
+        titleLabel.text = "나의 일기 기록"
+        titleLabel.font = UIFont.heading1Bold()
+        titleLabel.textColor = UIColor.gray900
+        titleLabel.textAlignment = .center
+        
+        diaryAllView.addSubview(titleContainer)
+        titleContainer.addSubview(titleLabel)
+        
+        titleContainer.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalToSuperview()
+            //$0.height.equalTo(44 + 31) // 기본 높이 + 패딩
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
+            $0.top.bottom.equalToSuperview().inset(15.5)
+        }
+        
+        // 기존 뷰를 아래로 밀기
+        diaryAllView.snp.remakeConstraints {
+            $0.top.equalTo(titleContainer.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
     }
     
     // MARK: Setup UI
