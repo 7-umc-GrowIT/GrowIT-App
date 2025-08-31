@@ -56,10 +56,10 @@ class ChallengeHomeAreaController: UIViewController {
                 // 빈 챌린지 상태 처리
                 let isEmpty = challenges.isEmpty
                 if isEmpty {
-                    self.challengeHomeArea.setEmptyChallenge()
+                    self.challengeHomeArea.setEmptyChallenge(true)
                     self.pageControl.isHidden = true
                 } else {
-                    self.challengeHomeArea.todayChallengeCollectionView.isHidden = false
+                    self.challengeHomeArea.setEmptyChallenge(false)
                     self.pageControl.isHidden = false
                 }
             }

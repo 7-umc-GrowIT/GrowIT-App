@@ -183,10 +183,11 @@ class ChallengeHomeArea: UIView {
         
     }
     
-    public func setEmptyChallenge(){
-        todayChallengeCollectionView.isHidden = true
-        emptyChallengeIcon.isHidden = false
-        emptyChallengeLabel.isHidden = false
+    public func setEmptyChallenge(_ isEmpty: Bool){
+        todayChallengeCollectionView.isHidden = isEmpty
+        emptyChallengeIcon.isHidden = !isEmpty
+        emptyChallengeLabel.isHidden = !isEmpty
+        hashTagStack.isHidden = isEmpty
         
         challengeReportTitle.snp.updateConstraints{
             $0.top.equalTo(emptyChallengeLabel.snp.bottom).offset(34)

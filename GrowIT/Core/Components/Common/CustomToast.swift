@@ -68,12 +68,12 @@ class CustomToast {
             make.leading.equalTo(imageView.snp.trailing).offset(spaceBetweenImageAndLabel)
         }
 
-        // 토스트 페이드 인, 딜레이 후 페이드 아웃
+        // 토스트 페이드 인 0.5, 딜레이 후 페이드 아웃 0.5 총 1초 후 사라짐
         containerView.alpha = 0
         UIView.animate(withDuration: 0.5, animations: {
             containerView.alpha = 1
         }) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
                 UIView.animate(withDuration: 0.5, animations: {
                     containerView.alpha = 0
                 }) { _ in
