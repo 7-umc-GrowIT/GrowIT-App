@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 class DiaryPostFixView: UIView {
 
@@ -19,6 +20,11 @@ class DiaryPostFixView: UIView {
     }
     
     // MARK: UI Components
+    
+    private let grabberIcon = UIImageView().then {
+        $0.image = UIImage(named: "grabberIcon")
+        $0.contentMode = .scaleAspectFit
+    }
     private let diaryIcon = UIImageView().then {
         $0.image = UIImage(named: "diaryIcon")
         $0.backgroundColor = .clear
@@ -65,50 +71,59 @@ class DiaryPostFixView: UIView {
     // MARK: Setup UI
     private func setupUI() {
         backgroundColor = .white
+        
+        addSubview(grabberIcon)
+        grabberIcon.snp.makeConstraints {
+            $0.width.equalTo(80)
+            $0.height.equalTo(4)
+            $0.top.equalToSuperview().offset(24)
+            $0.centerX.equalToSuperview()
+            
+        }
         addSubview(diaryIcon)
-        diaryIcon.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
-            make.top.equalToSuperview().offset(52)
+        diaryIcon.snp.makeConstraints {
+            $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
+            $0.leading.equalToSuperview().offset(24)
         }
         
         addSubview(fixLabel)
-        fixLabel.snp.makeConstraints { make in
-            make.leading.equalTo(diaryIcon.snp.leading)
-            make.top.equalTo(diaryIcon.snp.bottom).offset(8)
+        fixLabel.snp.makeConstraints {
+            $0.leading.equalTo(diaryIcon.snp.leading)
+            $0.top.equalTo(diaryIcon.snp.bottom).offset(8)
         }
         
         addSubview(label1)
-        label1.snp.makeConstraints { make in
-            make.leading.equalTo(fixLabel.snp.leading)
-            make.top.equalTo(fixLabel.snp.bottom).offset(16)
+        label1.snp.makeConstraints {
+            $0.leading.equalTo(fixLabel.snp.leading)
+            $0.top.equalTo(fixLabel.snp.bottom).offset(16)
         }
         
         addSubview(textView)
-        textView.snp.makeConstraints { make in
-            make.leading.equalTo(label1.snp.leading)
-            make.top.equalTo(label1.snp.bottom).offset(8)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(200)
+        textView.snp.makeConstraints {
+            $0.leading.equalTo(label1.snp.leading)
+            $0.top.equalTo(label1.snp.bottom).offset(8)
+            $0.centerX.equalToSuperview()
+            $0.height.equalTo(200)
         }
         
         addSubview(cancelButton)
-        cancelButton.snp.makeConstraints { make in
-            make.leading.equalTo(textView.snp.leading)
-            make.top.equalTo(textView.snp.bottom).offset(40)
-            make.width.equalTo(88)
+        cancelButton.snp.makeConstraints {
+            $0.leading.equalTo(textView.snp.leading)
+            $0.top.equalTo(textView.snp.bottom).offset(40)
+            $0.width.equalTo(88)
         }
         
         addSubview(fixButton)
-        fixButton.snp.makeConstraints { make in
-            make.leading.equalTo(cancelButton.snp.trailing).offset(8)
-            make.trailing.equalToSuperview().offset(-24)
-            make.top.equalTo(cancelButton.snp.top)
+        fixButton.snp.makeConstraints {
+            $0.leading.equalTo(cancelButton.snp.trailing).offset(8)
+            $0.trailing.equalToSuperview().offset(-24)
+            $0.top.equalTo(cancelButton.snp.top)
         }
         
         addSubview(deleteLabel)
-        deleteLabel.snp.makeConstraints { make in
-            make.top.equalTo(fixButton.snp.bottom).offset(15.5)
-            make.centerX.equalToSuperview()
+        deleteLabel.snp.makeConstraints {
+            $0.top.equalTo(fixButton.snp.bottom).offset(15.5)
+            $0.centerX.equalToSuperview()
         }
     }
     

@@ -338,11 +338,17 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
                         switch result{
                         case.success(let data):
                             let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
-                            diaryPostFixVC.modalPresentationStyle = .fullScreen
-                            diaryPostFixVC.onDismiss = { [weak self] in
-                                self?.getDiaryDates()
+                            if let sheet = diaryPostFixVC.sheetPresentationController {
+                                if #available(iOS 16.0, *) {
+                                    sheet.detents = [.custom { _ in return 0.6 * UIScreen.main.bounds.height }]
+                                } else {
+                                    // Fallback on earlier versions
+                                }
+                                sheet.prefersGrabberVisible = false
+                                sheet.preferredCornerRadius = 24
                             }
-                            presentPageSheet(viewController: diaryPostFixVC, detentFraction: 0.65)
+
+                            present(diaryPostFixVC, animated: true)
                         case.failure(let error):
                             print("Error: \(error)")
                         }

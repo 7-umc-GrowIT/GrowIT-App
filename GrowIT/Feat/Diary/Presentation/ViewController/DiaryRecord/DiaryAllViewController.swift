@@ -172,14 +172,29 @@ extension DiaryAllViewController: DiaryAllViewCellDelegate {
     func didTapButton(in cell: DiaryAllViewTableViewCell) {
         guard let indexPath = diaryAllView.diaryTableView.indexPath(for: cell) else { return }
         let diary = diaries[indexPath.row]
-        let fixVC = DiaryPostFixViewController(text: diary.content, date: diary.date.formattedDate(), diaryId: diary.diaryId)
+        
+        let fixVC = DiaryPostFixViewController(
+            text: diary.content,
+            date: diary.date.formattedDate(),
+            diaryId: diary.diaryId
+        )
         
         fixVC.onDismiss = { [weak self] in
             self?.callGetAllDiaries()
         }
         
         let navController = UINavigationController(rootViewController: fixVC)
-        navController.modalPresentationStyle = .fullScreen
-        presentPageSheet(viewController: navController, detentFraction: 0.65)
+        
+        if let sheet = navController.sheetPresentationController {
+            if #available(iOS 16.0, *) {
+                sheet.detents = [.custom { _ in 0.6 * UIScreen.main.bounds.height }]
+            } else {
+                // Fallback on earlier versions
+            }
+            sheet.prefersGrabberVisible = false
+            sheet.preferredCornerRadius = 24   // 🔥 모달 둥근 모서리 적용
+        }
+        
+        present(navController, animated: true)
     }
 }

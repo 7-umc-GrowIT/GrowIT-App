@@ -181,9 +181,6 @@ class HomeViewController: UIViewController {
         // 바텀 시트 설정
         modalVC.modalPresentationStyle = .pageSheet
         
-        // 바깥 영역 터치 막기
-        modalVC.isModalInPresentation = true
-        
         if let sheet = modalVC.sheetPresentationController {
             // iOS 16 이상
             if #available(iOS 16.0, *) {
