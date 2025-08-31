@@ -47,7 +47,7 @@ class HomeCharacterView: UIView {
     private lazy var friendIcon = makeIcon("friend")
     
     // 친구보기 버튼 컨테이너
-    private lazy var friendContainer = makeContainer()
+    public lazy var friendContainer = makeContainer()
     
     // 캐릭터 이미지
     private lazy var groFrameView = UIView().then {
