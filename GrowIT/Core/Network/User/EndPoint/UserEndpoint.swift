@@ -19,7 +19,9 @@ enum UserEndpoint {
     
     // Patch
     case patchPassword(data: UserPatchRequestDTO)
-    case patchUserWithdraw
+    
+    // Delete
+    case deleteUser(data: UserDeleteRequestDTO)
 }
 
 extension UserEndpoint: TargetType {
@@ -42,7 +44,7 @@ extension UserEndpoint: TargetType {
             return "/credits/payment"
         case .patchPassword:
             return "/password"
-        case .patchUserWithdraw:
+        case .deleteUser:
             return ""
         }
     }
@@ -51,8 +53,10 @@ extension UserEndpoint: TargetType {
         switch self {
         case .postPaymentCredits:
             return .post
-        case .patchPassword, .patchUserWithdraw:
+        case .patchPassword:
             return .patch
+        case .deleteUser:
+            return .delete
         default:
             return .get
         }
@@ -66,9 +70,8 @@ extension UserEndpoint: TargetType {
             return .requestJSONEncodable(data)
         case .patchPassword(let data):
             return .requestJSONEncodable(data)
-            // BE API 개발 진행중 (임시로 적어둔 상태)
-        case .patchUserWithdraw:
-            return .requestPlain
+        case .deleteUser(let data):
+            return .requestJSONEncodable(data)
         }
     }
     
