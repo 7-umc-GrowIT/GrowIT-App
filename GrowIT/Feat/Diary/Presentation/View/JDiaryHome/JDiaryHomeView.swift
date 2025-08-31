@@ -74,7 +74,7 @@ class JDiaryHomeView: UIView {
         diaryHomeNavbar.snp.makeConstraints{
             $0.top.equalTo(self.safeAreaLayoutGuide.snp.top)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalToSuperview().multipliedBy(0.065)
+            $0.height.equalToSuperview().multipliedBy(0.07)
         }
         
         diaryHomeScrollView.snp.makeConstraints{
