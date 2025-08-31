@@ -13,56 +13,51 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
-    
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
-
-        // LaunchScreenViewController를 첫 화면으로 설정
-        let window = UIWindow(windowScene: windowScene)
-        let launchVC = LaunchScreenViewController()
-        window.rootViewController = launchVC
-        self.window = window
-        window.makeKeyAndVisible()
+    func scene(_ scene: UIScene,
+               willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
         
-        launchVC.navigateToMain()
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+        window = UIWindow(windowScene: windowScene)
+        
+        window?.makeKeyAndVisible()
+        
+        let hasLaunchedBefore = UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
+        var mainVC: UIViewController
+        
+        if !hasLaunchedBefore {
+            mainVC = OnboardingViewController()
+            UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
+        } else {
+            if let _ = TokenManager.shared.getAccessToken() {
+                mainVC = CustomTabBarController(initialIndex: 1)
+            } else {
+                mainVC = LoginViewController()
+            }
+        }
+        
+        let navigationController = UINavigationController(rootViewController: mainVC)
+        
+        // 부드럽게 전환
+        UIView.transition(with: self.window!,
+                          duration: 0.4,
+                          options: .transitionCrossDissolve,
+                          animations: {
+            self.window?.rootViewController = navigationController
+        })
     }
+
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        
+        // 카카오 로그인 등 URL 스킴 처리
     }
     
-    
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
-    }
-    
+    func sceneDidDisconnect(_ scene: UIScene) {}
     func sceneDidBecomeActive(_ scene: UIScene) {
-        // Called when the scene has moved from an inactive state to an active state.
-        // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-        
-        // 개발용: 앱이 활성화될 때마다 로그아웃 처리 (디버깅용)
-        // 주석을 해제하면 앱을 열 때마다 로그인 화면으로 이동
+        // 개발용: 필요하다면 주석 해제
         // TokenManager.shared.clearTokens()
     }
-    
-    func sceneWillResignActive(_ scene: UIScene) {
-        // Called when the scene will move from an active state to an inactive state.
-        // This may occur due to temporary interruptions (ex. an incoming phone call).
-    }
-    
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
-    }
-    
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
-    }
-    
-    
+    func sceneWillResignActive(_ scene: UIScene) {}
+    func sceneWillEnterForeground(_ scene: UIScene) {}
+    func sceneDidEnterBackground(_ scene: UIScene) {}
 }

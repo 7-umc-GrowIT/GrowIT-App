@@ -8,84 +8,6 @@
 import UIKit
 import Then
 import SnapKit
-import SwiftUI
-
-struct ChallengeStatusAreaView: View {
-    let totalChallenges: Int = 4
-    
-    var body: some View {
-        VStack(alignment: .leading){
-            Spacer().frame(height: 28)
-            CategoryBtnGroup()
-            Spacer().frame(height: 16)
-            HStack(spacing: 4){
-                DefaultLabel(title: "챌린지 현황", color: .gray600, font: .body2Medium)
-                DefaultLabel(title: "\(totalChallenges)", color: .primary700, font: .body2SemiBold)
-            }
-            Spacer().frame(height: 12)
-            
-        }
-        .padding(.horizontal, 24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(.gray50)
-    }
-}
-
-// MARK: - 카테고리 버튼 그룹
-struct CategoryBtnGroup: View {
-    let categories: [String] = ["전체", "완료", "랜덤 챌린지", "데일리 챌린지"]
-    @State private var selectedIndex: Int = 0
-    
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false){
-            HStack(spacing: 8){
-                ForEach(Array(categories.enumerated()), id: \.offset) { index, category in
-                    CategoryButton(
-                        title: category,
-                        isSelected: selectedIndex == index, // 🎯 인덱스로 비교
-                        onTap: {
-                            selectedIndex = index // 🎯 인덱스 직접 설정
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-// MARK: - 카테고리 버튼
-struct CategoryButton: View {
-    let title: String
-    let isSelected: Bool
-    let onTap: () -> Void
-    
-    init(title: String, isSelected: Bool, onTap: @escaping () -> Void) {
-        self.title = title
-        self.isSelected = isSelected
-        self.onTap = onTap
-    }
-    
-    var body: some View {
-        Button(action: onTap){
-            DefaultLabel(title: "\(title)", color: isSelected ? .primary700 : .gray300, font: .heading3Bold)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 9)
-        .background(isSelected ? .primary100 : .white)
-        .clipShape(RoundedRectangle(cornerRadius: 6))
-        .overlay{
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(.black.opacity(0.1), lineWidth: 1)
-        }
-        
-    }
-}
-
-struct ChallengeStatusAreaView_Preview: PreviewProvider {
-    static var previews: some View {
-        ChallengeStatusAreaView()
-    }
-}
 
 class ChallengeStatusArea: UIView {
     
@@ -341,3 +263,82 @@ class ChallengeStatusArea: UIView {
         }
     }
 }
+
+//import SwiftUI
+//
+//struct ChallengeStatusAreaView: View {
+//    let totalChallenges: Int = 4
+//
+//    var body: some View {
+//        VStack(alignment: .leading){
+//            Spacer().frame(height: 28)
+//            CategoryBtnGroup()
+//            Spacer().frame(height: 16)
+//            HStack(spacing: 4){
+//                DefaultLabel(title: "챌린지 현황", color: .gray600, font: .body2Medium)
+//                DefaultLabel(title: "\(totalChallenges)", color: .primary700, font: .body2SemiBold)
+//            }
+//            Spacer().frame(height: 12)
+//
+//        }
+//        .padding(.horizontal, 24)
+//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+//        .background(.gray50)
+//    }
+//}
+//
+//// MARK: - 카테고리 버튼 그룹
+//struct CategoryBtnGroup: View {
+//    let categories: [String] = ["전체", "완료", "랜덤 챌린지", "데일리 챌린지"]
+//    @State private var selectedIndex: Int = 0
+//
+//    var body: some View {
+//        ScrollView(.horizontal, showsIndicators: false){
+//            HStack(spacing: 8){
+//                ForEach(Array(categories.enumerated()), id: \.offset) { index, category in
+//                    CategoryButton(
+//                        title: category,
+//                        isSelected: selectedIndex == index, // 🎯 인덱스로 비교
+//                        onTap: {
+//                            selectedIndex = index // 🎯 인덱스 직접 설정
+//                        }
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//// MARK: - 카테고리 버튼
+//struct CategoryButton: View {
+//    let title: String
+//    let isSelected: Bool
+//    let onTap: () -> Void
+//
+//    init(title: String, isSelected: Bool, onTap: @escaping () -> Void) {
+//        self.title = title
+//        self.isSelected = isSelected
+//        self.onTap = onTap
+//    }
+//
+//    var body: some View {
+//        Button(action: onTap){
+//            DefaultLabel(title: "\(title)", color: isSelected ? .primary700 : .gray300, font: .heading3Bold)
+//        }
+//        .padding(.horizontal, 16)
+//        .padding(.vertical, 9)
+//        .background(isSelected ? .primary100 : .white)
+//        .clipShape(RoundedRectangle(cornerRadius: 6))
+//        .overlay{
+//            RoundedRectangle(cornerRadius: 6)
+//                .stroke(.black.opacity(0.1), lineWidth: 1)
+//        }
+//
+//    }
+//}
+//
+//struct ChallengeStatusAreaView_Preview: PreviewProvider {
+//    static var previews: some View {
+//        ChallengeStatusAreaView()
+//    }
+//}

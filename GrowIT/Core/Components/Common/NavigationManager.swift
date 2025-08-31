@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import SnapKit
 
 class NavigationManager {
     
@@ -30,6 +31,7 @@ class NavigationManager {
         titleLabel.font = font
         titleLabel.textColor = textColor
         titleLabel.textAlignment = .center
+        
         navigationItem.titleView = titleLabel
     }
     
@@ -44,9 +46,9 @@ class NavigationManager {
         line.tag = 9999
         navigationBar.addSubview(line)
         line.snp.makeConstraints {
-                    $0.height.equalTo(1)
-                    $0.leading.trailing.equalToSuperview()
-                    $0.bottom.equalToSuperview()
+            $0.height.equalTo(1)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
     }
 }

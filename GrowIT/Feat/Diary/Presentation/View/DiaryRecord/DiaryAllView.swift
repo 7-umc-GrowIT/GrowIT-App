@@ -7,6 +7,7 @@
 
 import UIKit
 import DropDown
+import SnapKit
 
 class DiaryAllView: UIView {
     
@@ -45,16 +46,29 @@ class DiaryAllView: UIView {
     // 추후 드롭다운으로 수정 예정
     private let dropDown = DropDown()
     
-    private let dropDownButton = UIButton().then {
+    private let dropDownStack = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = 4
+        $0.alignment = .center
+        $0.distribution = .fill
+    }
+    
+    let dateLabel = UILabel().then {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy년 M월"
         let currentDate = dateFormatter.string(from: Date())
         
-        $0.setTitle("\(currentDate) ▼", for: .normal)
-        $0.titleLabel?.font = .heading2Bold()
-        $0.setTitleColor(.gray900, for: .normal)
+        $0.text = "\(currentDate)"
+        $0.font = .heading2Bold()
+        $0.textColor = .gray900
+        $0.isUserInteractionEnabled = false
+    }
+    
+    let dropDownButton = UIButton().then {
+        $0.setImage(UIImage(named: "dropdownIcon"), for: .normal)
         $0.backgroundColor = .clear
-        $0.contentHorizontalAlignment = .left
+        $0.tintColor = .gray500
+        $0.isUserInteractionEnabled = false
     }
 
     let diaryCountLabel = UILabel().then {
@@ -76,50 +90,85 @@ class DiaryAllView: UIView {
     private func setupUI() {
         backgroundColor = .white
         addSubview(dateView)
-        dateView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide)
-            make.leading.trailing.equalToSuperview()
-            make.height.equalTo(109)
+        dateView.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(109)
         }
         
         dateView.addSubview(dayLabel)
-        dayLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
-            make.top.equalToSuperview().offset(32)
+        dayLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(24)
+            $0.top.equalToSuperview().offset(32)
         }
         
-        dateView.addSubview(dropDownButton)
-        dropDownButton.snp.makeConstraints { make in
-            make.leading.equalTo(dayLabel.snp.leading)
-            make.top.equalTo(dayLabel.snp.bottom).offset(8)
-            make.centerX.equalToSuperview()
-        }
+        dropDownStack.addArrangedSubview(dateLabel)
+        dropDownStack.addArrangedSubview(dropDownButton)
+        dateView.addSubview(dropDownStack)
         
+        dropDownStack.snp.makeConstraints {
+            $0.top.equalTo(dayLabel.snp.bottom).offset(8)
+            $0.leading.equalTo(dayLabel.snp.leading)
+        }
+    
         addSubview(diaryCountLabel)
-        diaryCountLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
-            make.top.equalTo(dateView.snp.bottom).offset(16)
+        diaryCountLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(24)
+            $0.top.equalTo(dateView.snp.bottom).offset(16)
         }
         
         addSubview(diaryTableView)
-        diaryTableView.snp.makeConstraints { make in
-            make.leading.equalTo(diaryCountLabel.snp.leading)
-            make.top.equalTo(diaryCountLabel.snp.bottom).offset(16)
-            make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-53)
+        diaryTableView.snp.makeConstraints {
+            $0.leading.equalTo(diaryCountLabel.snp.leading)
+            $0.top.equalTo(diaryCountLabel.snp.bottom).offset(16)
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().offset(-53)
         }
     }
     
     private func setupDropDown() {
-        dropDown.dataSource = ["2024년 10월", "2024년 11월", "2024년 12월", "2025년 1월", "2025년 2월", "2025년 3월"]
+        // 최소 시작 연/월
+        let minYear = 2025
+        let minMonth = 3
+        
+        // 현재 연/월
+        let currentDate = Date()
+        let currentYear = Calendar.current.component(.year, from: currentDate)
+        let currentMonth = Calendar.current.component(.month, from: currentDate)
+        
+        // 날짜 포맷터
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "yyyy년 M월"
+        
+        var dataSource: [String] = []
+        
+        var year = minYear
+        var month = minMonth
+        
+        while (year < currentYear) || (year == currentYear && month <= currentMonth) {
+            if let date = Calendar.current.date(from: DateComponents(year: year, month: month)) {
+                dataSource.append(formatter.string(from: date))
+            }
+            
+            // 다음 달로 이동
+            month += 1
+            if month > 12 {
+                month = 1
+                year += 1
+            }
+        }
+        
+        dropDown.dataSource = dataSource
         dropDown.dismissMode = .automatic
         dropDown.backgroundColor = .gray50
         dropDown.textColor = .black
         dropDown.cornerRadius = 12
-        dropDown.anchorView = dropDownButton
+        dropDown.anchorView = dropDownStack
+        dropDown.width = UIScreen.main.bounds.width - 48
         
         dropDown.selectionAction = { [weak self] index, item in
-            self?.dropDownButton.setTitle("\(item) ▼", for: .normal)
+            self?.dateLabel.text = item
             
             let components = item.split(separator: " ")
             if let year = Int(components[0].replacingOccurrences(of: "년", with: "")),
@@ -127,28 +176,26 @@ class DiaryAllView: UIView {
                 
                 self?.selectedYear = year
                 self?.selectedMonth = month
-                
                 self?.onDateSelected?(year, month)
             }
         }
         
         dropDown.customCellConfiguration = { [weak self] (index: Int, item: String, cell: DropDownCell) -> Void in
-            guard let self = self else { return }
-            
+            guard self != nil else { return }
             let separator = UIView()
             separator.backgroundColor = .lightGray
-            
             cell.addSubview(separator)
-            
-            separator.snp.makeConstraints { make in
-                make.leading.trailing.equalToSuperview()
-                make.height.equalTo(0.5)
-                make.bottom.equalToSuperview()
+            separator.snp.makeConstraints {
+                $0.leading.trailing.equalToSuperview()
+                $0.height.equalTo(0.5)
+                $0.bottom.equalToSuperview()
             }
         }
         
-        dropDownButton.addTarget(self, action: #selector(showDropDown), for: .touchUpInside)
+        dropDownStack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showDropDown)))
+        dropDownStack.isUserInteractionEnabled = true
     }
+
     
     func updateDiaryCount(_ count: Int) {
         let allText = "작성한 일기 수 \(count)"

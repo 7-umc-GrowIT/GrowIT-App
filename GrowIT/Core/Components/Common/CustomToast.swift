@@ -13,20 +13,26 @@ class CustomToast {
     private var containerHeight: CGFloat
     private var imageWidthHeight: CGFloat
     private var spaceBetweenImageAndLabel: CGFloat
-
+    
+    // 현재 표시 중인 토스트 관리
+    private static var currentToastContainer: UIView?
+    
     init(containerWidth: CGFloat = 210, containerHeight: CGFloat = 56, imageWidthHeight: CGFloat = 24, spaceBetweenImageAndLabel: CGFloat = 8) {
         self.containerWidth = containerWidth
         self.containerHeight = containerHeight
         self.imageWidthHeight = imageWidthHeight
         self.spaceBetweenImageAndLabel = spaceBetweenImageAndLabel
-
-            }
+    }
 
     func show(image: UIImage, message: String, font: UIFont) {
         guard let keyWindow = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first else {
             print("Toast Error: No key window available")
             return
         }
+
+        // 기존 토스트가 있다면 즉시 제거
+        CustomToast.currentToastContainer?.removeFromSuperview()
+        CustomToast.currentToastContainer = nil
 
         let containerView = UIView().then {
             $0.backgroundColor = UIColor(hex: "#00000066")
@@ -45,7 +51,6 @@ class CustomToast {
             $0.textAlignment = .center
             $0.numberOfLines = 1
         }
-
 
         keyWindow.addSubview(containerView)
         containerView.snp.makeConstraints { make in
@@ -68,19 +73,29 @@ class CustomToast {
             make.leading.equalTo(imageView.snp.trailing).offset(spaceBetweenImageAndLabel)
         }
 
-        // 토스트 페이드 인, 딜레이 후 페이드 아웃
+        // 현재 토스트로 설정
+        CustomToast.currentToastContainer = containerView
+
+        // 토스트 애니메이션
         containerView.alpha = 0
         UIView.animate(withDuration: 0.5, animations: {
             containerView.alpha = 1
         }) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                UIView.animate(withDuration: 0.5, animations: {
-                    containerView.alpha = 0
-                }) { _ in
-                    containerView.removeFromSuperview()
+            // 1초 후 사라지기 시작
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
+                // 현재 토스트가 이 토스트와 같을 때만 자동 제거
+                if CustomToast.currentToastContainer == containerView {
+                    UIView.animate(withDuration: 0.5, animations: {
+                        containerView.alpha = 0
+                    }) { _ in
+                        containerView.removeFromSuperview()
+                        // 현재 토스트 참조 정리
+                        if CustomToast.currentToastContainer == containerView {
+                            CustomToast.currentToastContainer = nil
+                        }
+                    }
                 }
             }
         }
     }
 }
-
