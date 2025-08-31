@@ -23,7 +23,8 @@ class WithdrawModalViewController: UIViewController {
     //MARK: - Functional
     //MARK: Event
     @objc private func didTapWithDraw(){
-        print("회원탈퇴하기")
+        let nextVC = WithdrawViewController()
+        navigationController?.pushViewController(nextVC, animated: true)
     }
     
     @objc
