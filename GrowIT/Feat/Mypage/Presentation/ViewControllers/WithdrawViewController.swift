@@ -74,7 +74,11 @@ class WithdrawViewController: UIViewController {
     // MARK: Event
     @objc
     private func prevVC() {
-        navigationController?.popViewController(animated: true)
+        if let nav = navigationController {
+            if let targetVC = nav.viewControllers.first(where: { $0 is MyAccountViewController }) {
+                nav.popToViewController(targetVC, animated: true)
+            }
+        }
     }
     
     @objc
@@ -124,5 +128,6 @@ extension WithdrawViewController: UITableViewDataSource, UITableViewDelegate {
         withdrawView.dropDownLabel.textColor = .gray900
         
         tableView.isHidden = true
+        withdrawView.buttonStackView.isHidden = false
     }
 }

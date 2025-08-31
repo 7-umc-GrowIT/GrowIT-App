@@ -99,7 +99,7 @@ class WithdrawView: UIView {
         $0.attributedText = attrString
     }
     
-    private let buttonStackView = UIStackView().then {
+    public let buttonStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.distribution = .fillEqually
         $0.spacing = 8
@@ -142,7 +142,7 @@ class WithdrawView: UIView {
     private func setConstraints() {
         mainLabel.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.top.equalToSuperview().inset(32)
+            $0.top.equalTo(safeAreaLayoutGuide).inset(32)
         }
         
         descLabel.snp.makeConstraints {
@@ -182,7 +182,7 @@ class WithdrawView: UIView {
         }
         
         bottomGrayView.snp.makeConstraints {
-            $0.top.equalTo(dropDownView.snp.bottom).offset(264)
+            $0.height.equalTo(312)
             $0.bottom.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
         }
