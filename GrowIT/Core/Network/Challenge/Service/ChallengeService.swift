@@ -53,7 +53,11 @@ final class ChallengeService: NetworkManager {
         request(target: .getAllChallenges(challengeType: challengeType, completed: completed, page: page), decodingType: ChallengeStatusResponseDTO.self, completion: completion)
     }
     
-    func postSelectedChallenge(data: [ChallengeSelectRequestDTO], completion: @escaping (Result<Void, NetworkError>) -> Void) {
-        requestStatusCode(target: .postSelectChallenge(data: data), completion: completion)
+    func postSelectedChallenge(data: [ChallengeSelectRequestDTO], completion: @escaping (Result<ChallengeSelectResponseDTO, NetworkError>) -> Void) {
+        request(target: .postSelectChallenge(data: data), decodingType: ChallengeSelectResponseDTO.self, completion: completion)
+    }
+    
+    func postPresignedUrl(data: PresignedUrlRequestDTO, completion: @escaping (Result<PresignedUrlResponseDTO, NetworkError>) -> Void){
+        request(target: .postPresignedUrl(data: data), decodingType: PresignedUrlResponseDTO.self, completion: completion)
     }
 }

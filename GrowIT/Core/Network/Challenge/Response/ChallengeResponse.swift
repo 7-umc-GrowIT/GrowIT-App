@@ -39,3 +39,20 @@ struct ChallengePatchResponseDTO: Decodable{
     let certificationImageUrl: String
     let thoughts: String
 }
+
+struct PresignedUrlResponseDTO: Decodable {
+    let presignedUrl: String
+    let fileName: String
+}
+
+struct ChallengeSelectResponseDTO: Decodable {
+    let selectedChallenges: [SelectedChallenge]
+}
+
+struct SelectedChallenge: Decodable{
+    let id: Int
+    let challengeType: String
+    let title: String
+    let content: String
+    let time: Int
+}

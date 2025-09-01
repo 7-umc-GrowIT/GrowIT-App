@@ -17,6 +17,7 @@ enum ChallengeEndpoint {
     // Post
     case postSelectChallenge(data: [ChallengeSelectRequestDTO])
     case postProveChallenge(challengeId: Int, data: ChallengeRequestDTO)
+    case postPresignedUrl(data: PresignedUrlRequestDTO)
     
     // Delete
     case deleteChallengeById(challengeId: Int)
@@ -37,24 +38,26 @@ extension ChallengeEndpoint: TargetType {
         switch self {
         case.getChallengeById(let challengeId):
             return "/\(challengeId)"
-        case.getSummaryChallenge:
-            return "/summary"
+        case.getAllChallenges:
+            return "/status"
         case.postSelectChallenge:
             return "/select"
         case.postProveChallenge(let challengeId, _):
             return "/\(challengeId)/prove"
+        case.postPresignedUrl:
+            return "/presigned-url"
         case.deleteChallengeById(let challengeId):
             return "/\(challengeId)"
         case.patchChallengeById(let challengeId, _):
             return "/\(challengeId)"
         default:
-            return "/"
+            return ""
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .postSelectChallenge, .postProveChallenge:
+        case .postSelectChallenge, .postProveChallenge, .postPresignedUrl:
             return .post
         case .deleteChallengeById:
             return .delete
@@ -68,15 +71,16 @@ extension ChallengeEndpoint: TargetType {
     public var task: Moya.Task {
         switch self {
         case .postSelectChallenge(let data):
-           
+            return .requestJSONEncodable(data)
+        case .postPresignedUrl(let data):
             return .requestJSONEncodable(data)
         case .deleteChallengeById(_), .getChallengeById(_), .getSummaryChallenge:
             return .requestPlain
         case .postProveChallenge(_, let data), .patchChallengeById(_, let data):
             return .requestJSONEncodable(data)
-        case .getAllChallenges(challengeType: let dtype, completed: let completed, page: let page):
+        case .getAllChallenges(challengeType: let challengeType, completed: let completed, page: let page):
             return .requestParameters(
-                parameters: ["dtype": dtype, "completed": completed, "page": page],
+                parameters: ["challengeType": challengeType, "completed": completed, "page": page],
                 encoding: URLEncoding.queryString)
         }
     }

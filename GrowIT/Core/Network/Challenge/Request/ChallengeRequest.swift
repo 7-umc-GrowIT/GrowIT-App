@@ -19,3 +19,7 @@ struct ChallengeSelectRequestDTO: Codable {
 }
 
 typealias ChallengeSelectRequestListDTO = [ChallengeSelectRequestDTO]
+
+struct PresignedUrlRequestDTO: Codable {
+    let contentType: String
+}

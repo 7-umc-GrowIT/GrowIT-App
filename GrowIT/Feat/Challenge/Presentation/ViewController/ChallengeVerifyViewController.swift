@@ -189,7 +189,7 @@ class ChallengeVerifyViewController: UIViewController {
     /// S3 Presigned URL 요청 API
     private func getPresignedUrl(){
         let fileName = UUID().uuidString
-        s3Service.putS3UploadUrl(fileName: "\(fileName).png", completion: {
+        challengeService.postPresignedUrl(data: PresignedUrlRequestDTO(contentType: "\(fileName)/png"), completion: {
             [weak self] result in
             guard let self = self else {return}
             switch result{
