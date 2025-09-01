@@ -84,10 +84,10 @@ final class UserService: NetworkManager {
     }
     
     // 회원 탈퇴 API
-    func deleteUser(data: UserDeleteRequestDTO, completion: @escaping(Result<UserDeleteResponseDTO, NetworkError>) -> Void) {
+    func deleteUser(data: UserDeleteRequestDTO, completion: @escaping(Result<EmptyResult, NetworkError>) -> Void) {
         request(
             target: .deleteUser(data: data),
-            decodingType: UserDeleteResponseDTO.self,
+            decodingType: EmptyResult.self,
             completion: completion
         )
     }

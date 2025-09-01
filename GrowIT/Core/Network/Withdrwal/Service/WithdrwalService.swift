@@ -21,10 +21,10 @@ final class WithdrwalService: NetworkManager {
     }
     
     // 탈퇴목록 이유 조회 API
-    func getWithdrawalReasons(completion: @escaping(Result<WithdrwalReasonsResponseDTO, NetworkError>) -> Void) {
+    func getWithdrawalReasons(completion: @escaping(Result<[WithdrwalReasonsResponseDTO], NetworkError>) -> Void) {
         request(
             target: .getReasons,
-            decodingType: WithdrwalReasonsResponseDTO.self,
+            decodingType: [WithdrwalReasonsResponseDTO].self,
             completion: completion
         )
     }
