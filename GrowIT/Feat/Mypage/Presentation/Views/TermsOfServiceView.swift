@@ -9,35 +9,25 @@ import UIKit
 
 class TermsOfServiceView: UIView {
     
-    //MARK: - Data
-    var contents: String = """
-    • 앱의 콘텐츠 및 기능은 저작권 보호를 받으며 무단 도용을 금합니다.\n
-    • 이용자는 선의의 목적과 법령에 따라 서비스를 이용해야 합니다.\n 
-    • 회사는 서비스의 안정적인 제공을 위해 일부 기능을 변경하거나 중단할 수 있습니다.\n
-    • 이용 약관 및 정책은 사전 고지 후 변경될 수 있으며, 계속 사용 시 동의한 것으로 간주됩니다.\n
-    """
-    
-    //MARK: - Components
-    public lazy var contentLabel = UILabel().then {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = 0
-        paragraphStyle.firstLineHeadIndent = 0
-        paragraphStyle.headIndent = 8
-        
-        let attrString = NSMutableAttributedString(
-            string: contents,
-            attributes: [
-                .font: UIFont.body2SemiBold(),
-                .foregroundColor: UIColor.gray600,
-                .paragraphStyle: paragraphStyle
-            ]
-        )
-        
-        $0.numberOfLines = 0
-        $0.attributedText = attrString
+    // MARK: - Data
+    var contents: String = "" {
+        didSet {
+            contentLabel.text = contents
+        }
     }
-
-
+    
+    // MARK: - Components
+    private lazy var scrollView = UIScrollView()
+    private lazy var contentView = UIView()
+    
+    public lazy var contentLabel = AppLabel(
+        text: contents,
+        font: .body2SemiBold(),
+        textColor: .gray600
+    ).then {
+        $0.numberOfLines = 0
+    }
+    
     //MARK: - init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,15 +40,27 @@ class TermsOfServiceView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: - SetUI
+    // MARK: - SetUI
     private func setView() {
-        addSubview(contentLabel)
+        addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubview(contentLabel)
     }
     
     private func setConstraints() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalTo(scrollView.contentLayoutGuide)
+            $0.width.equalTo(scrollView.frameLayoutGuide) // 🔥 가로 스크롤 안 생기게
+        }
+        
         contentLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(32)
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.top.equalTo(safeAreaLayoutGuide).inset(32)
+            $0.bottom.equalToSuperview().offset(-32) // 🔥 끝까지 스크롤 가능하게
         }
     }
 }

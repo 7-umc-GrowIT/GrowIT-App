@@ -12,7 +12,7 @@ class TermsService {
     
     private let provider = MoyaProvider<TermsEndpoints>()
     
-    func fetchTerms(completion: @escaping (Result<[TermsData], Error>) -> Void) {
+    func getTerms(completion: @escaping (Result<[TermsData], Error>) -> Void) {
         provider.request(.getTerms) { result in
             switch result {
             case .success(let response):
