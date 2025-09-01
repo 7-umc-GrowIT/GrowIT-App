@@ -212,19 +212,6 @@ class ChallengeVerifyViewController: UIViewController {
         task.resume()
     }
     
-    /// S3 업로드 이미지 URL 받기 API
-//    private func getS3ImageUrl(fileName: String){
-//        s3Service.getS3DownloadUrl(fileName: fileName, completion: { [weak self] result in
-//            guard let self = self else {return}
-//            switch result{
-//            case .success(let data):
-//                saveChallengeVerify(fileName: fileName)
-//            case .failure(let error):
-//                print("S3 이미지 URL 반환 에러: \(error)")
-//            }
-//        })
-//    }
-    
     /// 챌린지 인증 저장 API
     private func saveChallengeVerify(fileName: String){
         challengeService.postProveChallenge(challengeId: challenge?.id ?? 0, data: ChallengeRequestDTO(certificationImageName: fileName, thoughts: review), completion: { [weak self] result in
@@ -240,22 +227,6 @@ class ChallengeVerifyViewController: UIViewController {
                 print("챌린지 인증 저장 에러: \(error)")
             }
         })
-    }
-    
-    /// 주어진 URL에서 쿼리 파라미터를 제거하고 반환합니다.
-    func removeQueryParameters(from urlString: String) -> String {
-        guard let url = URL(string: urlString),
-              var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            print("Invalid URL")
-            return urlString
-        }
-
-        // 쿼리 파라미터 제거
-        urlComponents.query = nil
-            
-        print("제거하고 저장되는 url: \(urlComponents.string ?? urlString)")
-        // 새로운 URL 문자열을 반환
-        return urlComponents.string ?? urlString
     }
 }
 
