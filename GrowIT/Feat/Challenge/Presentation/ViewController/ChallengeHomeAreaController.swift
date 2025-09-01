@@ -96,7 +96,7 @@ class ChallengeHomeAreaController: UIViewController {
     }
     
     private func setupNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(updateChallengeList), name: .challengeDidDelete, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateChallengeList), name: .challengeReloadNotification, object: nil)
     }
     
     @objc private func updateChallengeList() {

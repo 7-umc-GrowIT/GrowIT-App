@@ -88,7 +88,7 @@ class ChallengeHomeViewController: UIViewController {
     
     private func setupNotifications(){
         NotificationCenter.default.addObserver(self, selector: #selector(moveChallengeVerfiyVC(_:)), name: .closeModalAndMoveVC, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleChallengeStatusReload), name: .challengeStatusReload, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleChallengeStatusReload), name: .challengeReloadNotification, object: nil)
         
     }
     

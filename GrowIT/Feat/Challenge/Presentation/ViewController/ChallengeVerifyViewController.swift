@@ -221,7 +221,7 @@ class ChallengeVerifyViewController: UIViewController {
             switch result{
             case .success(let data):
                 navigationController?.popViewController(animated: false)
-                NotificationCenter.default.post(name: .challengeStatusReload, object: nil)
+                NotificationCenter.default.post(name: .challengeReloadNotification, object: nil)
                 CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "챌린지 인증을 완료했어요", font: .heading3SemiBold())
             case .failure(let error):
                 print("챌린지 인증 저장 에러: \(error)")
