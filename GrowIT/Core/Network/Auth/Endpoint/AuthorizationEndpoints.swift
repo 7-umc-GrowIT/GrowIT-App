@@ -15,6 +15,7 @@ enum AuthorizationEndpoints {
     case postSocialSignUp(data: SocialSignUpRequest) // 소셜 간편 가입 api
     case postReissueToken(data: ReissueTokenRequest) // 토큰 재발급 api
     case postKakaoLogin(data: SocialLoginRequest)
+    case postAppleLogin(data: SocialLoginRequest)
     case postEmailLogin(data: EmailLoginRequest)
     case postSendEmailVerification(type: String, data: SendEmailVerifyRequest) // 인증 메일 전송 api
     case postLogout
@@ -44,6 +45,8 @@ extension AuthorizationEndpoints: TargetType {
             return "/reissue"
         case .postKakaoLogin:
             return "/login/kakao"
+        case .postAppleLogin:
+            return "/login/apple'"
         case .postEmailLogin:
             return "/login"
         case .postSendEmailVerification:
@@ -77,6 +80,8 @@ extension AuthorizationEndpoints: TargetType {
         case .postReissueToken(let data):
             return .requestJSONEncodable(data)
         case .postKakaoLogin(let data):
+            return .requestJSONEncodable(data)
+        case .postAppleLogin(let data) :
             return .requestJSONEncodable(data)
         case .postEmailLogin(let data):
             return .requestJSONEncodable(data)
