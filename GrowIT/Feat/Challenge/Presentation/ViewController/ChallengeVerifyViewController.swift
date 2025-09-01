@@ -103,33 +103,7 @@ class ChallengeVerifyViewController: UIViewController {
         let challengeImageModalController = ChallengeImageModalController()
         challengeImageModalController.modalPresentationStyle = .pageSheet
         
-        if let sheet = challengeImageModalController.sheetPresentationController {
-                    
-            //지원할 크기 지정
-            if #available(iOS 16.0, *){
-                sheet.detents = [.custom{ _ in
-                    360.0
-                }]
-            }else{
-                sheet.detents = [.medium(), .large()]
-            }
-            
-            // 시트의 상단 둥근 모서리 설정
-            if #available(iOS 15.0, *) {
-                sheet.preferredCornerRadius = 40
-            }
-            
-            //크기 변하는거 감지
-            sheet.delegate = self
-           
-            //시트 상단에 그래버 표시 (기본 값은 false)
-            sheet.prefersGrabberVisible = false
-            
-            //처음 크기 지정 (기본 값은 가장 작은 크기)
-            sheet.selectedDetentIdentifier = .large
-        }
-        
-        self.present(challengeImageModalController, animated: true, completion: nil)
+        presentSheet(challengeImageModalController, heightRatio: 0.38)
     }
     
     /// 바깥 영역 터치 시 키보드 숨기기
@@ -319,12 +293,5 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder() // 키보드 숨기기
         return true
-    }
-}
-
-extension ChallengeVerifyViewController: UISheetPresentationControllerDelegate {
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        //크기 변경 됐을 경우
-        print(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")
     }
 }

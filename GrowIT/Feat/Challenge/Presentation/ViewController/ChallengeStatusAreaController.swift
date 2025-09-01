@@ -206,32 +206,9 @@ extension ChallengeStatusAreaController: UICollectionViewDelegateFlowLayout, UIC
                 challengeVerifyModalVC.modalPresentationStyle = .pageSheet
                 challengeVerifyModalVC.delegate = self
                 
-                if let sheet = challengeVerifyModalVC.sheetPresentationController {
-                    
-                    //지원할 크기 지정
-                    if #available(iOS 16.0, *){
-                        sheet.detents = [
-                            .custom{ _ in
-                                358.0
-                            }]
-                    }else{
-                        sheet.detents = [.medium(), .large()]
-                    }
-                    
-                    // 시트의 상단 둥근 모서리 설정
-                    if #available(iOS 15.0, *) {
-                        sheet.preferredCornerRadius = 40
-                    }
-                    
-                    //크기 변하는거 감지
-                    sheet.delegate = self
-                    
-                    //시트 상단에 그래버 표시 (기본 값은 false)
-                    sheet.prefersGrabberVisible = false
-                }
+                presentSheet(challengeVerifyModalVC, heightRatio: 0.34)
                 
                 challengeVerifyModalVC.challengeId = selectedChallenge!.id
-                self.present(challengeVerifyModalVC, animated: true, completion: nil)
             }
         case 2:
             selectedStatusIndex = indexPath.row
@@ -260,12 +237,6 @@ extension ChallengeStatusAreaController: UICollectionViewDelegateFlowLayout, UIC
         default:
             break
         }
-    }
-}
-
-extension ChallengeStatusAreaController: UISheetPresentationControllerDelegate {
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        print(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")
     }
 }
 

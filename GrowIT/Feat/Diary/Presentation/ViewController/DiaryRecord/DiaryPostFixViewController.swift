@@ -81,8 +81,8 @@ class DiaryPostFixViewController: UIViewController {
         
         let navController = UINavigationController(rootViewController: nextVC)
         navController.modalPresentationStyle = .fullScreen
-        presentPageSheet(viewController: navController, detentFraction: 0.37)
-    }
+        
+        presentSheet(navController, heightRatio: 0.37)    }
     
     // MARK: Setup APIs
     private func getUserContent() -> DiaryPatchDTO {

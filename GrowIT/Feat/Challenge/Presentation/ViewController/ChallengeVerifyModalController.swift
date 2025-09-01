@@ -35,31 +35,7 @@ class ChallengeVerifyModalController: UIViewController {
         }
         nextVC.modalPresentationStyle = .pageSheet
         
-        if let sheet = nextVC.sheetPresentationController {
-                    
-            //지원할 크기 지정
-            if #available(iOS 16.0, *){
-                sheet.detents = [
-                    .custom{ _ in
-                    314.0
-                }]
-            }else{
-                sheet.detents = [.medium(), .large()]
-            }
-            
-            // 시트의 상단 둥근 모서리 설정
-            if #available(iOS 15.0, *) {
-                sheet.preferredCornerRadius = 40
-            }
-            
-            //크기 변하는거 감지
-            sheet.delegate = self
-           
-            //시트 상단에 그래버 표시 (기본 값은 false)
-            sheet.prefersGrabberVisible = false
-        }
-        
-        self.present(nextVC, animated: true, completion: nil) //챌린지 삭제 바텀모달 이동
+        presentSheet(nextVC, heightRatio: 0.32)
     }
     
     @objc private func dismissModal() {
@@ -75,12 +51,6 @@ class ChallengeVerifyModalController: UIViewController {
 
 }
 
-extension ChallengeVerifyModalController: UISheetPresentationControllerDelegate {
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        //크기 변경 됐을 경우
-        print(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")
-    }
-}
 
 extension Notification.Name {
     static let closeModalAndMoveVC = Notification.Name("closeModalAndMoveVC")

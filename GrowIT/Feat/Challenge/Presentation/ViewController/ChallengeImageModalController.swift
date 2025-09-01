@@ -100,13 +100,6 @@ class ChallengeImageModalController: UIViewController {
     }
 }
 
-extension ChallengeImageModalController: UISheetPresentationControllerDelegate {
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        //크기 변경 됐을 경우
-        print(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")
-    }
-}
-
 extension ChallengeImageModalController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let image = info[.originalImage] as? UIImage {

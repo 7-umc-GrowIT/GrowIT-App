@@ -84,7 +84,7 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         prevVC.diaryId = diaryId
         let navController = UINavigationController(rootViewController: prevVC)
         navController.modalPresentationStyle = .fullScreen
-        presentPageSheet(viewController: navController, detentFraction: 0.37)
+        presentSheet(navController, heightRatio: 0.37)
     }
     
     @objc func nextVC() {
