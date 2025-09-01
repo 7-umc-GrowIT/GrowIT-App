@@ -49,37 +49,35 @@ class ChallengeImageModalController: UIViewController {
         }
     }
     
-    @objc private func galleryBtnTapped(){
-        imagePicker.sourceType = .photoLibrary
+    @objc private func galleryBtnTapped() {
+        guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary) else {
+            print("Photo library not available")
+            return
+        }
         
         let authorizationStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         switch authorizationStatus {
         case .notDetermined:
-            // 권한이 아직 요청되지 않았다면 권한 요청
             PHPhotoLibrary.requestAuthorization { status in
-                DispatchQueue.main.async {
-                    if status == .authorized {
-                        // 권한이 허용되면 이미지 피커 표시
-                        self.present(self.imagePicker, animated: true, completion: nil)
-                    } else {
-                        // 권한 거부 처리
+                if status == .authorized || status == .limited {
+                    DispatchQueue.main.async {
+                        self.openImagePicker(sourceType: .photoLibrary)
+                    }
+                } else {
+                    DispatchQueue.main.async {
                         self.showPermissionDeniedAlert()
                     }
                 }
             }
-        case .authorized:
-            // 권한이 이미 있으면 바로 이미지 피커 표시
-            self.present(self.imagePicker, animated: true, completion: nil)
+        case .authorized, .limited:
+            openImagePicker(sourceType: .photoLibrary)
         case .restricted, .denied:
-            // 권한이 거부되었거나 제한된 경우
-            self.showPermissionDeniedAlert()
-        case .limited:
-            self.present(self.imagePicker, animated: true, completion: nil)
+            showPermissionDeniedAlert()
         @unknown default:
-            // 예상치 못한 상태 처리
             break
         }
     }
+
     
     private func openImagePicker(sourceType: UIImagePickerController.SourceType) {
         imagePicker.sourceType = sourceType
