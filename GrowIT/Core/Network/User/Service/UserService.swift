@@ -14,7 +14,7 @@ final class UserService: NetworkManager {
     
     init(provider: MoyaProvider<UserEndpoint>? = nil) {
         let plugins: [PluginType] = [
-//            NetworkLoggerPlugin(configuration: .init(logOptions: [.requestHeaders, .verbose]))
+            // NetworkLoggerPlugin(configuration: .init(logOptions: [.requestHeaders, .verbose]))
             AuthPlugin()
         ]
         
@@ -70,6 +70,24 @@ final class UserService: NetworkManager {
         request(
             target: .getTotalCredits,
             decodingType: UserGetTotalCreditResponseDTO.self,
+            completion: completion
+        )
+    }
+    
+    // 마이페이지 조회 API
+    func getMypage(completion: @escaping(Result<UserGetMypageResponseDTO, NetworkError>) -> Void) {
+        request(
+            target: .getMypage,
+            decodingType: UserGetMypageResponseDTO.self,
+            completion: completion
+        )
+    }
+    
+    // 회원 탈퇴 API
+    func deleteUser(data: UserDeleteRequestDTO, completion: @escaping(Result<EmptyResult, NetworkError>) -> Void) {
+        request(
+            target: .deleteUser(data: data),
+            decodingType: EmptyResult.self,
             completion: completion
         )
     }

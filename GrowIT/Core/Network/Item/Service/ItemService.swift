@@ -47,6 +47,4 @@ final class ItemService: NetworkManager {
             completion: completion
         )
     }
-    
-    
 }

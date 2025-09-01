@@ -177,12 +177,7 @@ class TermsAgreeViewController: UIViewController, UITableViewDelegate {
     
     @objc private func nextButtonTapped() {
         if !validateAgreements() {
-            let toastImage = UIImage(named: "agreeIcon") ?? UIImage()
-            CustomToast(containerWidth: 250).show(
-                image: toastImage,
-                message: "필수 이용약관 동의가 필요합니다",
-                font: UIFont.body2Medium()
-            )
+            ToastSecond.show(image: UIImage(named: "agreeIcon") ?? UIImage(), message: "필수 이용약관 동의가 필요합니다", font: .body2Medium(), in: self.view)
             return
         }
         

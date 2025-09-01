@@ -19,7 +19,7 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     
     var diaryId = 0
         
-    var recommendedChallenges: [RecommendedChallenge] = []
+    var recommendedChallenges: [RecommendedDiaryChallengeDTO] = []
     var emotionKeywords: [EmotionKeyword] = []
     
     private var challengeViews: [VoiceChallengeItemView] {
@@ -135,7 +135,7 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     
     // MARK: Setup APIs
     private func callPostVoiceDiary() {
-        diaryService.postVoiceDiary(data: DiaryVoiceRequestDTO(
+        diaryService.postVoiceDiary(data: DiaryVoiceDTO(
             chat: ""),
                                     completion: { [weak self] result in
             guard let self = self else { return }
@@ -150,10 +150,20 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     
     func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
         let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""
-        return challengeViews.enumerated().compactMap { index, challengeView in
-            guard index < recommendedChallenges.count, challengeView.button.isSelectedState() else { return nil }
+        
+        return challengeViews.enumerated().compactMap { (index, challengeView) -> ChallengeSelectRequestDTO? in
+            // 인덱스 범위 확인
+            guard index < recommendedChallenges.count else { return nil }
+            
+            // 선택 상태 확인
+            guard challengeView.button.isSelectedState() else { return nil }
+            
             let challenge = recommendedChallenges[index]
-            return ChallengeSelectRequestDTO(challengeIds: [challenge.id], dtype: challenge.type, date: date)
+            return ChallengeSelectRequestDTO(
+                challengeIds: [challenge.id],
+                challengeType: challenge.challengeType,
+                date: date
+            )
         }
     }
 }

@@ -12,8 +12,8 @@ protocol ChallengeDataSource {
     func fetchChallengeHome() -> AnyPublisher<ChallengeHomeResponseDTO, Error>
     
     func fetchChallengeStatus(
-            dtype: String,
-            completed: Bool,
+            challengeType: String,
+            completed: String,
             page: Int
         ) -> AnyPublisher<ChallengeStatusResponseDTO, Error>
 }
@@ -34,13 +34,13 @@ final class ChallengeDataSourceImpl: ChallengeDataSource {
     }
     
     func fetchChallengeStatus(
-            dtype: String,
-            completed: Bool,
+            challengeType: String,
+            completed: String,
             page: Int
         ) -> AnyPublisher<ChallengeStatusResponseDTO, Error> {
             Future { promise in
                 ChallengeService().fetchChallengeStatus(
-                    dtype: dtype,
+                    challengeType: challengeType,
                     completed: completed,
                     page: page
                 ) { result in
@@ -48,6 +48,7 @@ final class ChallengeDataSourceImpl: ChallengeDataSource {
                     case .success(let dto):
                         promise(.success(dto))
                     case .failure(let error):
+                        print("챌린지 현황 조회 error: \(error)")
                         promise(.failure(error))
                     }
                 }

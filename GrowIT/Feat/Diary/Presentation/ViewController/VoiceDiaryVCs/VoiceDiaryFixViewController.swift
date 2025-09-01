@@ -16,7 +16,7 @@ class VoiceDiaryFixViewController: UIViewController {
     var diaryId = 0
     let diaryService = DiaryService()
     
-    var recommendedChallenges: [RecommendedChallenge] = []
+    var recommendedChallenges: [RecommendedDiaryChallengeDTO] = []
     var emotionKeywords: [EmotionKeyword] = []
     
     init(text: String) {

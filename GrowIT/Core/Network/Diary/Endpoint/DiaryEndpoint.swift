@@ -15,7 +15,7 @@ enum DiaryEndpoint {
     case getDiaryDates(year: Int, month: Int)
     
     // Post
-    case postVoiceDiary(data: DiaryVoiceRequestDTO)
+    case postVoiceDiary(data: DiaryVoiceDTO)
     case postTextDiary(data: DiaryRequestDTO)
     case postDiaryDate(data: DiaryVoiceDateRequestDTO)
     case postDiaryAnalyze(diaryId: Int)

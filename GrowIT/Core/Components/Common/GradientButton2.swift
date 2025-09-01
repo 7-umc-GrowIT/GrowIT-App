@@ -1,13 +1,13 @@
 //
-//  GradientButton.swift
+//  GradientButton2.swift
 //  GrowIT
 //
-//  Created by 오현민 on 1/21/25.
+//  Created by 오현민 on 7/30/25
 //
 
 import UIKit
 
-class GradientButton: UIButton {
+class GradientButton2: UIButton {
     private lazy var treeIcon = UIImageView().then {
         $0.image = UIImage(named: "GrowIT_Tree")?.withRenderingMode(.alwaysTemplate)
         $0.tintColor = .grayColor400
@@ -17,11 +17,25 @@ class GradientButton: UIButton {
         }
     }
     
+    private lazy var subtitle = UILabel().then {
+        $0.text = "서브타이틀"
+        $0.textColor = .grayColor400
+        $0.font = .body2SemiBold()
+        $0.textAlignment = .center
+    }
+    
     private lazy var title = UILabel().then {
         $0.text = "그로우잇 시작하기!"
         $0.textColor = .grayColor400
-        $0.font = UIFont.heading2Bold()
+        $0.font = .subHeading2()
         $0.textAlignment = .center
+    }
+    
+    private lazy var buttonContentStack = UIStackView().then {
+        $0.axis = .vertical
+        $0.alignment = .center
+        $0.spacing = 2
+        $0.isUserInteractionEnabled = false
     }
     
     private lazy var buttonContentView = UIStackView().then {
@@ -49,9 +63,11 @@ class GradientButton: UIButton {
     // MARK: - configure Button
     private func configure() {
         self.snp.makeConstraints { make in
-            make.height.equalTo(60)
+            make.height.equalTo(72)
         }
-        buttonContentView.addArrangedSubViews([treeIcon, title])
+        buttonContentView.addArrangedSubViews([treeIcon, buttonContentStack])
+        buttonContentStack.addArrangedSubViews([subtitle, title])
+
         addSubview(buttonContentView)
         buttonContentView.snp.makeConstraints {
             $0.center.equalToSuperview()

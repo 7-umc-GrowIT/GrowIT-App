@@ -135,7 +135,7 @@ class TextDiaryRecommendChallengeView: UIView {
         emoStackView.updateLabels(with: keywords)
     }
     
-    func updateChallenges(_ challenges: [RecommendedChallenge]) {
+    func updateChallenges(_ challenges: [RecommendedDiaryChallengeDTO]) {
         let titles = challenges.prefix(3).map { $0.title }
         let times = challenges.prefix(3).map { "\($0.time)분" }
         let content = challenges.prefix(3).map { $0.content }

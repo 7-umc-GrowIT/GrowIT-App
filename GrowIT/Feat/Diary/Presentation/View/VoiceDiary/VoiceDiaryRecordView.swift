@@ -32,7 +32,6 @@ class VoiceDiaryRecordView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        startTimer()
         startAnimation()
         setupActions()
         hideTipView()
@@ -48,6 +47,15 @@ class VoiceDiaryRecordView: UIView {
         // 그라데이션 적용
         setGradient(color1: .gray700, color2: .gray900)
         recordButton.setGradient(color1: .primary400, color2: .primary600)
+    }
+    
+    // 타이머 제어 메서드를 public으로
+    func startConversationTimer() {
+        startTimer()
+    }
+    
+    func stopConversationTimer() {
+        stopTimer()
     }
     
     private func hideTipView() {

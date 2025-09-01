@@ -11,3 +11,7 @@ struct GroRequestDTO: Codable {
     let name: String
     let backgroundItem: String
 }
+
+struct GroChangeNicknameRequestDTO: Codable {
+    let name: String
+}

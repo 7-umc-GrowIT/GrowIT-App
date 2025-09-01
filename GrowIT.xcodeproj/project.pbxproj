@@ -16,6 +16,9 @@
 		D1721EF82E4EFB4700C38E69 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EF72E4EFB4700C38E69 /* Lottie */; };
 		D1721EFB2E4EFB5A00C38E69 /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EFA2E4EFB5A00C38E69 /* NVActivityIndicatorView */; };
 		D1721EFE2E4EFB8900C38E69 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D1721EFD2E4EFB8900C38E69 /* Kingfisher */; };
+		D1AB6C6E2E6038A8008999FD /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = D1AB6C6D2E6038A8008999FD /* Lottie */; };
+		D1AB6C702E6038B4008999FD /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D1AB6C6F2E6038B4008999FD /* Kingfisher */; };
+		D1C897652E603963004ED865 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D1C897642E603963004ED865 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,10 +59,13 @@
 				D1721EF82E4EFB4700C38E69 /* Lottie in Frameworks */,
 				D1721EFE2E4EFB8900C38E69 /* Kingfisher in Frameworks */,
 				D1721EFB2E4EFB5A00C38E69 /* NVActivityIndicatorView in Frameworks */,
+				D1AB6C702E6038B4008999FD /* Kingfisher in Frameworks */,
+				D1C897652E603963004ED865 /* Kingfisher in Frameworks */,
 				D1721EEF2E4EFB1100C38E69 /* SnapKit in Frameworks */,
 				D1721EF22E4EFB2900C38E69 /* Moya in Frameworks */,
 				D1721EF52E4EFB3700C38E69 /* Then in Frameworks */,
 				8E315642FFD76A27864B4503 /* Pods_GrowIT.framework in Frameworks */,
+				D1AB6C6E2E6038A8008999FD /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,7 +164,7 @@
 				D1721EF32E4EFB3700C38E69 /* XCRemoteSwiftPackageReference "Then" */,
 				D1721EF62E4EFB4700C38E69 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				D1721EF92E4EFB5A00C38E69 /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
-				D1721EFC2E4EFB8900C38E69 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				D1C897632E603963004ED865 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D122A1D12E4E3D010055E22D /* Products */;
@@ -191,9 +197,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GrowIT/Pods-GrowIT-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GrowIT/Pods-GrowIT-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -244,9 +254,10 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3GC4GZHTX6;
+				DEVELOPMENT_TEAM = NZZ4F7L72Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GrowIT/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "음성 인식을 위해 마이크 사용이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -257,7 +268,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.GrowIT.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.GrowIT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -279,9 +290,10 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3GC4GZHTX6;
+				DEVELOPMENT_TEAM = NZZ4F7L72Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GrowIT/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "음성 인식을 위해 마이크 사용이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -292,7 +304,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.GrowIT.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.GrowIT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -496,6 +508,14 @@
 				minimumVersion = 8.5.0;
 			};
 		};
+		D1C897632E603963004ED865 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -527,6 +547,21 @@
 		D1721EFD2E4EFB8900C38E69 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D1721EFC2E4EFB8900C38E69 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		D1AB6C6D2E6038A8008999FD /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1721EF62E4EFB4700C38E69 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+		D1AB6C6F2E6038B4008999FD /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1721EFC2E4EFB8900C38E69 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		D1C897642E603963004ED865 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D1C897632E603963004ED865 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -61,6 +61,12 @@ final class GroImageCacheManager {
         fetchGroImage(completion: completion)
     }
 
+    // 3. 캐시 전체 초기화 (로그아웃 시 호출)
+       func clearAll() {
+           cachedGroData = nil
+           isFetching = false
+           print("🗑️ GroImageCacheManager 캐시 초기화 완료")
+       }
 
     private func isDataChanged(newData: GroGetResponseDTO) -> Bool {
         guard let oldData = cachedGroData else { return true }

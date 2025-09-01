@@ -39,4 +39,14 @@ final class GroService: NetworkManager {
             completion: completion
         )
     }
+    
+    // 그로 닉네임 변경 API
+    func patchGroChangeNickname(data: GroChangeNicknameRequestDTO, completion: @escaping (Result<EmptyResult, NetworkError>) -> Void) {
+        request(
+            target: .patchGroChangeNickname(data: data),
+            decodingType: EmptyResult.self,
+            completion: completion
+        )
+    }
+
 }

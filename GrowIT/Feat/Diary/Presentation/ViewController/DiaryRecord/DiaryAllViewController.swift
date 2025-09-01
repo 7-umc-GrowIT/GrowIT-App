@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 class DiaryAllViewController: UIViewController, UITableViewDelegate {
     
@@ -18,8 +19,11 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
+        
         setupUI()
         setupDelegate()
+        //setupCustomTitle()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -27,6 +31,7 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
         callGetAllDiaries()
         setupNavigationBar()
         setupActions()
+    
     }
     
     //MARK: - Setup Navigation Bar
@@ -40,9 +45,44 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
         
         navigationBarManager.setTitle(
             to: navigationItem,
-            title: "직접 일기 작성하기",
+            title: "나의 일기 기록",
             textColor: .black
         )
+    }
+    
+    private func setupCustomTitle() {
+        // 기본 타이틀은 비우고
+        self.title = ""
+        
+        // 커스텀 타이틀 뷰를 메인 뷰에 추가
+        let titleContainer = UIView()
+        titleContainer.backgroundColor = .white
+        
+        let titleLabel = UILabel()
+        titleLabel.text = "나의 일기 기록"
+        titleLabel.font = UIFont.heading1Bold()
+        titleLabel.textColor = UIColor.gray900
+        titleLabel.textAlignment = .center
+        
+        diaryAllView.addSubview(titleContainer)
+        titleContainer.addSubview(titleLabel)
+        
+        titleContainer.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalToSuperview()
+            //$0.height.equalTo(44 + 31) // 기본 높이 + 패딩
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
+            $0.top.bottom.equalToSuperview().inset(15.5)
+        }
+        
+        // 기존 뷰를 아래로 밀기
+        diaryAllView.snp.remakeConstraints {
+            $0.top.equalTo(titleContainer.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
     }
     
     // MARK: Setup UI
@@ -132,14 +172,29 @@ extension DiaryAllViewController: DiaryAllViewCellDelegate {
     func didTapButton(in cell: DiaryAllViewTableViewCell) {
         guard let indexPath = diaryAllView.diaryTableView.indexPath(for: cell) else { return }
         let diary = diaries[indexPath.row]
-        let fixVC = DiaryPostFixViewController(text: diary.content, date: diary.date.formattedDate(), diaryId: diary.diaryId)
+        
+        let fixVC = DiaryPostFixViewController(
+            text: diary.content,
+            date: diary.date.formattedDate(),
+            diaryId: diary.diaryId
+        )
         
         fixVC.onDismiss = { [weak self] in
             self?.callGetAllDiaries()
         }
         
         let navController = UINavigationController(rootViewController: fixVC)
-        navController.modalPresentationStyle = .fullScreen
-        presentPageSheet(viewController: navController, detentFraction: 0.65)
+        
+        if let sheet = navController.sheetPresentationController {
+            if #available(iOS 16.0, *) {
+                sheet.detents = [.custom { _ in 0.6 * UIScreen.main.bounds.height }]
+            } else {
+                // Fallback on earlier versions
+            }
+            sheet.prefersGrabberVisible = false
+            sheet.preferredCornerRadius = 24   // 🔥 모달 둥근 모서리 적용
+        }
+        
+        present(navController, animated: true)
     }
 }
