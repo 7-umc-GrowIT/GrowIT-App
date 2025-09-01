@@ -71,7 +71,7 @@ class LoginView: UIView {
     }
     
     // 애플 로그인 버튼
-    private lazy var appleLoginButton = UIButton().then {
+    public lazy var appleLoginButton = UIButton().then {
         // 배경색 및 스타일 설정
         $0.backgroundColor = .black
         $0.layer.cornerRadius = 30

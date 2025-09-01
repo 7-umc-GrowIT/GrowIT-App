@@ -103,6 +103,22 @@ final class AuthService: NetworkManager {
         }
     }
     
+    // 애플 소셜 로그인 API
+    func postLoginApple(data: SocialLoginRequest, completion: @escaping (Result<SocialLoginResponse, NetworkError>) -> Void) {
+        provider.request(.postKakaoLogin(data: data)) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    let decoded = try JSONDecoder().decode(SocialLoginResponse.self, from: response.data)
+                    completion(.success(decoded))
+                } catch {
+                    completion(.failure(.decodingError))
+                }
+            case .failure(let error):
+                completion(.failure(.networkError(message: error.localizedDescription)))
+            }
+        }
+    }
     
     /// 이메일 로그인
     func loginEmail(data: EmailLoginRequest, completion: @escaping (Result<LoginResponse, NetworkError>) -> Void) {

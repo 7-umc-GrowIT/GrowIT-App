@@ -39,8 +39,13 @@ struct SocialLoginResponse: Codable {
 
 struct SocialLoginResult: Codable {
     let signupRequired: Bool
-    let tokens: Tokens?
+    let loginResponseDTO: LoginResponseDTO
     let oauthUserInfo: OauthUserInfo?
+}
+
+struct LoginResponseDTO: Codable {
+    let tokens: Tokens?
+    let loginMethod: String
 }
 
 struct OauthUserInfo: Codable {
