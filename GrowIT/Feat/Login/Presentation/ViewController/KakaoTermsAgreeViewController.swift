@@ -39,7 +39,7 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
         setupUI()
         setupDelegate()
         setupActions()
-        fetchTerms()
+        callGetTerms()
     }
     
     // MARK: - SetupUI
@@ -90,8 +90,8 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
     }
     
     // MARK: - API 호출 (약관 목록 불러오기)
-    private func fetchTerms() {
-        termsService.fetchTerms { [weak self] result in
+    private func callGetTerms() {
+        termsService.getTerms { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let terms):

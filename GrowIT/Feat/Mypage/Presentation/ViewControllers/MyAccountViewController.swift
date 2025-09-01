@@ -178,8 +178,8 @@ class MyAccountViewController: UIViewController {
     }
     
     @objc
-    func didTapTermsOfService() {
-        let nextVC = TermsOfServiceViewController()
+    func didTapTermsOfService(_ type: String) {
+        let nextVC = TermsOfServiceViewController(navigationBarTitle: type)
         navigationController?.pushViewController(nextVC, animated: true)
     }
     
@@ -251,9 +251,9 @@ extension MyAccountViewController: UITableViewDataSource, UITableViewDelegate {
         case (0, 1):
             changePwdBtnTap()
         case (1, 0):
-            print("멀랑ㅋ")
+            didTapTermsOfService("개인정보 처리방침")
         case (1, 1):
-            didTapTermsOfService()
+            didTapTermsOfService("서비스 이용약관")
         default:
             break
         }
