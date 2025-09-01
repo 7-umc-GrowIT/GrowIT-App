@@ -247,7 +247,7 @@ class ChangePasswordViewController: UIViewController {
             let changePwdErrorVC = ChangePasswordErrorViewController()
             let navController = UINavigationController(rootViewController: changePwdErrorVC)
             navController.modalPresentationStyle = .pageSheet
-            presentPageSheet(viewController: navController, detentFraction: 0.37)
+            presentSheet(navController, heightRatio: 0.37)
         }
         else {
             // 그냥 pop 또는 dismiss
