@@ -8,179 +8,179 @@
 import UIKit
 import Then
 import SnapKit
-import SwiftUI
-
-struct ChallengeCompleteScreen: View {
-    let challenge: ChallengeDTO = ChallengeDTO(id: 0, title: "좋아하는 책 독서하기 좋아하는 책 독서하기 좋아하는 책 독서하기 좋아하는 책 독서하기", certificationImageUrl: "https://cdnweb01.wikitree.co.kr/webdata/editor/202408/16/img_20240816175532_b82de03f.webp", thoughts: "오늘의 챌린지에 대한 한줄 소감입니다", time: 1, certificationDate: "2025년 8월 12일 인증")
-    
-    var body: some View {
-        ScrollView(.vertical, showsIndicators: false){
-            VStack(alignment: .leading){
-                Image("grabberIcon")
-                    .resizable()
-                    .frame(width: 80, height: 4)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
-                Image("challengeCompleteIcon")
-                    .resizable()
-                    .frame(width: 28, height: 28)
-                DefaultLabel(title: "챌린지 인증 완료!", color: .primary600, font: .heading2Bold)
-                Spacer().frame(height: 16)
-                DefaultLabel(title: "어떤 챌린지인가요?", color: .gray900, font: .heading3Bold)
-                Spacer().frame(height: 8)
-                ChallengeCompleteCard(challenge: challenge)
-                Spacer().frame(height: 8)
-                DefaultLabel(title: challenge.certificationDate, color: .gray500, font: .body2Medium)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                Spacer().frame(height: 24)
-                DefaultLabel(title: "챌린지 인증샷", color: .gray900, font: .heading3Bold)
-                Spacer().frame(height: 8)
-                CertificationImageBox(url: challenge.certificationImageUrl)
-                Spacer().frame(height: 24)
-                DefaultLabel(title: "챌린지 한줄소감", color: .gray900, font: .heading3Bold)
-                Spacer().frame(height: 8)
-                ReviewBox(review: challenge.thoughts)
-                Spacer().frame(height: 4)
-                DefaultLabel(title: "챌린지 한줄소감을 50자 이상 적어 주세요", color: .gray500, font: .detail2Regular)
-                Spacer().frame(height: 40)
-                HStack(spacing: 8){
-                    ChallengeCompleteButton(title: "나가기", onTap: {})
-                    ChallengeCompleteButton(title: "수정하기", onTap: {})
-                }
-                
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .padding(.horizontal, 24)
-        }
-        }
-}
-
-// MARK: - 챌린지 완료 카드
-struct ChallengeCompleteCard: View {
-    let challenge: ChallengeDTO
-    
-    var body: some View {
-        HStack{
-            // 아이콘
-            Image("challengeIcon")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 40, height: 40)
-            
-            Spacer().frame(width: 12)
-            
-            // 중앙 컨텐츠 (제목 + 시간)
-            VStack(alignment: .leading, spacing: 8) {
-                // 제목
-                Text(challenge.title)
-                    .foregroundColor(.gray900)
-                    .styled(.heading3Bold)
-                    .lineLimit(2)
-                    .truncationMode(.tail)
-                    .multilineTextAlignment(.leading)
-                    .minimumScaleFactor(0.5)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                // 시간 정보
-                HStack(spacing: 4) {
-                    Image("timeIcon")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 16, height: 16)
-                    
-                    Text(challenge.time.formattedTime)
-                        .foregroundColor(.primary600)
-                        .styled(.body2Medium)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            
-            Text("인증하기")
-                .styled(.detail1Medium)
-                .foregroundColor(.gray400)
-                .minimumScaleFactor(0.8)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.gray100)
-                .clipShape(RoundedRectangle(cornerRadius: 999))
-        }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 24.5)
-        .frame(maxWidth: .infinity)
-        .background(.white)
-        .cornerRadius(20)
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.black.opacity(0.1), lineWidth: 1)
-        )
-    }
-}
-
-// MARK: - 인증 이미지 박스
-struct CertificationImageBox: View {
-    let url: String
-    
-    var body: some View {
-        AsyncImage(url: URL(string: url)) { image in
-            image
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 140, height: 140)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-        } placeholder: {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(.gray200)
-                .frame(width: 140, height: 140)
-                .overlay(
-                    
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                )
-        }
-    }
-}
-
-// MARK: - 인증 리뷰 박스
-struct ReviewBox: View {
-    let review: String
-    
-    var body: some View {
-        DefaultLabel(title: review, color: .gray900, font: .body1Medium)
-            .multilineTextAlignment(.leading)
-            .lineLimit(nil)
-            .padding(.all, 12)
-            .frame(maxWidth: .infinity, alignment: .leading) // 🎯 먼저 가로 정렬
-            .frame(height: 140, alignment: .top) // 🎯 그 다음 세로 정렬
-            .overlay{
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(.black.opacity(0.1), lineWidth: 1)
-            }
-            
-    }
-}
-
-// MARK: - 공통 버튼
-struct ChallengeCompleteButton: View {
-    let title: String
-    let onTap: () -> Void
-    
-    var body: some View {
-        Button(action: onTap){
-            DefaultLabel(title: title, color: .gray400, font: .heading2Bold)
-                .padding(.vertical, 17)
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 60, alignment: .center)
-        .background(.gray100)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        
-    }
-}
-struct ChallengeCompletePreview: PreviewProvider {
-    static var previews: some View {
-        ChallengeCompleteScreen()
-    }
-}
+//import SwiftUI
+//
+//struct ChallengeCompleteScreen: View {
+//    let challenge: ChallengeDTO = ChallengeDTO(id: 0, title: "좋아하는 책 독서하기 좋아하는 책 독서하기 좋아하는 책 독서하기 좋아하는 책 독서하기", certificationImageUrl: "https://cdnweb01.wikitree.co.kr/webdata/editor/202408/16/img_20240816175532_b82de03f.webp", thoughts: "오늘의 챌린지에 대한 한줄 소감입니다", time: 1, certificationDate: "2025년 8월 12일 인증")
+//    
+//    var body: some View {
+//        ScrollView(.vertical, showsIndicators: false){
+//            VStack(alignment: .leading){
+//                Image("grabberIcon")
+//                    .resizable()
+//                    .frame(width: 80, height: 4)
+//                    .frame(maxWidth: .infinity)
+//                    .padding(.vertical, 24)
+//                Image("challengeCompleteIcon")
+//                    .resizable()
+//                    .frame(width: 28, height: 28)
+//                DefaultLabel(title: "챌린지 인증 완료!", color: .primary600, font: .heading2Bold)
+//                Spacer().frame(height: 16)
+//                DefaultLabel(title: "어떤 챌린지인가요?", color: .gray900, font: .heading3Bold)
+//                Spacer().frame(height: 8)
+//                ChallengeCompleteCard(challenge: challenge)
+//                Spacer().frame(height: 8)
+//                DefaultLabel(title: challenge.certificationDate, color: .gray500, font: .body2Medium)
+//                    .frame(maxWidth: .infinity, alignment: .trailing)
+//                Spacer().frame(height: 24)
+//                DefaultLabel(title: "챌린지 인증샷", color: .gray900, font: .heading3Bold)
+//                Spacer().frame(height: 8)
+//                CertificationImageBox(url: challenge.certificationImageUrl)
+//                Spacer().frame(height: 24)
+//                DefaultLabel(title: "챌린지 한줄소감", color: .gray900, font: .heading3Bold)
+//                Spacer().frame(height: 8)
+//                ReviewBox(review: challenge.thoughts)
+//                Spacer().frame(height: 4)
+//                DefaultLabel(title: "챌린지 한줄소감을 50자 이상 적어 주세요", color: .gray500, font: .detail2Regular)
+//                Spacer().frame(height: 40)
+//                HStack(spacing: 8){
+//                    ChallengeCompleteButton(title: "나가기", onTap: {})
+//                    ChallengeCompleteButton(title: "수정하기", onTap: {})
+//                }
+//                
+//            }
+//            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+//            .padding(.horizontal, 24)
+//        }
+//        }
+//}
+//
+//// MARK: - 챌린지 완료 카드
+//struct ChallengeCompleteCard: View {
+//    let challenge: ChallengeDTO
+//    
+//    var body: some View {
+//        HStack{
+//            // 아이콘
+//            Image("challengeIcon")
+//                .resizable()
+//                .aspectRatio(contentMode: .fit)
+//                .frame(width: 40, height: 40)
+//            
+//            Spacer().frame(width: 12)
+//            
+//            // 중앙 컨텐츠 (제목 + 시간)
+//            VStack(alignment: .leading, spacing: 8) {
+//                // 제목
+//                Text(challenge.title)
+//                    .foregroundColor(.gray900)
+//                    .styled(.heading3Bold)
+//                    .lineLimit(2)
+//                    .truncationMode(.tail)
+//                    .multilineTextAlignment(.leading)
+//                    .minimumScaleFactor(0.5)
+//                    .frame(maxWidth: .infinity, alignment: .leading)
+//                
+//                // 시간 정보
+//                HStack(spacing: 4) {
+//                    Image("timeIcon")
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fit)
+//                        .frame(width: 16, height: 16)
+//                    
+//                    Text(challenge.time.formattedTime)
+//                        .foregroundColor(.primary600)
+//                        .styled(.body2Medium)
+//                }
+//            }
+//            .frame(maxWidth: .infinity)
+//            
+//            Text("인증하기")
+//                .styled(.detail1Medium)
+//                .foregroundColor(.gray400)
+//                .minimumScaleFactor(0.8)
+//                .padding(.horizontal, 12)
+//                .padding(.vertical, 8)
+//                .background(.gray100)
+//                .clipShape(RoundedRectangle(cornerRadius: 999))
+//        }
+//        .padding(.horizontal, 24)
+//        .padding(.vertical, 24.5)
+//        .frame(maxWidth: .infinity)
+//        .background(.white)
+//        .cornerRadius(20)
+//        .overlay(
+//            RoundedRectangle(cornerRadius: 20)
+//                .stroke(Color.black.opacity(0.1), lineWidth: 1)
+//        )
+//    }
+//}
+//
+//// MARK: - 인증 이미지 박스
+//struct CertificationImageBox: View {
+//    let url: String
+//    
+//    var body: some View {
+//        AsyncImage(url: URL(string: url)) { image in
+//            image
+//                .resizable()
+//                .aspectRatio(contentMode: .fill)
+//                .frame(width: 140, height: 140)
+//                .clipShape(RoundedRectangle(cornerRadius: 8))
+//        } placeholder: {
+//            RoundedRectangle(cornerRadius: 8)
+//                .fill(.gray200)
+//                .frame(width: 140, height: 140)
+//                .overlay(
+//                    
+//                    ProgressView()
+//                        .progressViewStyle(CircularProgressViewStyle())
+//                )
+//        }
+//    }
+//}
+//
+//// MARK: - 인증 리뷰 박스
+//struct ReviewBox: View {
+//    let review: String
+//    
+//    var body: some View {
+//        DefaultLabel(title: review, color: .gray900, font: .body1Medium)
+//            .multilineTextAlignment(.leading)
+//            .lineLimit(nil)
+//            .padding(.all, 12)
+//            .frame(maxWidth: .infinity, alignment: .leading) // 🎯 먼저 가로 정렬
+//            .frame(height: 140, alignment: .top) // 🎯 그 다음 세로 정렬
+//            .overlay{
+//                RoundedRectangle(cornerRadius: 8)
+//                    .stroke(.black.opacity(0.1), lineWidth: 1)
+//            }
+//            
+//    }
+//}
+//
+//// MARK: - 공통 버튼
+//struct ChallengeCompleteButton: View {
+//    let title: String
+//    let onTap: () -> Void
+//    
+//    var body: some View {
+//        Button(action: onTap){
+//            DefaultLabel(title: title, color: .gray400, font: .heading2Bold)
+//                .padding(.vertical, 17)
+//        }
+//        .frame(maxWidth: .infinity)
+//        .frame(height: 60, alignment: .center)
+//        .background(.gray100)
+//        .clipShape(RoundedRectangle(cornerRadius: 16))
+//        
+//    }
+//}
+//struct ChallengeCompletePreview: PreviewProvider {
+//    static var previews: some View {
+//        ChallengeCompleteScreen()
+//    }
+//}
 
 
 
