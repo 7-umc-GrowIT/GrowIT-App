@@ -33,6 +33,7 @@ final class ChallengeStatusAreaController: UIViewController {
         view.backgroundColor = .gray50
         
         setupCollectionView()
+        setupNotifications()
         bindViewModel()
         viewModel.moveToPage(1) // 진입 시 1페이지 조회
     }
@@ -51,6 +52,15 @@ final class ChallengeStatusAreaController: UIViewController {
         challengeStatusArea.onPageSelected = { [weak self] page in
             self?.viewModel.moveToPage(page)
         }
+    }
+    
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(navigateToVerify), name: NSNotification.Name("navigateToChallengeVerify"), object: nil)
+    }
+    
+    @objc private func navigateToVerify() {
+        let challengeVerifyVC = ChallengeVerifyViewController(title: selectedChallenge?.title)
+        navigationController?.pushViewController(challengeVerifyVC, animated: true)
     }
     
     private func bindViewModel() {
@@ -180,7 +190,6 @@ extension ChallengeStatusAreaController: UICollectionViewDelegateFlowLayout, UIC
                 let challengeVerifyModalVC = ChallengeVerifyModalController()
                 
                 challengeVerifyModalVC.modalPresentationStyle = .pageSheet
-                challengeVerifyModalVC.delegate = self
                 
                 presentSheet(challengeVerifyModalVC, heightRatio: 0.34)
                 
@@ -212,20 +221,6 @@ extension ChallengeStatusAreaController: UICollectionViewDelegateFlowLayout, UIC
             scrollToTop()
         default:
             break
-        }
-    }
-}
-
-extension ChallengeStatusAreaController: ChallengeVerifyModalDelegate {
-    func didRequestVerification() {
-        if let challenge = selectedChallenge {
-            self.dismiss(animated: true, completion: {
-                let nextVC = ChallengeVerifyViewController()
-                
-                self.navigationController?.pushViewController(
-                    nextVC, animated: true
-                )
-            })
         }
     }
 }

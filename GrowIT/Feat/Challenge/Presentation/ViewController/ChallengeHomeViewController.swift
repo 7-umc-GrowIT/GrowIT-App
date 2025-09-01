@@ -87,14 +87,14 @@ class ChallengeHomeViewController: UIViewController {
     }
     
     private func setupNotifications(){
-        NotificationCenter.default.addObserver(self, selector: #selector(moveChallengeVerfiyVC(_:)), name: .closeModalAndMoveVC, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(moveChallengeVerfiyVC(_:)), name: Notification.Name("navigateToChallengeVerify"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleChallengeStatusReload), name: .challengeReloadNotification, object: nil)
         
     }
     
     @objc private func moveChallengeVerfiyVC(_ notification: Notification) {
         if let userInfo = notification.userInfo, let challenge = userInfo["challenge"] as? UserChallenge{
-            let nextVC = ChallengeVerifyViewController()
+            let nextVC = ChallengeVerifyViewController(title: challenge.title)
             
             navigationController?.pushViewController(nextVC, animated: true)
         }

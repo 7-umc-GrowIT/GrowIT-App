@@ -163,7 +163,6 @@ extension ChallengeHomeAreaController: UICollectionViewDelegateFlowLayout, UICol
             presentSheet(completeVC, heightRatio: 1.0, useLargeOnly: true)
         } else {
             let verifyModalVC = ChallengeVerifyModalController()
-            verifyModalVC.delegate = self
             verifyModalVC.challengeId = challenge.id
             presentSheet(verifyModalVC, heightRatio: 0.34)
         }
@@ -178,19 +177,5 @@ extension ChallengeHomeAreaController: UIScrollViewDelegate {
             selectedIndex = indexPath.row
             pageControl.currentPage = indexPath.row
         }
-    }
-}
-
-// MARK: - ChallengeVerifyModalDelegate
-extension ChallengeHomeAreaController: ChallengeVerifyModalDelegate {
-    func presentChallengeVerifyModal() {
-        let modalVC = ChallengeVerifyModalController()
-        modalVC.delegate = self
-        present(modalVC, animated: true, completion: nil)
-    }
-    
-    func didRequestVerification() {
-        let verifyVC = ChallengeVerifyViewController()
-        navigationController?.pushViewController(verifyVC, animated: true)
     }
 }

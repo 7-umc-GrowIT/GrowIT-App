@@ -7,13 +7,7 @@
 
 import UIKit
 
-
-protocol ChallengeVerifyModalDelegate: AnyObject {
-    func didRequestVerification()
-}
-
 class ChallengeVerifyModalController: UIViewController {
-    weak var delegate: ChallengeVerifyModalDelegate?
     var challengeId: Int?
     
     private lazy var challengeVerifyModal = ChallengeVerifyModal()
@@ -45,13 +39,8 @@ class ChallengeVerifyModalController: UIViewController {
     @objc private func verifyBtnTapped() {
         print("인증버튼 클릭됨")
         self.dismiss(animated: true) {
-            self.delegate?.didRequestVerification() // 챌린지 인증 바텀모달 해제 후 챌린지 인증화면으로 이동
+            NotificationCenter.default.post(name: NSNotification.Name("navigateToChallengeVerify"), object: nil)
         }
     }
 
-}
-
-
-extension Notification.Name {
-    static let closeModalAndMoveVC = Notification.Name("closeModalAndMoveVC")
 }
