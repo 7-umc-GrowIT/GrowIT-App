@@ -42,6 +42,16 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
         callGetTerms()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        termsAgreeView.termsTableView.snp.updateConstraints {
+            $0.height.equalTo(termsAgreeView.termsTableView.contentSize.height)
+        }
+        termsAgreeView.termsOptTableView.snp.updateConstraints {
+            $0.height.equalTo(termsAgreeView.termsOptTableView.contentSize.height)
+        }
+    }
+    
     // MARK: - SetupUI
     private func setupUI() {
         view.addSubview(termsAgreeView)
