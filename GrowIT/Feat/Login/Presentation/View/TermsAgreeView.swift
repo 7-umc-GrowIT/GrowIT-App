@@ -61,6 +61,7 @@ class TermsAgreeView: UIView {
         $0.separatorStyle = .none
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = false
+        $0.isScrollEnabled = false
         $0.register(TermsAgreeTableViewCell.self, forCellReuseIdentifier: TermsAgreeTableViewCell.identifier)
         $0.tag = 0
     }
@@ -75,6 +76,7 @@ class TermsAgreeView: UIView {
         $0.separatorStyle = .none
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = false
+        $0.isScrollEnabled = false
         $0.register(TermsAgreeOptionalTableViewCell.self, forCellReuseIdentifier: TermsAgreeOptionalTableViewCell.identifier)
         $0.tag = 1
     }
