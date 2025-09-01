@@ -78,6 +78,7 @@ class LoginViewController: UIViewController {
             case .success(let code):
                 // 2. 서버 로그인 요청
                 self.loginWithServer(code)
+                print(code)
             case .failure(let error):
                 print("카카오 로그인 실패: \(error.localizedDescription)")
             }
@@ -87,13 +88,15 @@ class LoginViewController: UIViewController {
     // MARK: - 서버 요청 로직
     // 인가 코드를 서버에 전달하여 로그인 요청
     private func loginWithServer(_ code: String) {
-        authService.loginKakao(code: code) { [weak self] response in
+        let request = SocialLoginRequest(code: code, name: "미니")
+        authService.postLoginKakao(data: request) { [weak self] result in
             guard let self = self else { return }
+            print(request)
             
             DispatchQueue.main.async {
-                switch response {
+                switch result {
                 case .success(let loginResponse):
-                    print("🌳 그로우잇 서버 로그인 성공: \(loginResponse)")
+                    print("🌳 그로우잇 서버 카카오 로그인 성공: \(loginResponse)")
                     self.handleLoginResponse(loginResponse)
                 case .failure(let error):
                     print("서버 로그인 실패: \(error.localizedDescription)")
@@ -105,7 +108,7 @@ class LoginViewController: UIViewController {
     /// 로그인 응답 처리
     /// - 회원가입이 필요한 경우: 약관 동의 화면으로 이동
     /// - 회원가입 불필요: 토큰 저장 후 메인 화면 이동
-    private func handleLoginResponse(_ loginResponse: KakaoLoginResponse) {
+    private func handleLoginResponse(_ loginResponse: SocialLoginResponse) {
         if loginResponse.result.signupRequired {
             // 회원가입 필요 (true)
             showTermsAgree(oauthUserInfo: loginResponse.result.oauthUserInfo)
@@ -119,7 +122,7 @@ class LoginViewController: UIViewController {
     }
 
     /// 약관 동의 화면 표시
-    private func showTermsAgree(oauthUserInfo: KakaoUserInfo?) {
+    private func showTermsAgree(oauthUserInfo: OauthUserInfo?) {
         guard let oauthUserInfo = oauthUserInfo else {
             print("회원가입에 필요한 사용자 정보가 없습니다")
             return
@@ -134,7 +137,7 @@ class LoginViewController: UIViewController {
     }
 
     /// 회원가입 요청
-    private func signupWithKakao(oauthUserInfo: KakaoUserInfo, userTerms: [UserTermDTO]) {
+    private func signupWithKakao(oauthUserInfo: OauthUserInfo, userTerms: [UserTermDTO]) {
         authService.signupWithKakao(oauthUserInfo: oauthUserInfo, userTerms: userTerms) { [weak self] signupResponse in
             guard let self = self else { return }
             DispatchQueue.main.async {

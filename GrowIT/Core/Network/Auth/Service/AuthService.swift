@@ -33,7 +33,7 @@ final class AuthService: NetworkManager {
     }
     
     // 소셜 간편 가입
-    func signupWithKakao(oauthUserInfo: KakaoUserInfo, userTerms: [UserTermDTO], completion: @escaping (Result<KakaoSignUpResponse, Error>) -> Void) {
+    func signupWithKakao(oauthUserInfo: OauthUserInfo, userTerms: [UserTermDTO], completion: @escaping (Result<SocialSignUpResponse, Error>) -> Void) {
         let url = URL(string: "\(Constants.API.authURL)/signup/social")!
         
         var request = URLRequest(url: url)
@@ -45,7 +45,7 @@ final class AuthService: NetworkManager {
         let requestBody: [String: Any] = [
             "userTerms": userTermsArray,
             "oauthUserInfo": [
-                "id": oauthUserInfo.id,
+                "id": oauthUserInfo.socialId,
                 "email": oauthUserInfo.email,
                 "name": oauthUserInfo.name
             ]
@@ -71,7 +71,7 @@ final class AuthService: NetworkManager {
             
             if httpResponse.statusCode == 200 {
                 do {
-                    let signupResponse = try JSONDecoder().decode(KakaoSignUpResponse.self, from: data)
+                    let signupResponse = try JSONDecoder().decode(SocialSignUpResponse.self, from: data)
                     completion(.success(signupResponse))
                 } catch {
                     completion(.failure(error))
@@ -86,52 +86,21 @@ final class AuthService: NetworkManager {
     }
     
     
-    /// 카카오 로그인
-    func loginKakao(code: String, completion: @escaping (Result<KakaoLoginResponse, Error>) -> Void) {
-        let urlString = "\(Constants.API.authURL)/login/kakao"
-        guard var urlComponents = URLComponents(string: urlString) else {
-            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
-            return
-        }
-        
-        urlComponents.queryItems = [URLQueryItem(name: "code", value: code)]
-        
-        guard let url = urlComponents.url else {
-            completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No Data"])))
-                return
-            }
-            
-            do {
-                let decodedResponse = try JSONDecoder().decode(KakaoLoginResponse.self, from: data)
-                
-                if let tokens = decodedResponse.result.tokens {
-                    TokenManager.shared.saveTokens(
-                        accessToken: tokens.accessToken,
-                        refreshToken: tokens.refreshToken
-                    )
+    // 카카오 소셜 로그인 API
+    func postLoginKakao(data: SocialLoginRequest, completion: @escaping (Result<SocialLoginResponse, NetworkError>) -> Void) {
+        provider.request(.postKakaoLogin(data: data)) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    let decoded = try JSONDecoder().decode(SocialLoginResponse.self, from: response.data)
+                    completion(.success(decoded))
+                } catch {
+                    completion(.failure(.decodingError))
                 }
-                
-                completion(.success(decodedResponse))
-            } catch {
-                completion(.failure(error))
+            case .failure(let error):
+                completion(.failure(.networkError(message: error.localizedDescription)))
             }
         }
-        task.resume()
     }
     
     
