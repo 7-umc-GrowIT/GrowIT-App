@@ -15,47 +15,49 @@ struct LoginResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: TokenData?
+    let result: Tokens?
 }
 
 struct SignUpResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: TokenData
+    let result: Tokens
 }
 
-struct TokenData: Codable {
+struct Tokens: Codable {
     let accessToken: String
     let refreshToken: String
 }
 
-struct KakaoLoginResponse: Codable {
+struct SocialLoginResponse: Codable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: KakaoLoginResult
+    let result: SocialLoginResult
 }
 
-struct KakaoLoginResult: Codable {
+struct SocialLoginResult: Codable {
     let signupRequired: Bool
-    let tokens: TokenData?
-    let oauthUserInfo: KakaoUserInfo?
+    let tokens: Tokens?
+    let oauthUserInfo: OauthUserInfo?
 }
 
-// 카카오 회원가입 전용 응답 구조체
-struct KakaoSignUpResponse: Codable {
-    let isSuccess: Bool
-    let code: String
-    let message: String
-    let result: TokenData
-}
-
-struct KakaoUserInfo: Codable {
-    let id: Int
+struct OauthUserInfo: Codable {
+    let socialId: String
     let email: String
     let name: String
+    let provider: String
 }
+
+// 카카오 또는 애플 회원가입 전용 응답 구조체
+struct SocialSignUpResponse: Codable {
+    let isSuccess: Bool
+    let code: String
+    let message: String
+    let result: Tokens
+}
+
 
 struct AuthResult: Codable {
     let accessToken: String
