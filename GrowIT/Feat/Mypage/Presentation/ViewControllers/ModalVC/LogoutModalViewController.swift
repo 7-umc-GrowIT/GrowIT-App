@@ -35,32 +35,7 @@ class LogoutModalViewController: UIViewController {
             switch result {
             case .success:
                 print("서버에서 로그아웃 성공")
-                UserDefaults.standard.set(true, forKey: "shouldShowLogoutToast")
-
-                // 토큰 삭제
-                TokenManager.shared.clearTokens()
-                GroImageCacheManager.shared.clearAll()
-                ImageCache.default.clearMemoryCache()
-                ImageCache.default.clearDiskCache {
-                    print("🗑️ Kingfisher 디스크 캐시 초기화 완료")
-                }
-                
-                // 네트워크 요청 취소
-                self.authService.provider.session.cancelAllRequests()
-                
-                // 로그인 화면으로 전환
-                let loginVC = LoginViewController()
-                let nav = UINavigationController(rootViewController: loginVC)
-                if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let window = scene.windows.first {
-                    window.rootViewController = nav
-                    window.makeKeyAndVisible()
-                    UIView.transition(with: window,
-                                      duration: 0.1,
-                                      options: .transitionCrossDissolve,
-                                      animations: nil,
-                                      completion: nil)
-                }
+                finishLogout()
 
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
@@ -70,8 +45,40 @@ class LogoutModalViewController: UIViewController {
 
     
     //MARK: - Functional
+    private func finishLogout() {
+        UserDefaults.standard.set(true, forKey: "shouldShowLogoutToast")
+
+        // 토큰 삭제
+        TokenManager.shared.clearTokens()
+        GroImageCacheManager.shared.clearAll()
+        ImageCache.default.clearMemoryCache()
+        ImageCache.default.clearDiskCache {
+            print("🗑️ Kingfisher 디스크 캐시 초기화 완료")
+        }
+        
+        // 네트워크 요청 취소
+        self.authService.provider.session.cancelAllRequests()
+    }
+    
+    private func goToLoginView() {
+        // 로그인 화면으로 전환
+        let loginVC = LoginViewController()
+        let nav = UINavigationController(rootViewController: loginVC)
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
+            window.rootViewController = nav
+            window.makeKeyAndVisible()
+            UIView.transition(with: window,
+                              duration: 0.1,
+                              options: .transitionCrossDissolve,
+                              animations: nil,
+                              completion: nil)
+        }
+    }
+    
     //MARK: Event
     @objc private func didTapLogout(){
+        goToLoginView()
         callPostLogout()
     }
     

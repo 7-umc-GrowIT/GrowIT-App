@@ -41,11 +41,12 @@ final class GroService: NetworkManager {
     }
     
     // 그로 닉네임 변경 API
-    func patchGroChangeNickname(data: GroChangeNicknameRequestDTO, completion: @escaping (Result<GroPatchResponseDTO, NetworkError>) -> Void) {
+    func patchGroChangeNickname(data: GroChangeNicknameRequestDTO, completion: @escaping (Result<EmptyResult, NetworkError>) -> Void) {
         request(
             target: .patchGroChangeNickname(data: data),
-            decodingType: GroPatchResponseDTO.self,
+            decodingType: EmptyResult.self,
             completion: completion
         )
     }
+
 }

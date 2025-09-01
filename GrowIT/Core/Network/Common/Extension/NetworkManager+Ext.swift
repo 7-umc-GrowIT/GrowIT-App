@@ -237,10 +237,16 @@ fileprivate func handleResponse<T: Decodable>(
             return .failure(.serverError(statusCode: response.statusCode, message: message))
         }
         let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
-        guard let result = apiResponse.result else {
+        
+        // ✅ result가 없어도 성공 처리할 수 있게 분기
+        if let result = apiResponse.result {
+            return .success(result)
+        } else if T.self == EmptyResult.self {
+            // result 없는 경우 → EmptyResult() 로 success 반환
+            return .success(EmptyResult() as! T)
+        } else {
             return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
         }
-        return .success(result)
     } catch {
         return .failure(.decodingError)
     }

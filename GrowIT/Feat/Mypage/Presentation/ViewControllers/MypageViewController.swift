@@ -56,7 +56,6 @@ class MypageViewController: UIViewController {
             switch result {
             case .success(let data):
                 mypageView.nicknameLabel.text = data.name
-                print(data.name)
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
             }
