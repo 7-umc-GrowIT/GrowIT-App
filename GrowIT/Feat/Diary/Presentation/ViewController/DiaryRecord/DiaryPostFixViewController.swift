@@ -67,9 +67,6 @@ class DiaryPostFixViewController: UIViewController {
     @objc func nextVC() {
         // 수정하기 api 추가 필요
         callPatchFixDiary()
-        dismiss(animated: true) { [weak self] in
-            self?.onDismiss?()
-        }
     }
     
     @objc func labelTapped() {
@@ -100,6 +97,10 @@ class DiaryPostFixViewController: UIViewController {
                 switch result {
                 case .success(let data):
                     print("Success: \(data)")
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: .diaryReloadNotification, object: nil)
+                        self.onDismiss?()
+                    }
                 case .failure(let error):
                     print("Error: \(error)")
                 }
