@@ -156,6 +156,8 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         // 기존 버튼들 숨김 (대화식으로 변경)
         voiceDiaryRecordView.recordButton.isHidden = true
         voiceDiaryRecordView.loadingButton.isHidden = true
+        
+        voiceDiaryRecordView.endButton.addTarget(self, action: #selector(nextVC), for: .touchUpInside)
     }
     
     // MARK: @objc methods
@@ -257,13 +259,13 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             try audioSession.setActive(true)
             
             let settings: [String: Any] = [
-                AVFormatIDKey: Int(kAudioFormatLinearPCM),
+                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
                 AVSampleRateKey: 16000,
                 AVNumberOfChannelsKey: 1,
                 AVLinearPCMBitDepthKey: 16,
                 AVLinearPCMIsBigEndianKey: false,
                 AVLinearPCMIsFloatKey: false,
-                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+                AVEncoderAudioQualityKey: AVAudioQuality.medium.rawValue
             ]
             
             let tempDir = NSTemporaryDirectory()
@@ -375,7 +377,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         }
         
         // 오디오 데이터가 너무 작으면 무시 (0.5초 미만)
-        if audioData.count < 8000 {
+        if audioData.count < 4000 {
             print("오디오 데이터가 너무 작음 - 무시")
             restartListening()
             return
@@ -384,40 +386,43 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         isProcessingAudio = true
         
         // 단일 Task로 전체 프로세스 처리
-        Task { @MainActor in
+        Task.detached { [weak self] in
+            guard let self = self else { return }
+            
             do {
-                // 1단계: STT 처리
-                print("STT 시작...")
-                let recognizedText = try await speechToTextUseCase.execute(audioData: audioData)
-                print("변환된 텍스트: \(recognizedText)")
+                // 백그라운드에서 STT 처리
+                let recognizedText = try await self.speechToTextUseCase.execute(audioData: audioData)
                 
-                // 의미있는 텍스트인지 확인
                 let trimmedText = recognizedText.trimmingCharacters(in: .whitespacesAndNewlines)
                 
                 if trimmedText.isEmpty || trimmedText.count < 2 {
-                    print("유효한 발화 없음 - 녹음 계속")
-                    self.isProcessingAudio = false
-                    self.restartListening()
+                    await MainActor.run {
+                        self.isProcessingAudio = false
+                        self.restartListening()
+                    }
                     return
                 }
                 
-                // 2단계: 서버 통신
-                print("서버 통신 시작: \(trimmedText)")
-                let responseText = try await getSTTResponseUseCase.execute(chat: trimmedText)
-                print("서버 응답: \(responseText)")
+                // 백그라운드에서 서버 통신
+                let responseText = try await self.getSTTResponseUseCase.execute(chat: trimmedText)
                 
-                // 상태 업데이트
-                conversationTurnCount += 1
-                isProcessingAudio = false
-                
-                // 3단계: TTS 처리
-                print("TTS 시작...")
-                await synthesizeSpeech(text: responseText)
+                // 결과만 메인 스레드로
+                await MainActor.run {
+                    print("서버 응답: \(responseText)")
+                    self.conversationTurnCount += 1
+                    self.isProcessingAudio = false
+                    
+                    Task {
+                        await self.synthesizeSpeech(text: responseText)
+                    }
+                }
                 
             } catch {
-                print("오디오 처리 실패: \(error.localizedDescription)")
-                isProcessingAudio = false
-                restartListening()
+                await MainActor.run {
+                    print("오디오 처리 실패: \(error.localizedDescription)")
+                    self.isProcessingAudio = false
+                    self.restartListening()
+                }
             }
         }
     }
