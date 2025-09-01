@@ -12,7 +12,7 @@ protocol ChallengeVerifyRepository {
     func uploadImage(imageData: Data, fileName: String, presignedUrl: String) -> AnyPublisher<Void, Error>
     func getPresignedUrl(fileName: String) -> AnyPublisher<String, Error>
     func getS3ImageUrl(fileName: String) -> AnyPublisher<String, Error>
-    func postVerification(challengeId: Int, imageUrl: String, thoughts: String) -> AnyPublisher<Void, Error>
+    func postVerification(challengeId: Int, fileName: String, thoughts: String) -> AnyPublisher<Void, Error>
 }
 
 final class ChallengeVerifyRepositoryImpl: ChallengeVerifyRepository {
@@ -34,7 +34,7 @@ final class ChallengeVerifyRepositoryImpl: ChallengeVerifyRepository {
         dataSource.getS3ImageUrl(fileName: fileName)
     }
 
-    func postVerification(challengeId: Int, imageUrl: String, thoughts: String) -> AnyPublisher<Void, Error> {
-        dataSource.postChallengeVerification(challengeId: challengeId, imageUrl: imageUrl, thoughts: thoughts)
+    func postVerification(challengeId: Int, fileName: String, thoughts: String) -> AnyPublisher<Void, Error> {
+        dataSource.postChallengeVerification(challengeId: challengeId, fileName: fileName, thoughts: thoughts)
     }
 }

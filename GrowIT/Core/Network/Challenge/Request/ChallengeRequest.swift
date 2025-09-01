@@ -8,7 +8,7 @@
 import Foundation
 
 struct ChallengeRequestDTO: Codable {
-    let certificationImageUrl: String
+    let certificationImageName: String
     let thoughts: String
 }
 

@@ -59,7 +59,7 @@ final class ChallengeStatusAreaController: UIViewController {
     }
     
     @objc private func navigateToVerify() {
-        let challengeVerifyVC = ChallengeVerifyViewController(title: selectedChallenge?.title)
+        let challengeVerifyVC = ChallengeVerifyViewController(challenge: selectedChallenge)
         navigationController?.pushViewController(challengeVerifyVC, animated: true)
     }
     

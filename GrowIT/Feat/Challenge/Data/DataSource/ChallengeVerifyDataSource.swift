@@ -12,7 +12,7 @@ protocol ChallengeVerifyDataSource {
     func uploadImageToS3(imageData: Data, fileName: String, presignedUrl: String) -> AnyPublisher<Void, Error>
     func getPresignedUrl(fileName: String) -> AnyPublisher<String, Error>
     func getS3ImageUrl(fileName: String) -> AnyPublisher<String, Error>
-    func postChallengeVerification(challengeId: Int, imageUrl: String, thoughts: String) -> AnyPublisher<Void, Error>
+    func postChallengeVerification(challengeId: Int, fileName: String, thoughts: String) -> AnyPublisher<Void, Error>
 }
 
 final class ChallengeVerifyDataSourceImpl: ChallengeVerifyDataSource {
@@ -64,11 +64,11 @@ final class ChallengeVerifyDataSourceImpl: ChallengeVerifyDataSource {
         }.eraseToAnyPublisher()
     }
 
-    func postChallengeVerification(challengeId: Int, imageUrl: String, thoughts: String) -> AnyPublisher<Void, Error> {
+    func postChallengeVerification(challengeId: Int, fileName: String, thoughts: String) -> AnyPublisher<Void, Error> {
         Future { promise in
             ChallengeService().postProveChallenge(
                 challengeId: challengeId,
-                data: ChallengeRequestDTO(certificationImageUrl: imageUrl, thoughts: thoughts),
+                data: ChallengeRequestDTO(certificationImageName: fileName, thoughts: thoughts),
                 completion: { result in
                     switch result {
                     case .success:

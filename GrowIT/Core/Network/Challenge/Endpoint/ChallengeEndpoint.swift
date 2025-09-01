@@ -43,7 +43,7 @@ extension ChallengeEndpoint: TargetType {
         case.postSelectChallenge:
             return "/select"
         case.postProveChallenge(let challengeId, _):
-            return "/\(challengeId)/prove"
+            return "/\(challengeId)"
         case.postPresignedUrl:
             return "/presigned-url"
         case.deleteChallengeById(let challengeId):

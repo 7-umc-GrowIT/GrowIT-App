@@ -23,8 +23,8 @@ final class ChallengeService: NetworkManager {
     }
 
     /// Post Prove Challenge API
-    func postProveChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<ChallengeDTO, NetworkError>) -> Void) {
-        request(target: .postProveChallenge(challengeId: challengeId, data: data), decodingType: ChallengeDTO.self, completion: completion)
+    func postProveChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        requestStatusCode(target: .postProveChallenge(challengeId: challengeId, data: data), completion: completion)
     }
     
     /// Fetch Challenge API(단일 챌린지 조회)
