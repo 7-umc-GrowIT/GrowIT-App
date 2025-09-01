@@ -15,7 +15,7 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
     let termsService = TermsService()
     
     var completionHandler: (([UserTermDTO]) -> Void)?
-    var oauthUserInfo: KakaoUserInfo
+    var oauthUserInfo: OauthUserInfo
     
     // 약관 관련 데이터
     var termsList: [TermsData] = [] // 필수 약관
@@ -25,7 +25,7 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
     private var mandatoryTermIds: Set<Int> = [] // 필수 약관 ID 저장
     
     // MARK: - Initializer
-    init(oauthUserInfo: KakaoUserInfo) {
+    init(oauthUserInfo: OauthUserInfo) {
         self.oauthUserInfo = oauthUserInfo
         super.init(nibName: nil, bundle: nil)
     }

@@ -22,6 +22,12 @@ struct EmailSignUpRequest: Codable {
     let userTerms: [UserTermDTO] // 약관 동의 리스트
 }
 
+// 카카오 또는 애플 로그인 요청
+struct SocialLoginRequest: Codable {
+    let code: String
+    let name: String
+}
+
 struct SocialSignUpRequest: Codable {
     let userTerms: [UserTermDTO]
 }
@@ -47,16 +53,5 @@ struct EmailLoginRequest: Codable {
 
 struct SendEmailVerifyRequest: Codable {
     let email: String
-}
-
-// 카카오 로그인 요청
-struct KakaoLoginRequest: Codable {
-    let authCode: String  // 카카오 인가 코드
-}
-
-// 카카오 회원가입 요청 (회원가입이 필요한 경우)
-struct KakaoSignUpRequest: Codable {
-    let authCode: String       // 카카오 인가 코드
-    let userTerms: [UserTermDTO] // 약관 동의 리스트
 }
 
