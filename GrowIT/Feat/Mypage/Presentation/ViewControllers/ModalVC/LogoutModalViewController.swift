@@ -79,7 +79,6 @@ class LogoutModalViewController: UIViewController {
     
     //MARK: Event
     @objc private func didTapLogout(){
-       
         callPostLogout()
     }
     
