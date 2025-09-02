@@ -37,6 +37,7 @@ struct Tokens: Codable {
     let refreshToken: String
 }
 
+// 소셜 로그인
 struct SocialLoginResponse: Codable {
     let isSuccess: Bool
     let code: String
