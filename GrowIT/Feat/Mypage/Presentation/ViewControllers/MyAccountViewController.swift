@@ -48,31 +48,12 @@ class MyAccountViewController: UIViewController {
     
     private func setupNotifications() {
         NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(navigateToWithdraw),
-                name: NSNotification.Name("NavigateToWithdraw"),
-                object: nil
-            )
-    }
-    
-    // MARK: - NetWork
-    func callGetMypage() {
-        userService.getMypage(completion: { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let data):
-                print(data.name)
-                self.tableviewData[0][0].1 = data.name
-                DispatchQueue.main.async {
-                    self.myAccountView.myAccounttableView.reloadRows(
-                        at: [IndexPath(row: 0, section: 0)],
-                        with: .automatic
-                    )
-                }
-            case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-            }
-        })
+            self,
+            selector: #selector(navigateToWithdraw),
+            name: NSNotification.Name("NavigateToWithdraw"),
+            object: nil
+        )
+        
     }
     
     // MARK: - NetWork
@@ -110,6 +91,8 @@ class MyAccountViewController: UIViewController {
                 at: [IndexPath(row: 0, section: 0)],
                 with: .automatic
             )
+        }
+        
         presentSheet(editNameVC, heightRatio: 0.32)
     }
     
@@ -131,6 +114,67 @@ class MyAccountViewController: UIViewController {
     
     @objc
     func didTapWithdraw() {
+       /* 커스텀 모달 방식
+        // 불투명 검은 뷰
+        let dimmedView = UIView(frame: view.bounds)
+        dimmedView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+        dimmedView.alpha = 0
+        view.addSubview(dimmedView)
+        self.dimmedView = dimmedView
+        
+        // 모달 대체 뷰
+        let sheetView = UIView()
+        sheetView.backgroundColor = .white
+        sheetView.layer.cornerRadius = 40
+        sheetView.clipsToBounds = true
+        dimmedView.addSubview(sheetView)
+        self.sheetView = sheetView
+        
+        sheetView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(322)
+        }
+        
+        let contentView = WithdrawModalView()
+        sheetView.addSubview(contentView)
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        sheetView.transform = CGAffineTransform(translationX: 0, y: 300)
+        UIView.animate(withDuration: 0.25) {
+            dimmedView.alpha = 1
+            sheetView.transform = .identity
+        }
+        
+        contentView.cancleButton.addTarget(self, action: #selector(dismissWithdrawModal), for: .touchUpInside)
+        contentView.withDrawButton.addTarget(self, action: #selector(goWithdrawPage), for: .touchUpInside)
+    
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissWithdrawModal))
+        tap.delegate = self
+        dimmedView.addGestureRecognizer(tap)
+       
+      
+
+    }
+    
+    @objc
+    private func dismissWithdrawModal() {
+        guard let dimmedView = dimmedView else { return }
+        UIView.animate(withDuration: 0.25, animations: {
+            dimmedView.alpha = 0
+        }) { _ in
+            dimmedView.removeFromSuperview()
+        }
+    }
+    
+    @objc
+    private func goWithdrawPage() {
+        dismissWithdrawModal()
+        let nextVC = WithdrawViewController()
+        navigationController?.pushViewController(nextVC, animated: true)
+        */
+        // Notification 이용 방식
         let withDrawModalVC = WithdrawModalViewController()
         withDrawModalVC.modalPresentationStyle = .pageSheet
         
