@@ -58,6 +58,7 @@ class LogoutModalViewController: UIViewController {
         
         // 네트워크 요청 취소
         self.authService.provider.session.cancelAllRequests()
+        goToLoginView()
     }
     
     private func goToLoginView() {
@@ -78,7 +79,7 @@ class LogoutModalViewController: UIViewController {
     
     //MARK: Event
     @objc private func didTapLogout(){
-        goToLoginView()
+       
         callPostLogout()
     }
     
