@@ -75,6 +75,26 @@ class MyAccountViewController: UIViewController {
         })
     }
     
+    // MARK: - NetWork
+    func callGetMypage() {
+        userService.getMypage(completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                print(data.name)
+                self.tableviewData[0][0].1 = data.name
+                DispatchQueue.main.async {
+                    self.myAccountView.myAccounttableView.reloadRows(
+                        at: [IndexPath(row: 0, section: 0)],
+                        with: .automatic
+                    )
+                }
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
+    }
+    
     //MARK: - Functional
     //MARK: Event
     @objc
@@ -90,8 +110,6 @@ class MyAccountViewController: UIViewController {
                 at: [IndexPath(row: 0, section: 0)],
                 with: .automatic
             )
-        }
-        
         presentSheet(editNameVC, heightRatio: 0.32)
     }
     
@@ -118,7 +136,6 @@ class MyAccountViewController: UIViewController {
         
         presentSheet(withDrawModalVC, heightRatio: 0.34)
     }
-
     
     @objc
     func didTapTermsOfService(_ type: String) {
