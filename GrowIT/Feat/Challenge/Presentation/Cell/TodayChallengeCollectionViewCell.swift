@@ -148,11 +148,11 @@ class TodayChallengeCollectionViewCell: UICollectionViewCell {
         //self.time.text = "\(time)시간"
         
         if(!completed){
-            self.buttonLabel.text = "인증하기"
-            self.buttonLabel.textColor = .white
-            self.buttonContainer.backgroundColor = .black
-            width = 0.191
-            textWidth = 0.561
+            self.buttonLabel.text = "인증 미완료"
+            self.buttonLabel.textColor = .negative400
+            self.buttonContainer.backgroundColor = .negative50
+            width = 0.222
+            textWidth = 0.623
         }
         else{
             self.buttonLabel.text = "인증 완료"
