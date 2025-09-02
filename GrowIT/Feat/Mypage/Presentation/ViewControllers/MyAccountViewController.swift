@@ -209,7 +209,12 @@ extension MyAccountViewController: UITableViewDataSource, UITableViewDelegate {
         case (0, 0):
             didTapChangeNickname()
         case (0, 1):
-            changePwdBtnTap()
+            let provider = UserDefaults.standard.string(forKey: "loginMethod")
+            if provider == "LOCAL" {
+                changePwdBtnTap()
+            } else {
+                print("안돼돌아가")
+            }
         case (1, 0):
             didTapTermsOfService("개인정보 처리방침")
         case (1, 1):
