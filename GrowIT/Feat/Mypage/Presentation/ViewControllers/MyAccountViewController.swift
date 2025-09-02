@@ -213,7 +213,21 @@ extension MyAccountViewController: UITableViewDataSource, UITableViewDelegate {
             if provider == "LOCAL" {
                 changePwdBtnTap()
             } else {
-                print("안돼돌아가")
+               
+                let modalVC = CannotChangePasswordViewController()
+                modalVC.modalPresentationStyle = .pageSheet
+                if let sheet = modalVC.sheetPresentationController {
+                    //지원할 크기 지정
+                    if #available(iOS 16.0, *) {
+                        sheet.detents = [
+                            .custom{ context in
+                                0.36 * context.maximumDetentValue
+                            }
+                        ]
+                    } else { sheet.detents = [.medium()] }
+                    sheet.prefersGrabberVisible = true
+                }
+                present(modalVC, animated: true, completion: nil)
             }
         case (1, 0):
             didTapTermsOfService("개인정보 처리방침")
