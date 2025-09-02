@@ -19,7 +19,6 @@ struct GroGetResponseDTO: Decodable {
 }
 
 struct Gro: Decodable {
-    let id: Int
     let level: Int
     let groImageUrl: String
 }
