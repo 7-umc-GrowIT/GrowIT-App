@@ -28,6 +28,7 @@ class ShortageModalView: UIView {
         $0.font = UIFont.heading3SemiBold()
         $0.textColor = UIColor.grayColor700
         $0.textAlignment = .left
+        $0.numberOfLines = 0
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -79,7 +80,7 @@ class ShortageModalView: UIView {
         
         subtitleLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().inset(24)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         confirmButton.snp.makeConstraints {
@@ -89,5 +90,10 @@ class ShortageModalView: UIView {
         }
     }
     
+    public func config(title: String, sub: String, icon: UIImage) {
+        titleLabel.text = title
+        subtitleLabel.text = sub
+        cartIcon.image = icon
+    }
 }
 
