@@ -105,7 +105,7 @@ final class AuthService: NetworkManager {
     
     // 애플 소셜 로그인 API
     func postLoginApple(data: SocialLoginRequest, completion: @escaping (Result<SocialLoginResponse, NetworkError>) -> Void) {
-        provider.request(.postKakaoLogin(data: data)) { result in
+        provider.request(.postAppleLogin(data: data)) { result in
             switch result {
             case .success(let response):
                 do {
