@@ -11,18 +11,25 @@ struct VerifyResponse: Decodable {
     let message: String
 }
 
-struct LoginResponse: Decodable {
+// 이메일 로그인
+struct EmailLoginResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: Tokens?
+    let result: EmailResult
 }
 
-struct SignUpResponse: Decodable {
+// 이메일 회원가입
+struct EmailSignUpResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: Tokens
+    let result: EmailResult
+}
+
+struct EmailResult: Codable {
+    let tokens: Tokens
+    let loginMethod: String
 }
 
 struct Tokens: Codable {
@@ -44,7 +51,7 @@ struct SocialLoginResult: Codable {
 }
 
 struct LoginResponseDTO: Codable {
-    let tokens: Tokens?
+    let tokens: Tokens
     let loginMethod: String
 }
 

@@ -121,20 +121,23 @@ final class AuthService: NetworkManager {
     }
     
     /// 이메일 로그인
-    func loginEmail(data: EmailLoginRequest, completion: @escaping (Result<LoginResponse, NetworkError>) -> Void) {
+    func loginEmail(data: EmailLoginRequest, completion: @escaping (Result<EmailLoginResponse, NetworkError>) -> Void) {
         provider.request(.postEmailLogin(data: data)) { result in
             switch result {
             case .success(let response):
                 do {
-                    let decodedResponse = try JSONDecoder().decode(LoginResponse.self, from: response.data)
+                    let decodedResponse = try JSONDecoder().decode(EmailLoginResponse.self, from: response.data)
                     print("로그인 응답: \(decodedResponse)")
                     
-                    if decodedResponse.isSuccess, let tokenData = decodedResponse.result {
-                        // ✅ 성공 시에만 토큰 저장
+                    if decodedResponse.isSuccess {
+                        let tokenData = decodedResponse.result.tokens
                         TokenManager.shared.saveTokens(
                             accessToken: tokenData.accessToken,
                             refreshToken: tokenData.refreshToken
                         )
+                        
+                        UserDefaults.standard.set(decodedResponse.result.loginMethod, forKey: "loginMethod")
+                        
                         print("로그인 성공 & 토큰 저장 완료")
                         completion(.success(decodedResponse))
                     } else {
@@ -153,7 +156,7 @@ final class AuthService: NetworkManager {
             }
         }
     }
-
+    
     
     /// 이메일 인증 요청
     func email(type: String, data: SendEmailVerifyRequest, completion: @escaping (Result<EmailVerifyResponse, NetworkError>) -> Void) {
@@ -161,7 +164,7 @@ final class AuthService: NetworkManager {
     }
     
     /// 회원가입 요청 (디코딩 오류 출력 추가)
-    func signUp(type: String, data: EmailSignUpRequest, completion: @escaping (Result<SignUpResponse, NetworkError>) -> Void) {
+    func signUp(type: String, data: EmailSignUpRequest, completion: @escaping (Result<EmailSignUpResponse, NetworkError>) -> Void) {
         provider.request(.postEmailSignUp(data: data)) { result in
             switch result {
             case .success(let response):
@@ -171,14 +174,14 @@ final class AuthService: NetworkManager {
                     print("서버 응답 JSON: \(jsonString ?? "데이터 없음")")
                     
                     // JSON 디코딩 시 오류 확인
-                    let decodedResponse = try JSONDecoder().decode(SignUpResponse.self, from: response.data)
+                    let decodedResponse = try JSONDecoder().decode(EmailSignUpResponse.self, from: response.data)
                     print("회원가입 성공! 액세스 토큰")
-
-                    let accessToken = decodedResponse.result.accessToken
-                    let refreshToken = decodedResponse.result.refreshToken
+                    
+                    let accessToken = decodedResponse.result.tokens.accessToken
+                    let refreshToken = decodedResponse.result.tokens.refreshToken
                     TokenManager.shared.saveTokens(accessToken: accessToken, refreshToken: refreshToken)
                     print("회원가입 후 토큰 저장 완료")
-
+                    
                     completion(.success(decodedResponse))
                     
                 } catch {
@@ -209,7 +212,7 @@ final class AuthService: NetworkManager {
     /// 토큰 재발급 요청 메서드
     func reissueToken(refreshToken: String, completion: @escaping (Result<ReissueResponse, NetworkError>) -> Void) {
         print("토큰 재발급 요청 시작 RefreshToken: \(refreshToken)")
-
+        
         let request = ReissueTokenRequest(refreshToken: refreshToken)
         provider.request(.postReissueToken(data: request)) { result in
             switch result {
@@ -217,21 +220,21 @@ final class AuthService: NetworkManager {
                 do {
                     let decodedResponse = try JSONDecoder().decode(ReissueResponse.self, from: response.data)
                     print("토큰 재발급 서버 응답 데이터: \(decodedResponse)")
-
+                    
                     if decodedResponse.isSuccess {
                         print("토큰 재발급 성공! 새로운 AccessToken: \(decodedResponse.result.accessToken)")
-
+                        
                         // AccessToken과 RefreshToken을 바로 저장
                         TokenManager.shared.saveAccessToken(decodedResponse.result.accessToken)
                         print("새로운 AccessToken 저장됨: \(decodedResponse.result.accessToken)")
-
-
+                        
+                        
                         completion(.success(decodedResponse))
                     } else {
                         print("토큰 재발급 실패: \(decodedResponse.message)")
                         completion(.failure(.serverError(statusCode: 400, message: decodedResponse.message)))
                     }
-
+                    
                 } catch {
                     print("토큰 재발급 응답 디코딩 실패: \(error)")
                     completion(.failure(.decodingError))
@@ -243,7 +246,7 @@ final class AuthService: NetworkManager {
             }
         }
     }
-
+    
     /// 로그아웃
     func postAuthLogout(completion: @escaping (Result<postLogoutResponseDTO, NetworkError>) -> Void) {
         request(

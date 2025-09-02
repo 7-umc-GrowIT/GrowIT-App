@@ -132,23 +132,21 @@ class EmailLoginViewController: UIViewController {
                 switch result {
                 case .success(let response):
                     if response.isSuccess {
-                        if let tokenData = response.result {
-                            print("로그인 성공")
+                        let tokenData = response.result
+                        print("로그인 성공")
 
-                            // ✅ Keychain에 토큰 저장
-                            TokenManager.shared.saveTokens(
-                                accessToken: tokenData.accessToken,
-                                refreshToken: tokenData.refreshToken
-                            )
+                        TokenManager.shared.saveTokens(
+                            accessToken: tokenData.tokens.accessToken,
+                            refreshToken: tokenData.tokens.refreshToken
+                        )
 
-                            print("AccessToken 저장됨")
-                            print("RefreshToken 저장됨")
+                        // loginMethod 저장
+                        UserDefaults.standard.set(tokenData.loginMethod, forKey: "loginMethod")
 
-                            self.moveToNextScreen()
-                        } else {
-                            print("로그인 실패: 서버 응답에 result 없음")
-                            self.emailLoginView.pwdTextField.setError(message: response.message)
-                        }
+                        print("AccessToken 저장됨")
+                        print("RefreshToken 저장됨")
+
+                        self.moveToNextScreen()
                     } else {
                         print("로그인 실패: \(response.message)")
                         self.emailLoginView.pwdTextField.setError(message: response.message)
