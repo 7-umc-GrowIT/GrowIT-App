@@ -177,7 +177,7 @@ class ChallengeCompleteViewController: UIViewController {
     
     /// 챌린지 수정 API
     private func updateChallenge(id: Int, url: String, thoughts: String){
-        challengeService.patchChallenge(challengeId: id, data: ChallengeRequestDTO(certificationImageUrl: url, thoughts: thoughts), completion: { [weak self] result in
+        challengeService.patchChallenge(challengeId: id, data: ChallengeRequestDTO(certificationImageName: url, thoughts: thoughts), completion: { [weak self] result in
             guard let self = self else {return}
             switch result {
             case .success(let data):
