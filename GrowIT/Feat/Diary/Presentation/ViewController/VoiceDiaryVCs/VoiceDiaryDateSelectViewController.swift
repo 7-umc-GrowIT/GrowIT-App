@@ -139,7 +139,7 @@ class VoiceDiaryDateSelectViewController: UIViewController, JDiaryCalendarContro
         let nextVC = VoiceDiaryTipViewController()
         nextVC.modalPresentationStyle = .pageSheet
         
-        presentPageSheet(viewController: nextVC, detentFraction: 0.37)
+        presentSheet(nextVC, heightRatio: 0.37)
     }
     
     @objc func toggleTapped() {

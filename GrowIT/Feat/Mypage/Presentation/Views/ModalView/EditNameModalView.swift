@@ -9,6 +9,11 @@ import UIKit
 
 class EditNameModalView: UIView {
     //MARK: - Components
+    private let grabberIcon = UIImageView().then {
+        $0.image = UIImage(named: "grabberIcon")
+        $0.contentMode = .scaleAspectFit
+    }
+    
     public lazy var nickNameTextField = CustomTextField(frame: .zero, isPasswordField: false).then {
         $0.setTitleLabel("변경할 닉네임을 입력해 주세요")
         $0.setPlaceholder("닉네임을 입력해 주세요")
@@ -48,13 +53,20 @@ class EditNameModalView: UIView {
     }
     
     private func setView() {
-        self.addSubviews([nickNameTextField, changeButton])
+        self.addSubviews([grabberIcon, nickNameTextField, changeButton])
     }
     
     //MARK: - 레이아웃 설정
     private func setConstraints() {
+        grabberIcon.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.width.equalTo(80)
+            $0.height.equalTo(4)
+            $0.centerX.equalToSuperview()
+        }
+        
         nickNameTextField.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(52)
+            $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(24)
             $0.height.equalTo(100)
         }

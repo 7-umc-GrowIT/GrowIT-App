@@ -9,6 +9,11 @@ import UIKit
 
 class TwoButtonModalView: UIView {
     // MARK: - Components
+    private let grabberIcon = UIImageView().then {
+        $0.image = UIImage(named: "grabberIcon")
+        $0.contentMode = .scaleAspectFit
+    }
+    
     private let titleLabel = AppLabel(
         text: "",
         font: .heading2Bold(),
@@ -73,10 +78,17 @@ class TwoButtonModalView: UIView {
     
     private func setupUI() {
         buttonStackView.addArrangedSubViews([subButton, mainButton])
-        addSubviews([titleLabel, descLabel, buttonStackView])
+        addSubviews([grabberIcon, titleLabel, descLabel, buttonStackView])
+        
+        grabberIcon.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(80)
+            $0.height.equalTo(4)
+        }
         
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(52)
+            $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
         

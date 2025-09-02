@@ -22,6 +22,7 @@ class ChallengeVerifyViewController: UIViewController {
     private lazy var s3Service = S3Service()
     var challenge: UserChallenge?
     private lazy var imageData: Data? = nil
+    var review: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,12 +39,22 @@ class ChallengeVerifyViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleImage(_:)), name: NSNotification.Name("ImageSelected"), object: nil)
         
-        if let challenge = challenge{
-            challengeVerifyView.setChallengeName(name: challenge.title)
-        }
-        
         setupInitialTextViewState()
         
+        challengeVerifyView.setChallengeName(name: challenge?.title ?? "")
+        
+    }
+    
+    init(challenge: UserChallenge?){
+        super.init(nibName: nil, bundle: nil)
+        if let challenge = challenge {
+            self.challenge = challenge
+        }
+        
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func setupInitialTextViewState() {
@@ -103,33 +114,7 @@ class ChallengeVerifyViewController: UIViewController {
         let challengeImageModalController = ChallengeImageModalController()
         challengeImageModalController.modalPresentationStyle = .pageSheet
         
-        if let sheet = challengeImageModalController.sheetPresentationController {
-                    
-            //지원할 크기 지정
-            if #available(iOS 16.0, *){
-                sheet.detents = [.custom{ _ in
-                    360.0
-                }]
-            }else{
-                sheet.detents = [.medium(), .large()]
-            }
-            
-            // 시트의 상단 둥근 모서리 설정
-            if #available(iOS 15.0, *) {
-                sheet.preferredCornerRadius = 40
-            }
-            
-            //크기 변하는거 감지
-            sheet.delegate = self
-           
-            //시트 상단에 그래버 표시 (기본 값은 false)
-            sheet.prefersGrabberVisible = false
-            
-            //처음 크기 지정 (기본 값은 가장 작은 크기)
-            sheet.selectedDetentIdentifier = .large
-        }
-        
-        self.present(challengeImageModalController, animated: true, completion: nil)
+        presentSheet(challengeImageModalController, heightRatio: 0.38)
     }
     
     /// 바깥 영역 터치 시 키보드 숨기기
@@ -171,6 +156,7 @@ class ChallengeVerifyViewController: UIViewController {
             CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "인증샷을 업로드해 주세요", font: .heading3SemiBold())
         }else{
             if(isReviewValidate){
+                review = challengeVerifyView.reviewTextView.text
                 getPresignedUrl()
             }else{
                 if(reviewLength > 0 || reviewLength < 50){
@@ -188,14 +174,13 @@ class ChallengeVerifyViewController: UIViewController {
     
     /// S3 Presigned URL 요청 API
     private func getPresignedUrl(){
-        let fileName = UUID().uuidString
-        s3Service.putS3UploadUrl(fileName: "\(fileName).png", completion: {
-            [weak self] result in
+        challengeService.postPresignedUrl(data: PresignedUrlRequestDTO(contentType: "image/png"), completion: { [weak self] result in
             guard let self = self else {return}
             switch result{
             case .success(let data):
+                
                 if let image = imageData{
-                    putImageToS3(presignedUrl: data.presignedUrl, imageData: image, fileName: "\(fileName).png")
+                    putImageToS3(presignedUrl: data.presignedUrl, imageData: image, fileName: data.fileName)
                 }
                
             case .failure(let error):
@@ -219,7 +204,7 @@ class ChallengeVerifyViewController: UIViewController {
             }
 
             if response.statusCode == 200 {
-                self.getS3ImageUrl(fileName: fileName)
+                self.saveChallengeVerify(fileName: fileName)
             } else {
                 print("Upload failed with status: \(response.statusCode)")
             }
@@ -227,48 +212,21 @@ class ChallengeVerifyViewController: UIViewController {
         task.resume()
     }
     
-    /// S3 업로드 이미지 URL 받기 API
-    private func getS3ImageUrl(fileName: String){
-        s3Service.getS3DownloadUrl(fileName: fileName, completion: { [weak self] result in
-            guard let self = self else {return}
-            switch result{
-            case .success(let data):
-                saveChallengeVerify(imageUrl: data.components(separatedBy: "?").first!)
-            case .failure(let error):
-                print("S3 이미지 URL 반환 에러: \(error)")
-            }
-        })
-    }
-    
     /// 챌린지 인증 저장 API
-    private func saveChallengeVerify(imageUrl: String){
-        challengeService.postProveChallenge(challengeId: challenge!.id, data: ChallengeRequestDTO(certificationImageUrl: imageUrl, thoughts: challengeVerifyView.reviewTextView.text), completion: { [weak self] result in
+    private func saveChallengeVerify(fileName: String){
+        challengeService.postProveChallenge(challengeId: challenge?.id ?? 0, data: ChallengeRequestDTO(certificationImageName: fileName, thoughts: review), completion: { [weak self] result in
             guard let self = self else {return}
             switch result{
-            case .success(let data):
-                navigationController?.popViewController(animated: false)
-                NotificationCenter.default.post(name: .challengeStatusReload, object: nil)
-                CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "챌린지 인증을 완료했어요", font: .heading3SemiBold())
+            case .success(_):
+                DispatchQueue.main.async {
+                    self.navigationController?.popViewController(animated: false)
+                    NotificationCenter.default.post(name: .challengeReloadNotification, object: nil)
+                    CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "챌린지 인증을 완료했어요", font: .heading3SemiBold())
+                }
             case .failure(let error):
                 print("챌린지 인증 저장 에러: \(error)")
             }
         })
-    }
-    
-    /// 주어진 URL에서 쿼리 파라미터를 제거하고 반환합니다.
-    func removeQueryParameters(from urlString: String) -> String {
-        guard let url = URL(string: urlString),
-              var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            print("Invalid URL")
-            return urlString
-        }
-
-        // 쿼리 파라미터 제거
-        urlComponents.query = nil
-            
-        print("제거하고 저장되는 url: \(urlComponents.string ?? urlString)")
-        // 새로운 URL 문자열을 반환
-        return urlComponents.string ?? urlString
     }
 }
 
@@ -319,12 +277,5 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder() // 키보드 숨기기
         return true
-    }
-}
-
-extension ChallengeVerifyViewController: UISheetPresentationControllerDelegate {
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        //크기 변경 됐을 경우
-        print(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")
     }
 }

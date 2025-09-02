@@ -23,8 +23,10 @@ class WithdrawModalViewController: UIViewController {
     //MARK: - Functional
     //MARK: Event
     @objc private func didTapWithDraw(){
-        let nextVC = WithdrawViewController()
-        navigationController?.pushViewController(nextVC, animated: true)
+        self.dismiss(animated: true) { [weak self] in
+            // NotificationCenter로 이벤트 전달
+            NotificationCenter.default.post(name: NSNotification.Name("NavigateToWithdraw"), object: nil)
+        }
     }
     
     @objc

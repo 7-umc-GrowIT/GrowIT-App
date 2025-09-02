@@ -23,8 +23,8 @@ final class ChallengeService: NetworkManager {
     }
 
     /// Post Prove Challenge API
-    func postProveChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<ChallengeDTO, NetworkError>) -> Void) {
-        request(target: .postProveChallenge(challengeId: challengeId, data: data), decodingType: ChallengeDTO.self, completion: completion)
+    func postProveChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        requestStatusCode(target: .postProveChallenge(challengeId: challengeId, data: data), completion: completion)
     }
     
     /// Fetch Challenge API(단일 챌린지 조회)
@@ -53,7 +53,11 @@ final class ChallengeService: NetworkManager {
         request(target: .getAllChallenges(challengeType: challengeType, completed: completed, page: page), decodingType: ChallengeStatusResponseDTO.self, completion: completion)
     }
     
-    func postSelectedChallenge(data: [ChallengeSelectRequestDTO], completion: @escaping (Result<Void, NetworkError>) -> Void) {
-        requestStatusCode(target: .postSelectChallenge(data: data), completion: completion)
+    func postSelectedChallenge(data: [ChallengeSelectRequestDTO], completion: @escaping (Result<ChallengeSelectResponseDTO, NetworkError>) -> Void) {
+        request(target: .postSelectChallenge(data: data), decodingType: ChallengeSelectResponseDTO.self, completion: completion)
+    }
+    
+    func postPresignedUrl(data: PresignedUrlRequestDTO, completion: @escaping (Result<PresignedUrlResponseDTO, NetworkError>) -> Void){
+        request(target: .postPresignedUrl(data: data), decodingType: PresignedUrlResponseDTO.self, completion: completion)
     }
 }

@@ -43,6 +43,36 @@ class MyAccountViewController: UIViewController {
         
         setupNavigationBar()
         setupTableView()
+        setupNotifications()
+    }
+    
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(navigateToWithdraw),
+                name: NSNotification.Name("NavigateToWithdraw"),
+                object: nil
+            )
+    }
+    
+    // MARK: - NetWork
+    func callGetMypage() {
+        userService.getMypage(completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                print(data.name)
+                self.tableviewData[0][0].1 = data.name
+                DispatchQueue.main.async {
+                    self.myAccountView.myAccounttableView.reloadRows(
+                        at: [IndexPath(row: 0, section: 0)],
+                        with: .automatic
+                    )
+                }
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
     }
     
     // MARK: - NetWork
@@ -80,38 +110,19 @@ class MyAccountViewController: UIViewController {
                 at: [IndexPath(row: 0, section: 0)],
                 with: .automatic
             )
-        }
-        
-        if let sheet = editNameVC.sheetPresentationController {
-            //지원할 크기 지정
-            if #available(iOS 16.0, *) {
-                sheet.detents = [
-                    .custom{ context in
-                        0.33 * context.maximumDetentValue
-                    }
-                ]
-            } else { sheet.detents = [.medium()] }
-            sheet.prefersGrabberVisible = true
-        }
-        present(editNameVC, animated: true, completion: nil)
+        presentSheet(editNameVC, heightRatio: 0.32)
     }
     
     @objc
     func didTapLogout() {
         let logoutVC = LogoutModalViewController()
         logoutVC.modalPresentationStyle = .pageSheet
-        if let sheet = logoutVC.sheetPresentationController {
-            //지원할 크기 지정
-            if #available(iOS 16.0, *) {
-                sheet.detents = [
-                    .custom{ context in
-                        0.28 * context.maximumDetentValue
-                    }
-                ]
-            } else { sheet.detents = [.medium()] }
-            sheet.prefersGrabberVisible = true
-        }
-        present(logoutVC, animated: true, completion: nil)
+        presentSheet(logoutVC, heightRatio: 0.27)
+    }
+    
+    @objc private func navigateToWithdraw() {
+        let nextVC = WithdrawViewController()
+        navigationController?.pushViewController(nextVC, animated: true)
     }
     
     // 회원탈퇴 모달 -> 뷰로 구현
@@ -120,61 +131,10 @@ class MyAccountViewController: UIViewController {
     
     @objc
     func didTapWithdraw() {
-        // 불투명 검은 뷰
-        let dimmedView = UIView(frame: view.bounds)
-        dimmedView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
-        dimmedView.alpha = 0
-        view.addSubview(dimmedView)
-        self.dimmedView = dimmedView
+        let withDrawModalVC = WithdrawModalViewController()
+        withDrawModalVC.modalPresentationStyle = .pageSheet
         
-        // 모달 대체 뷰
-        let sheetView = UIView()
-        sheetView.backgroundColor = .white
-        sheetView.layer.cornerRadius = 40
-        sheetView.clipsToBounds = true
-        dimmedView.addSubview(sheetView)
-        self.sheetView = sheetView
-        
-        sheetView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(322)
-        }
-        
-        let contentView = WithdrawModalView()
-        sheetView.addSubview(contentView)
-        contentView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        sheetView.transform = CGAffineTransform(translationX: 0, y: 300)
-        UIView.animate(withDuration: 0.25) {
-            dimmedView.alpha = 1
-            sheetView.transform = .identity
-        }
-        
-        contentView.cancleButton.addTarget(self, action: #selector(dismissWithdrawModal), for: .touchUpInside)
-        contentView.withDrawButton.addTarget(self, action: #selector(goWithdrawPage), for: .touchUpInside)
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissWithdrawModal))
-        tap.delegate = self
-        dimmedView.addGestureRecognizer(tap)
-    }
-    
-    @objc
-    private func dismissWithdrawModal() {
-        guard let dimmedView = dimmedView else { return }
-        UIView.animate(withDuration: 0.25, animations: {
-            dimmedView.alpha = 0
-        }) { _ in
-            dimmedView.removeFromSuperview()
-        }
-    }
-    
-    @objc
-    private func goWithdrawPage() {
-        dismissWithdrawModal()
-        let nextVC = WithdrawViewController()
-        navigationController?.pushViewController(nextVC, animated: true)
+        presentSheet(withDrawModalVC, heightRatio: 0.34)
     }
     
     @objc

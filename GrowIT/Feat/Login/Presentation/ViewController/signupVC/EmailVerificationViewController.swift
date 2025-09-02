@@ -150,7 +150,7 @@ class EmailVerificationViewController: UIViewController {
         let emailErrorVC = EmailVerificationErrorViewController()
         let navController = UINavigationController(rootViewController: emailErrorVC)
         navController.modalPresentationStyle = .pageSheet
-        presentPageSheet(viewController: navController, detentFraction: 0.37)
+        presentSheet(navController, heightRatio: 0.37)
     }
     
     @objc private func sendCodeButtonTapped() {

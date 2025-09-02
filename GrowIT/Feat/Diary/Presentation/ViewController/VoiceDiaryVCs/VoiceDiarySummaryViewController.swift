@@ -89,7 +89,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         prevVC.diaryId = diaryId
         let navController = UINavigationController(rootViewController: prevVC)
         navController.modalPresentationStyle = .fullScreen
-        presentPageSheet(viewController: navController, detentFraction: 0.37)
+        presentSheet(navController, heightRatio: 0.37)
     }
     
     @objc func nextVC() {
@@ -108,7 +108,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         nextVC.recommendedChallenges = recommendedChallenges
         let navController = UINavigationController(rootViewController: nextVC)
         navController.modalPresentationStyle = .fullScreen
-        presentPageSheet(viewController: navController, detentFraction: 0.6)
+        presentSheet(navController, heightRatio: 0.6)
     }
     
     func didTapExitButton() {

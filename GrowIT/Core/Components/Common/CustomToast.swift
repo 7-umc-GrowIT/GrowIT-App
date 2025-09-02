@@ -82,7 +82,7 @@ class CustomToast {
             containerView.alpha = 1
         }) { _ in
             // 1초 후 사라지기 시작
-            DispatchQueue.main.asyncAfter(deadline: .now()) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 // 현재 토스트가 이 토스트와 같을 때만 자동 제거
                 if CustomToast.currentToastContainer == containerView {
                     UIView.animate(withDuration: 0.5, animations: {

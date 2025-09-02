@@ -30,8 +30,8 @@ final class ChallengeVerifyUseCaseImpl: ChallengeVerifyUseCase {
             .flatMap { _ in
                 self.repository.getS3ImageUrl(fileName: fileName)
             }
-            .flatMap { imageUrl in
-                self.repository.postVerification(challengeId: challengeId, imageUrl: imageUrl, thoughts: thoughts)
+            .flatMap { fileName in
+                self.repository.postVerification(challengeId: challengeId, fileName: fileName, thoughts: thoughts)
             }
             .eraseToAnyPublisher()
     }

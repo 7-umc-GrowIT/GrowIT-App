@@ -9,6 +9,11 @@ import UIKit
 
 class WithdrawModalView: UIView {
     // MARK: - Components
+    private let grabberIcon = UIImageView().then {
+        $0.image = UIImage(named: "grabberIcon")
+        $0.contentMode = .scaleAspectFit
+    }
+    
     private let titleLabel = AppLabel(
         text: "정말로 탈퇴할까요?",
         font: .heading2Bold(),
@@ -50,13 +55,20 @@ class WithdrawModalView: UIView {
     }
     
     private func setView() {
-        self.addSubviews([titleLabel, descLabel, cancleButton, withDrawButton])
+        self.addSubviews([grabberIcon, titleLabel, descLabel, cancleButton, withDrawButton])
     }
     
     //MARK: - 레이아웃 설정
     private func setConstraints() {
+        grabberIcon.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.width.equalTo(80)
+            $0.height.equalTo(4)
+            $0.centerX.equalToSuperview()
+        }
+        
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(52)
+            $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
         

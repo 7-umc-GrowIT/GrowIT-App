@@ -181,20 +181,7 @@ class HomeViewController: UIViewController {
         // 바텀 시트 설정
         modalVC.modalPresentationStyle = .pageSheet
         
-        if let sheet = modalVC.sheetPresentationController {
-            // iOS 16 이상
-            if #available(iOS 16.0, *) {
-                sheet.detents = [.custom { _ in return 300 }] // 원하는 높이
-            } else {
-                // iOS 15
-                sheet.detents = [.medium()]
-            }
-            
-            sheet.preferredCornerRadius = 20
-            sheet.prefersGrabberVisible = false
-        }
-        
-        present(modalVC, animated: true)
+        presentSheet(modalVC, heightRatio: 0.33)
     }
         
     //MARK: Notification

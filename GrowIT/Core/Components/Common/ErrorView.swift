@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Then
 
 class ErrorView: UIView {
 
@@ -19,6 +20,11 @@ class ErrorView: UIView {
     }
     
     //MARK: - UI Components
+    private let grabberIcon = UIImageView().then {
+        $0.image = UIImage(named: "grabberIcon")
+        $0.contentMode = .scaleAspectFit
+    }
+    
     private lazy var diaryIcon = UIImageView().then {
         $0.image = UIImage(named: "diaryIcon")
         $0.backgroundColor = .clear
@@ -51,36 +57,45 @@ class ErrorView: UIView {
     private func setupUI() {
         layer.cornerRadius = 40
         backgroundColor = .white
+        
+        addSubview(grabberIcon)
+        grabberIcon.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.width.equalTo(80)
+            $0.height.equalTo(4)
+            $0.centerX.equalToSuperview()
+            
+        }
         addSubview(diaryIcon)
-        diaryIcon.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
-            make.top.equalToSuperview().offset(52)
+        diaryIcon.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(24)
+            $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
         }
         
         addSubview(label1)
-        label1.snp.makeConstraints { make in
-            make.leading.equalTo(diaryIcon.snp.leading)
-            make.top.equalTo(diaryIcon.snp.bottom).offset(8)
+        label1.snp.makeConstraints {
+            $0.leading.equalTo(diaryIcon.snp.leading)
+            $0.top.equalTo(diaryIcon.snp.bottom).offset(8)
         }
         
         addSubview(label2)
-        label2.snp.makeConstraints { make in
-            make.leading.equalTo(label1.snp.leading)
-            make.top.equalTo(label1.snp.bottom).offset(16)
+        label2.snp.makeConstraints {
+            $0.leading.equalTo(label1.snp.leading)
+            $0.top.equalTo(label1.snp.bottom).offset(16)
         }
         
         addSubview(exitButton)
-        exitButton.snp.makeConstraints { make in
-            make.leading.equalTo(label2.snp.leading)
-            make.top.equalTo(label2.snp.bottom).offset(42)
-            make.width.equalTo(88)
+        exitButton.snp.makeConstraints {
+            $0.leading.equalTo(label2.snp.leading)
+            $0.top.equalTo(label2.snp.bottom).offset(42)
+            $0.width.equalTo(88)
         }
         
         addSubview(continueButton)
-        continueButton.snp.makeConstraints { make in
-            make.leading.equalTo(exitButton.snp.trailing).offset(8)
-            make.trailing.equalToSuperview().offset(-24)
-            make.top.equalTo(exitButton.snp.top)
+        continueButton.snp.makeConstraints { 
+            $0.leading.equalTo(exitButton.snp.trailing).offset(8)
+            $0.trailing.equalToSuperview().offset(-24)
+            $0.top.equalTo(exitButton.snp.top)
         }
     }
     

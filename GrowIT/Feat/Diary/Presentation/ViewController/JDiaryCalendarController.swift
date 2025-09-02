@@ -79,6 +79,8 @@ class JDiaryCalendarController: UIViewController {
         self.view = jDiaryCalendar
         view.backgroundColor = .clear
         
+        setupNotifications()
+        
         currentMonthIndex = currentCalendar.component(.month, from: currentDate) - 1
         currentYear = currentCalendar.component(.year, from: currentDate)
         
@@ -88,6 +90,10 @@ class JDiaryCalendarController: UIViewController {
         jDiaryCalendar.todayBtn.addTarget(self, action: #selector(todayBtnTapped), for: .touchUpInside)
         jDiaryCalendar.backMonthBtn.addTarget(self, action: #selector(backMonthTapped), for: .touchUpInside)
         jDiaryCalendar.nextMonthBtn.addTarget(self, action: #selector(nextMonthTapped), for: .touchUpInside)
+    }
+    
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshDiary), name: .diaryReloadNotification, object: nil)
     }
     
     func refreshData(){
@@ -120,6 +126,10 @@ class JDiaryCalendarController: UIViewController {
         }
     }
     
+    @objc private func refreshDiary() {
+        refreshData()
+    }
+    
     @objc private func todayBtnTapped() {
         // 오늘 날짜를 currentDate에 설정
         currentDate = Date()
@@ -140,6 +150,7 @@ class JDiaryCalendarController: UIViewController {
             currentMonthIndex! -= 1
         }
         updateCalendar()
+        getDiaryDates()
     }
     
     @objc private func nextMonthTapped() {
@@ -150,6 +161,7 @@ class JDiaryCalendarController: UIViewController {
             currentMonthIndex! += 1
         }
         updateCalendar()
+        getDiaryDates()
     }
     
     private func updateCalendar() {
@@ -337,18 +349,9 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
                         guard let self = self else {return}
                         switch result{
                         case.success(let data):
+                            print("받은 일기 데이터는 \(data)")
                             let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
-                            if let sheet = diaryPostFixVC.sheetPresentationController {
-                                if #available(iOS 16.0, *) {
-                                    sheet.detents = [.custom { _ in return 0.6 * UIScreen.main.bounds.height }]
-                                } else {
-                                    // Fallback on earlier versions
-                                }
-                                sheet.prefersGrabberVisible = false
-                                sheet.preferredCornerRadius = 24
-                            }
-
-                            present(diaryPostFixVC, animated: true)
+                            presentSheet(diaryPostFixVC, heightRatio: 0.55)
                         case.failure(let error):
                             print("Error: \(error)")
                         }

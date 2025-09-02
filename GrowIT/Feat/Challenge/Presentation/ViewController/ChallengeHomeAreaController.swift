@@ -96,7 +96,7 @@ class ChallengeHomeAreaController: UIViewController {
     }
     
     private func setupNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(updateChallengeList), name: .challengeDidDelete, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateChallengeList), name: .challengeReloadNotification, object: nil)
     }
     
     @objc private func updateChallengeList() {
@@ -163,38 +163,9 @@ extension ChallengeHomeAreaController: UICollectionViewDelegateFlowLayout, UICol
             presentSheet(completeVC, heightRatio: 1.0, useLargeOnly: true)
         } else {
             let verifyModalVC = ChallengeVerifyModalController()
-            verifyModalVC.delegate = self
             verifyModalVC.challengeId = challenge.id
-            presentSheet(verifyModalVC, heightRatio: 0.45)
+            presentSheet(verifyModalVC, heightRatio: 0.34)
         }
-    }
-}
-
-// MARK: - Sheet Presentation
-extension ChallengeHomeAreaController: UISheetPresentationControllerDelegate {
-    private func presentSheet(_ viewController: UIViewController, heightRatio: CGFloat, useLargeOnly: Bool = false) {
-        viewController.modalPresentationStyle = .pageSheet
-        if let sheet = viewController.sheetPresentationController {
-            if #available(iOS 16.0, *) {
-                sheet.detents = useLargeOnly ? [.large()] : [.custom { _ in self.view.frame.height * heightRatio }]
-            } else {
-                sheet.detents = [.medium(), .large()]
-            }
-            
-            if #available(iOS 15.0, *) {
-                sheet.preferredCornerRadius = 40
-            }
-            
-            sheet.delegate = self
-            sheet.prefersGrabberVisible = false
-            sheet.selectedDetentIdentifier = .large
-        }
-        
-        present(viewController, animated: true, completion: nil)
-    }
-    
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        print("시트 상태 변경: \(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")")
     }
 }
 
@@ -206,19 +177,5 @@ extension ChallengeHomeAreaController: UIScrollViewDelegate {
             selectedIndex = indexPath.row
             pageControl.currentPage = indexPath.row
         }
-    }
-}
-
-// MARK: - ChallengeVerifyModalDelegate
-extension ChallengeHomeAreaController: ChallengeVerifyModalDelegate {
-    func presentChallengeVerifyModal() {
-        let modalVC = ChallengeVerifyModalController()
-        modalVC.delegate = self
-        present(modalVC, animated: true, completion: nil)
-    }
-    
-    func didRequestVerification() {
-        let verifyVC = ChallengeVerifyViewController()
-        navigationController?.pushViewController(verifyVC, animated: true)
     }
 }
