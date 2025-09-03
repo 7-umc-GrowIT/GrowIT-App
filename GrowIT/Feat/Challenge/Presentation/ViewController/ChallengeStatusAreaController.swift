@@ -198,25 +198,7 @@ extension ChallengeStatusAreaController: UICollectionViewDelegateFlowLayout, UIC
             }
         case 2:
             selectedStatusIndex = indexPath.row
-            switch indexPath.row {
-            case 0: // 전체
-                viewModel.selectedType = .all
-                viewModel.completed = false
-            case 1: // 완료
-                viewModel.selectedType = .all
-                viewModel.completed = true
-            case 2: // 랜덤 챌린지
-                viewModel.selectedType = .random
-                viewModel.completed = false
-            case 3: // 데일리 챌린지
-                viewModel.selectedType = .daily
-                viewModel.completed = false
-            default:
-                break
-            }
-            
-            viewModel.page = 1
-            
+            viewModel.fetchChallengesForStatus(index: selectedStatusIndex)
             collectionView.reloadData()
             challengeStatusArea.challengeAllList.reloadData()
             scrollToTop()
