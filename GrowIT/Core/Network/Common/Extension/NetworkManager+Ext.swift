@@ -40,7 +40,7 @@ extension NetworkManager {
             }
         }
     }
-
+    
     
     // ✅ 2. 옵셔널 데이터 요청
     func requestOptional<T: Decodable>(
@@ -71,7 +71,7 @@ extension NetworkManager {
             }
         }
     }
-
+    
     
     // ✅ 3. 상태 코드만 확인
     func requestStatusCode(
@@ -117,7 +117,7 @@ extension NetworkManager {
             }
         }
     }
-
+    
     
     // ✅ 4. 유효기간 파싱 + 데이터 파싱
     func requestWithTime<T: Decodable>(
@@ -154,12 +154,13 @@ extension NetworkManager {
             }
         }
     }
+}
     
-    // MARK: - 상태 코드 처리 헬퍼들
-    fileprivate func handleResponse<T: Decodable>(
-        _ response: Response,
-        decodingType: T.Type
-    ) -> Result<T, NetworkError> {
+// MARK: - 상태 코드 처리 헬퍼들
+fileprivate func handleResponse<T: Decodable>(
+    _ response: Response,
+    decodingType: T.Type
+) -> Result<T, NetworkError> {
         do {
             print("🔍 handleResponse 호출됨 - Status: \(response.statusCode)")
             
@@ -185,7 +186,7 @@ extension NetworkManager {
             return .failure(.decodingError)
         }
     }
-}
+
 
 fileprivate func handleResponseOptional<T: Decodable>(
     _ response: Response,
