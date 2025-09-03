@@ -1,80 +1,174 @@
-//
-//  TokenManager.swift
+//  NetworkManager+Ext.swift
 //  GrowIT
 //
-//  Created by 강희정 on 2/1/25.
+//  Created by 이수현 on 1/20/25.
 //
 
-import Security
+import Moya
 import Foundation
 
-final class TokenManager {
-    static let shared = TokenManager()
-    private init() {}
-
-    private let service = "com.growit.auth"
-
-    // MARK: - Save
-    func saveTokens(accessToken: String, refreshToken: String) {
-        saveKeychain(key: "accessToken", value: accessToken)
-        saveKeychain(key: "refreshToken", value: refreshToken)
-    }
-
-    func saveAccessToken(_ accessToken: String) {
-        saveKeychain(key: "accessToken", value: accessToken)
-    }
-
-    // MARK: - Get
-    func getAccessToken() -> String? {
-        return loadKeychain(key: "accessToken")
-    }
-
-    func getRefreshToken() -> String? {
-        return loadKeychain(key: "refreshToken")
-    }
-
-    // MARK: - Clear
-    func clearTokens() {
-        deleteKeychain(key: "accessToken")
-        deleteKeychain(key: "refreshToken")
-    }
-
-    // MARK: - Keychain Helpers
-    private func saveKeychain(key: String, value: String) {
-        let data = value.data(using: .utf8)!
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: key,
-            kSecValueData as String: data
-        ]
-        SecItemDelete(query as CFDictionary) // 기존 값 제거
-        SecItemAdd(query as CFDictionary, nil)
-    }
-
-    private func loadKeychain(key: String) -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: key,
-            kSecReturnData as String: kCFBooleanTrue!,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-        var dataTypeRef: AnyObject?
-        if SecItemCopyMatching(query as CFDictionary, &dataTypeRef) == noErr,
-           let data = dataTypeRef as? Data,
-           let value = String(data: data, encoding: .utf8) {
-            return value
+extension NetworkManager {
+    // ✅ 1. 필수 데이터 요청
+    func request<T: Decodable>(
+        target: Endpoint,
+        decodingType: T.Type,
+        completion: @escaping (Result<T, NetworkError>) -> Void
+    ) {
+        provider.request(target) { result in
+            switch result {
+            case .success(let response):
+                // AuthPlugin이 이미 401을 처리했다면 새로운 토큰으로 성공 응답이 올 것임
+                let result: Result<T, NetworkError> = handleResponse(response, decodingType: decodingType)
+                completion(result)
+            case .failure(let error):
+                completion(.failure(handleNetworkError(error)))
+            }
         }
-        return nil
     }
+    
+    // ✅ 2. 옵셔널 데이터 요청
+    func requestOptional<T: Decodable>(
+        target: Endpoint,
+        decodingType: T.Type,
+        completion: @escaping (Result<T?, NetworkError>) -> Void
+    ) {
+        provider.request(target) { result in
+            switch result {
+            case .success(let response):
+                let result: Result<T?, NetworkError> = handleResponseOptional(response, decodingType: decodingType)
+                completion(result)
+            case .failure(let error):
+                completion(.failure(handleNetworkError(error)))
+            }
+        }
+    }
+    
+    // ✅ 3. 상태 코드만 확인
+    func requestStatusCode(
+        target: Endpoint,
+        completion: @escaping (Result<Void, NetworkError>) -> Void
+    ) {
+        provider.request(target) { result in
+            switch result {
+            case .success(let response):
+                let result: Result<ApiResponse<String?>?, NetworkError> = handleResponseOptional(
+                    response,
+                    decodingType: ApiResponse<String?>.self
+                )
+                switch result {
+                case .success:
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            case .failure(let error):
+                completion(.failure(handleNetworkError(error)))
+            }
+        }
+    }
+    
+    // ✅ 4. 유효기간 파싱 + 데이터 파싱
+    func requestWithTime<T: Decodable>(
+        target: Endpoint,
+        decodingType: T.Type,
+        completion: @escaping (Result<(T, TimeInterval?), NetworkError>) -> Void
+    ) {
+        provider.request(target) { result in
+            switch result {
+            case .success(let response):
+                let result: Result<(T, TimeInterval?), NetworkError> = handleResponseTimeInterval(response, decodingType: decodingType)
+                completion(result)
+            case .failure(let error):
+                completion(.failure(handleNetworkError(error)))
+            }
+        }
+    }
+}
 
-    private func deleteKeychain(key: String) {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: key
-        ]
-        SecItemDelete(query as CFDictionary)
+// MARK: - 상태 코드 처리 헬퍼들
+fileprivate func handleResponse<T: Decodable>(
+    _ response: Response,
+    decodingType: T.Type
+) -> Result<T, NetworkError> {
+    do {
+        print("🔍 handleResponse 호출됨 - Status: \(response.statusCode)")
+        
+        // 200-299 성공 응답만 처리
+        // 401 에러가 여기까지 왔다는 것은 AuthPlugin에서 처리하지 못했거나
+        // 토큰 갱신에 실패했다는 뜻
+        guard (200...299).contains(response.statusCode) else {
+            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
+            let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
+            return .failure(.serverError(statusCode: response.statusCode, message: message))
+        }
+        
+        let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
+        
+        if let result = apiResponse.result {
+            return .success(result)
+        } else if T.self == EmptyResult.self {
+            return .success(EmptyResult() as! T)
+        } else {
+            return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
+        }
+    } catch {
+        return .failure(.decodingError)
+    }
+}
+
+fileprivate func handleResponseOptional<T: Decodable>(
+    _ response: Response,
+    decodingType: T.Type
+) -> Result<T?, NetworkError> {
+    do {
+        print("🔍 handleResponseOptional 호출됨 - Status: \(response.statusCode)")
+        
+        guard (200...299).contains(response.statusCode) else {
+            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
+            let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
+            return .failure(.serverError(statusCode: response.statusCode, message: message))
+        }
+        
+        if response.data.isEmpty { return .success(nil) }
+        let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
+        return .success(apiResponse.result)
+    } catch {
+        return .failure(.decodingError)
+    }
+}
+
+fileprivate func handleResponseTimeInterval<T: Decodable>(
+    _ response: Response,
+    decodingType: T.Type
+) -> Result<(T, TimeInterval?), NetworkError> {
+    do {
+        print("🔍 handleResponseTimeInterval 호출됨 - Status: \(response.statusCode)")
+        
+        guard (200...299).contains(response.statusCode) else {
+            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
+            let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
+            return .failure(.serverError(statusCode: response.statusCode, message: message))
+        }
+        
+        let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
+        guard let result = apiResponse.result else {
+            return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
+        }
+        return .success((result, nil))
+    } catch {
+        return .failure(.decodingError)
+    }
+}
+
+// 네트워크 오류 핸들링
+fileprivate func handleNetworkError(_ error: Error) -> NetworkError {
+    let nsError = error as NSError
+    switch nsError.code {
+    case NSURLErrorNotConnectedToInternet:
+        return .networkError(message: "인터넷 연결이 끊겼습니다.")
+    case NSURLErrorTimedOut:
+        return .networkError(message: "요청 시간이 초과되었습니다.")
+    default:
+        return .networkError(message: "네트워크 오류가 발생했습니다.")
     }
 }
