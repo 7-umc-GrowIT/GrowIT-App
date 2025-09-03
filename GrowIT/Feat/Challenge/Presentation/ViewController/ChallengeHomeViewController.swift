@@ -88,6 +88,20 @@ class ChallengeHomeViewController: UIViewController {
     
     private func setupNotifications(){
         NotificationCenter.default.addObserver(self, selector: #selector(handleChallengeStatusReload), name: .challengeReloadNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showChallengeVerifyToast(_:)), name: NSNotification.Name("challengeVerifyCompleted"), object: nil)
+    }
+    
+    @objc private func showChallengeVerifyToast(_ notification: Notification) { // 챌린지 4개 이상 인증하여 크레딧 미지급한다는 토스트 메시지
+        CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "챌린지 인증을 완료했어요", font: .heading3SemiBold())
+        if let userInfo = notification.userInfo,
+           let granted = userInfo["granted"] as? Bool{
+            print("granted 값은 \(granted)")
+            if granted == false {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    CustomToast(containerWidth: 310, containerHeight: 76).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "해당 일자 챌린지 인증으로 크레딧은\n더 이상 제공되지 않습니다.", font: .heading3SemiBold())
+                }
+            }
+        }
     }
     
     @objc private func handleChallengeStatusReload() {

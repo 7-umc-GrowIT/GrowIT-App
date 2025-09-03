@@ -217,11 +217,17 @@ class ChallengeVerifyViewController: UIViewController {
         challengeService.postProveChallenge(challengeId: challenge?.id ?? 0, data: ChallengeRequestDTO(certificationImageName: fileName, thoughts: review), completion: { [weak self] result in
             guard let self = self else {return}
             switch result{
-            case .success(_):
+            case .success(let data):
                 DispatchQueue.main.async {
-                    self.navigationController?.popViewController(animated: false)
+                    
                     NotificationCenter.default.post(name: .challengeReloadNotification, object: nil)
-                    CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "챌린지 인증을 완료했어요", font: .heading3SemiBold())
+                    NotificationCenter.default.post(name: NSNotification.Name("challengeVerifyCompleted"), object: nil, userInfo: ["granted": data.creditInfo.granted])
+//                    CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "챌린지 인증을 완료했어요", font: .heading3SemiBold())
+//                    if(!data.creditInfo.granted) {
+////
+//                        CustomToast(containerWidth: 310, containerHeight: 76).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "해당 일자 챌린지 인증으로 크레딧은\n더 이상 제공되지 않습니다.", font: .heading3SemiBold())
+//                    }
+                    self.navigationController?.popViewController(animated: false)
                 }
             case .failure(let error):
                 print("챌린지 인증 저장 에러: \(error)")
