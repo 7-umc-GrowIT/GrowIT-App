@@ -222,11 +222,6 @@ class ChallengeVerifyViewController: UIViewController {
                     
                     NotificationCenter.default.post(name: .challengeReloadNotification, object: nil)
                     NotificationCenter.default.post(name: NSNotification.Name("challengeVerifyCompleted"), object: nil, userInfo: ["granted": data.creditInfo.granted])
-//                    CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "챌린지 인증을 완료했어요", font: .heading3SemiBold())
-//                    if(!data.creditInfo.granted) {
-////
-//                        CustomToast(containerWidth: 310, containerHeight: 76).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "해당 일자 챌린지 인증으로 크레딧은\n더 이상 제공되지 않습니다.", font: .heading3SemiBold())
-//                    }
                     self.navigationController?.popViewController(animated: false)
                 }
             case .failure(let error):
