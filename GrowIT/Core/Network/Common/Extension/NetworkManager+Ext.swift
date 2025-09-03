@@ -1,4 +1,3 @@
-//
 //  NetworkManager+Ext.swift
 //  GrowIT
 //
@@ -18,6 +17,7 @@ extension NetworkManager {
         provider.request(target) { result in
             switch result {
             case .success(let response):
+                // AuthPlugin이 이미 401을 처리했다면 새로운 토큰으로 성공 응답이 올 것임
                 let result: Result<T, NetworkError> = handleResponse(response, decodingType: decodingType)
                 completion(result)
             case .failure(let error):
@@ -91,11 +91,17 @@ fileprivate func handleResponse<T: Decodable>(
     decodingType: T.Type
 ) -> Result<T, NetworkError> {
     do {
+        print("🔍 handleResponse 호출됨 - Status: \(response.statusCode)")
+        
+        // 200-299 성공 응답만 처리
+        // 401 에러가 여기까지 왔다는 것은 AuthPlugin에서 처리하지 못했거나
+        // 토큰 갱신에 실패했다는 뜻
         guard (200...299).contains(response.statusCode) else {
             let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
             let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
             return .failure(.serverError(statusCode: response.statusCode, message: message))
         }
+        
         let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
         
         if let result = apiResponse.result {
@@ -115,11 +121,14 @@ fileprivate func handleResponseOptional<T: Decodable>(
     decodingType: T.Type
 ) -> Result<T?, NetworkError> {
     do {
+        print("🔍 handleResponseOptional 호출됨 - Status: \(response.statusCode)")
+        
         guard (200...299).contains(response.statusCode) else {
             let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
             let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
             return .failure(.serverError(statusCode: response.statusCode, message: message))
         }
+        
         if response.data.isEmpty { return .success(nil) }
         let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
         return .success(apiResponse.result)
@@ -133,11 +142,14 @@ fileprivate func handleResponseTimeInterval<T: Decodable>(
     decodingType: T.Type
 ) -> Result<(T, TimeInterval?), NetworkError> {
     do {
+        print("🔍 handleResponseTimeInterval 호출됨 - Status: \(response.statusCode)")
+        
         guard (200...299).contains(response.statusCode) else {
             let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
             let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
             return .failure(.serverError(statusCode: response.statusCode, message: message))
         }
+        
         let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
         guard let result = apiResponse.result else {
             return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
