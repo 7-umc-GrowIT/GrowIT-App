@@ -9,7 +9,7 @@ import UIKit
 import Then
 import SnapKit
 
-class JDiaryHomeCalendarHeader: UIView {
+class DiaryHomeCalendarHeader: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)

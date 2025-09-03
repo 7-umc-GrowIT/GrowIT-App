@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class JDiaryHomeView: UIView {
+class DiaryHomeView: UIView {
 
     
     override init(frame: CGRect) {
@@ -34,16 +34,16 @@ class JDiaryHomeView: UIView {
     }
     
     // 일기 홈화면 상단 네비게이션바
-    private lazy var diaryHomeNavbar = JDiaryHomeNavbar()
+    private lazy var diaryHomeNavbar = DiaryHomeNavbar()
     
     // 일기 홈화면 배너
-    public lazy var diaryHomeBanner = JDiaryHomeBanner()
+    public lazy var diaryHomeBanner = DiaryHomeBanner()
     
     // 캘린더 헤더
-    lazy var diaryHomeCalendarHeader = JDiaryHomeCalendarHeader()
+    lazy var diaryHomeCalendarHeader = DiaryHomeCalendarHeader()
     
     // 캘린더
-    public lazy var diaryHomeCalendar = JDiaryCalendar()
+    public lazy var diaryHomeCalendar = DiaryCalendar()
 
     // 일기 홈화면 스택 뷰
     public lazy var diaryHomeStack = makeStack()

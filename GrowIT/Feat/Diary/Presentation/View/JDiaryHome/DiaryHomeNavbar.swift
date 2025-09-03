@@ -9,7 +9,7 @@ import UIKit
 import Then
 import SnapKit
 
-class JDiaryHomeNavbar: UIView {
+class DiaryHomeNavbar: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)

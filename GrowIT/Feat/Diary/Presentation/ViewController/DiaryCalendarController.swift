@@ -9,12 +9,12 @@ import UIKit
 import Then
 import SnapKit
 
-protocol JDiaryCalendarControllerDelegate: AnyObject {
+protocol DiaryCalendarControllerDelegate: AnyObject {
     func didSelectDate(_ date: String)
 }
 
-class JDiaryCalendarController: UIViewController {
-    private lazy var jDiaryCalendar = JDiaryCalendar()
+class DiaryCalendarController: UIViewController {
+    private lazy var jDiaryCalendar = DiaryCalendar()
     private lazy var diaryService = DiaryService()
     private lazy var callendarDiaries : [DiaryDateDTO] = []
     private var numberOfWeeksInMonth = 0  // 주 수를 저장하는 변수
@@ -27,7 +27,7 @@ class JDiaryCalendarController: UIViewController {
         return formatter
     }()
     
-    weak var delegate: JDiaryCalendarControllerDelegate?
+    weak var delegate: DiaryCalendarControllerDelegate?
     
     var daysPerMonth: [Int] {
         return [31, isLeapYear() ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] // 윤년 고려
@@ -195,7 +195,7 @@ class JDiaryCalendarController: UIViewController {
     
 }
 
-extension JDiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int{
         let firstDayOfMonth = firstWeekdayOfMonth // 현재월의 시작
         let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12]  // 이전 달의 날짜 수
@@ -298,7 +298,7 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
         guard kind == UICollectionView.elementKindSectionHeader else {
             fatalError("Unexpected element kind")
         }
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: JWeekDayHeaderView.reuseIdentifier, for: indexPath) as! JWeekDayHeaderView
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: WeekDayHeaderView.reuseIdentifier, for: indexPath) as! WeekDayHeaderView
         
         header.configureTheme(isDarkMode: self.isDark)
         return header

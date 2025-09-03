@@ -7,13 +7,13 @@
 
 import UIKit
 
-class VoiceDiaryDateSelectViewController: UIViewController, JDiaryCalendarControllerDelegate {
+class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControllerDelegate {
     
     // MARK: Properties
     let  voiceDiaryDateSelectView = VoiceDiaryDateSelectView()
     let navigationBarManager = NavigationManager()
     
-    let calVC = JDiaryCalendarController(isDropDown: true)
+    let calVC = DiaryCalendarController(isDropDown: true)
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -8,14 +8,14 @@
 import UIKit
 import EzPopup
 
-class TextDiaryViewController: UIViewController, JDiaryCalendarControllerDelegate {
+class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate {
     
     //MARK: - Properties
     let navigationBarManager = NavigationManager()
     let textDiaryView = TextDiaryView()
     let diaryService = DiaryService()
     
-    let calVC = JDiaryCalendarController(isDropDown: true)
+    let calVC = DiaryCalendarController(isDropDown: true)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,7 +83,7 @@ class TextDiaryViewController: UIViewController, JDiaryCalendarControllerDelegat
     }
     
     @objc func calenderVC(_ sender: UIButton) {
-        let calVC = JDiaryCalendarController(isDropDown: true)
+        let calVC = DiaryCalendarController(isDropDown: true)
         calVC.configureTheme(isDarkMode: false)
         calVC.delegate = self
         calVC.view.backgroundColor = .clear
