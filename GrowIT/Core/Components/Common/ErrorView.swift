@@ -7,6 +7,7 @@
 
 import UIKit
 import Then
+import SnapKit
 
 class ErrorView: UIView {
 
@@ -80,7 +81,7 @@ class ErrorView: UIView {
         
         addSubview(label2)
         label2.snp.makeConstraints {
-            $0.leading.equalTo(label1.snp.leading)
+            $0.horizontalEdges.equalToSuperview().inset(24)
             $0.top.equalTo(label1.snp.bottom).offset(16)
         }
         
