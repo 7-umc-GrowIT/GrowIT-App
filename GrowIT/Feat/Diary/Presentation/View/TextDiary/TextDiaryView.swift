@@ -42,12 +42,21 @@ class TextDiaryView: UIView, UITextViewDelegate {
         $0.text = "\(currentDate)"
         $0.font = .heading2Bold()
         $0.textColor = .gray900
+        $0.isUserInteractionEnabled = false
     }
     
-    let dropDownButton = UIButton().then {
+    private let dropDownButton = UIButton().then {
         $0.setImage(UIImage(named: "dropdownIcon"), for: .normal)
         $0.backgroundColor = .clear
         $0.tintColor = .gray500
+        $0.isUserInteractionEnabled = false
+    }
+    
+    let dropDownStack = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = 4
+        $0.alignment = .center
+        $0.distribution = .fill
     }
     
     private let placeholder: String = "일기 내용을 입력하세요"
@@ -124,28 +133,25 @@ class TextDiaryView: UIView, UITextViewDelegate {
             make.height.equalTo(109)
         }
         
-        dateView.addSubview(dayLabel)
+        dropDownStack.addArrangedSubViews([dateLabel, dropDownButton])
+        
+        dateView.addSubviews([dayLabel, dropDownStack])
+        
         dayLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
             make.top.equalToSuperview().offset(32)
         }
         
-        dateView.addSubview(dateLabel)
-        dateLabel.snp.makeConstraints { make in
-            make.leading.equalTo(dayLabel)
-            make.top.equalTo(dayLabel.snp.bottom).offset(8)
-            // make.width.equalTo(160)
+        dropDownStack.snp.makeConstraints {
+            $0.top.equalTo(dayLabel.snp.bottom).offset(20)
+            $0.left.equalTo(dayLabel.snp.left)
         }
         
-        addSubview(dropDownButton)
-        dropDownButton.snp.makeConstraints { make in
-            make.leading.equalTo(dateLabel.snp.trailing).offset(4)
-            make.centerY.equalTo(dateLabel.snp.centerY)
-        }
+        //dateView.addSubview(dateLabel)
         
         addSubview(diaryTextField)
         diaryTextField.snp.makeConstraints { make in
-            make.top.equalTo(dateView.snp.bottom).offset(24)
+            make.top.equalTo(dropDownStack.snp.bottom).offset(24)
             make.leading.equalToSuperview().offset(24)
             make.centerX.equalToSuperview()
             make.height.equalTo(360)

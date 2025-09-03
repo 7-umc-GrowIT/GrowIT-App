@@ -53,7 +53,8 @@ class TextDiaryViewController: UIViewController, JDiaryCalendarControllerDelegat
     //MARK: - Setup Button actions
     private func setupActions() {
         textDiaryView.saveButton.addTarget(self, action: #selector(nextVC), for: .touchUpInside)
-        textDiaryView.dropDownButton.addTarget(self, action: #selector(calenderVC), for: .touchUpInside)
+        textDiaryView.dropDownStack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(calenderVC))
+        )
     }
     
     //MARK: - @objc methods
