@@ -12,7 +12,6 @@ class HomeCharacterView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addStackView()
         addComponents()
         constraints()
         setGroLayer()
@@ -35,13 +34,20 @@ class HomeCharacterView: UIView {
     
     // 크레딧 개수
     public lazy var creditNum = UILabel().then{
-        $0.text = "1개"
+        $0.text = ""
         $0.font = UIFont.heading2Bold()
         $0.textColor = .white
     }
     
     // 크레딧 컨테이너
     private lazy var creditContainer = makeContainer()
+    
+    public var redDot = UIView().then {
+        $0.backgroundColor = .negative400
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.layer.cornerRadius = 3   // 6/2 → 완전한 원
+        $0.clipsToBounds = true
+    }
     
     // 친구보기 버튼 아이콘
     private lazy var friendIcon = makeIcon("friend")
@@ -81,12 +87,6 @@ class HomeCharacterView: UIView {
         $0.contentMode = .scaleAspectFill
     }
     
-    // MARK: - Stack
-    
-    // 크레딧 개수 가로 스택
-    private lazy var creditBoxStack = makeStackView(axis: .horizontal, spacing: 12)
-    
-    
     // MARK: - Function
     
     // 스택뷰 생성 함수(스택 방향, 간격)
@@ -123,14 +123,22 @@ class HomeCharacterView: UIView {
         groObjectImageView.layer.zPosition = 3
     }
     
+    public func showDot(_ showStatus: Bool) {
+        if showStatus {
+            redDot.snp.updateConstraints {
+                $0.width.height.equalTo(6)
+            }
+        }else{
+            redDot.snp.updateConstraints {
+                $0.width.height.equalTo(0)
+            }
+        }
+        
+    }
     // MARK: - add Function & Constraints
     
-    private func addStackView(){
-        [creditIcon, creditNum].forEach(creditBoxStack.addArrangedSubview)
-    }
-    
     private func addComponents(){
-        creditContainer.addSubview(creditBoxStack)
+        creditContainer.addSubviews([creditIcon, creditNum, redDot])
         friendContainer.addSubview(friendIcon)
         [backgroundImageView, groFrameView, creditContainer, friendContainer, bottomGradientView].forEach(self.addSubview)
         
@@ -153,8 +161,22 @@ class HomeCharacterView: UIView {
             $0.left.equalToSuperview().offset(24)
         }
         
-        creditBoxStack.snp.makeConstraints{
-            $0.edges.equalToSuperview().inset(15)
+        creditIcon.snp.makeConstraints {
+            $0.verticalEdges.equalToSuperview().inset(14)
+            $0.left.equalToSuperview().offset(16)
+            $0.width.height.equalTo(28)
+        }
+        
+        creditNum.snp.makeConstraints {
+            $0.verticalEdges.equalToSuperview().inset(14)
+            $0.left.equalTo(creditIcon.snp.right).offset(12)
+        }
+        
+        redDot.snp.makeConstraints {
+            $0.top.equalTo(creditNum.snp.top)
+            $0.left.equalTo(creditNum.snp.right).offset(4)
+            $0.right.equalToSuperview().inset(16)
+            $0.width.height.equalTo(0)
         }
         
         friendContainer.snp.makeConstraints{
