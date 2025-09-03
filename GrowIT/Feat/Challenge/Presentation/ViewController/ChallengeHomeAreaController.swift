@@ -97,10 +97,18 @@ class ChallengeHomeAreaController: UIViewController {
     
     private func setupNotifications() {
         NotificationCenter.default.addObserver(self, selector: #selector(updateChallengeList), name: .challengeReloadNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(navigateToVerify), name: NSNotification.Name("navigateToChallengeVerify"), object: nil)
     }
     
     @objc private func updateChallengeList() {
         viewModel.refresh()
+    }
+    
+    @objc private func navigateToVerify() {
+        guard !view.isHidden else { return }
+        let challengeVerifyVC = ChallengeVerifyViewController(challenge: UserChallenge(dto: todayChallenges[selectedIndex]))
+        navigationController?.pushViewController(challengeVerifyVC, animated: true)
+    
     }
     
     public func refreshData(){

@@ -65,7 +65,6 @@ class DiaryPostFixViewController: UIViewController {
     }
     
     @objc func nextVC() {
-        // 수정하기 api 추가 필요
         callPatchFixDiary()
     }
     
@@ -99,7 +98,8 @@ class DiaryPostFixViewController: UIViewController {
                     print("Success: \(data)")
                     DispatchQueue.main.async {
                         NotificationCenter.default.post(name: .diaryReloadNotification, object: nil)
-                        self.onDismiss?()
+                        CustomToast(containerWidth: 195).show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "일기를 수정했어요", font: .heading3SemiBold())
+                        self.dismiss(animated: true, completion: nil)
                     }
                 case .failure(let error):
                     print("Error: \(error)")

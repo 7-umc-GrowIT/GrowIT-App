@@ -19,6 +19,8 @@ class HomeViewController: UIViewController {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        
+        callGetCredit()
     }
     
     override func viewDidLoad() {
@@ -26,8 +28,6 @@ class HomeViewController: UIViewController {
         self.view = homeview
         loadGroImage()
         setNotification()
-        callGetCredit()
-        
     }
     
     override func viewDidLayoutSubviews() {
