@@ -246,13 +246,20 @@ extension TermsAgreeViewController: UITableViewDataSource {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: TermsAgreeTableViewCell.identifier, for: indexPath) as? TermsAgreeTableViewCell else {
                 return UITableViewCell()
             }
-            
+        
             let term = termsList[indexPath.row]
-            let numberedTitle = "이용약관 (\(indexPath.row + 1))"
+            let numberedTitle: String
+            if term.termId == 7 {
+                numberedTitle = "서비스 이용약관"
+            } else {
+                numberedTitle = "개인정보 수집•이용 동의"
+            }
+            
             
             // 화살표 버튼을 눌렀을 때 상세 화면으로 이동
             cell.detailButton.addTarget(self, action: #selector(showTermsDetail(_:)), for: .touchUpInside)
             cell.detailButton.tag = term.termId
+            cell.detailButton.accessibilityLabel = numberedTitle
         
             cell.configure(
                 title: numberedTitle,
@@ -304,10 +311,11 @@ extension TermsAgreeViewController: UITableViewDataSource {
     
     @objc private func showTermsDetail(_ sender: UIButton) {
         let termId = sender.tag
+        let title = sender.accessibilityLabel ?? "약관 상세"
 
         guard let term = (termsList + optionalTermsList).first(where: { $0.termId == termId }) else { return }
 
-        let detailVC = TermsDetailViewController()
+        let detailVC = TermsDetailViewController(navigationBarTitle: title)
         detailVC.termsContent = term.content
         detailVC.termId = term.termId
         

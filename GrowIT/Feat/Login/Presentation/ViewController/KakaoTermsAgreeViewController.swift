@@ -220,7 +220,17 @@ extension KakaoTermsAgreeViewController: UITableViewDataSource {
             }
             
             let term = termsList[indexPath.row]
-            let numberedTitle = "이용약관 (\(indexPath.row + 1))"
+            let numberedTitle: String
+            if term.termId == 7 {
+                numberedTitle = "서비스 이용약관"
+            } else {
+                numberedTitle = "개인정보 수집•이용 동의"
+            }
+            
+            // 화살표 버튼을 눌렀을 때 상세 화면으로 이동
+            cell.detailButton.addTarget(self, action: #selector(showTermsDetail(_:)), for: .touchUpInside)
+            cell.detailButton.tag = term.termId
+            cell.detailButton.accessibilityLabel = numberedTitle
             
             cell.configure(
                 title: numberedTitle,
@@ -263,5 +273,26 @@ extension KakaoTermsAgreeViewController: UITableViewDataSource {
             
             return cell
         }
+    }
+    
+    @objc private func showTermsDetail(_ sender: UIButton) {
+        let termId = sender.tag
+        let title = sender.accessibilityLabel ?? "약관 상세"
+
+        guard let term = (termsList + optionalTermsList).first(where: { $0.termId == termId }) else { return }
+
+        let detailVC = TermsDetailViewController(navigationBarTitle: title)
+        detailVC.termsContent = term.content
+        detailVC.termId = term.termId
+        
+        detailVC.onAgreeCompletion = { [weak self] agreedTermId in
+            guard let self = self else { return }
+            self.agreedTerms[agreedTermId] = true
+            
+            self.termsAgreeView.termsTableView.reloadData()
+            self.termsAgreeView.termsOptTableView.reloadData()
+        }
+
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }

@@ -14,9 +14,20 @@ class TermsDetailViewController: UIViewController, UITextViewDelegate {
     let termsDetailView = TermsDetailView()
     var termsContent: String?
     var termId: Int?
+    let navigationBarTitle: String
     
     // 동의 완료 후 콜백
     var onAgreeCompletion: ((Int) -> Void)?
+    
+    //MARK: - init
+    init(navigationBarTitle: String) {
+        self.navigationBarTitle = navigationBarTitle
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,7 +48,7 @@ class TermsDetailViewController: UIViewController, UITextViewDelegate {
         
         navigationBarManager.setTitle(
             to: self.navigationItem,
-            title: "개인정보 수집이용",
+            title: navigationBarTitle,
             textColor: .gray900,
             font: .heading1Bold()
         )

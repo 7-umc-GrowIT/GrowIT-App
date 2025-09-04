@@ -70,6 +70,7 @@ class TermsAgreeView: UIView {
         $0.text = "그로우잇 이용약관"
         $0.font = .detail1Medium()
         $0.textColor = .gray400
+        $0.isHidden = true
     }
     
     let termsOptTableView = UITableView(frame: .zero, style: .plain).then {
@@ -149,11 +150,8 @@ class TermsAgreeView: UIView {
         }
     
         nextButton.snp.makeConstraints { make in
-            make.leading.equalTo(termsOptTableView.snp.leading)
-            make.top.equalTo(termsOptTableView.snp.bottom).offset(80)
-            make.bottom.equalToSuperview().inset(20)
-            make.centerX.equalToSuperview()
+            make.horizontalEdges.equalTo(self).inset(24)
+            make.bottom.equalTo(self.safeAreaLayoutGuide).inset(20)
         }
     }
-    
 }
