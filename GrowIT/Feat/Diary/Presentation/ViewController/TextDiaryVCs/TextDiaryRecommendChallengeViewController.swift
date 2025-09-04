@@ -100,7 +100,7 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         let selectedChallenges = getSelectedChallenges()
         
         if selectedChallenges.isEmpty {
-            CustomToast(containerWidth: 314).show(image: UIImage(named: "toast_Icon") ?? UIImage(),
+            CustomToast(containerWidth: 314).show(image: UIImage(named: "toastIcon") ?? UIImage(),
                        message: "한 개 이상의 챌린지를 선택해 주세요",
                        font: .heading3SemiBold())
             return

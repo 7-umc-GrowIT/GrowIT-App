@@ -65,7 +65,7 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     @objc func nextVC() {
         print(textDiaryView.saveButton.isEnabled)
         if textDiaryView.saveButton.isEnabled == false {
-            CustomToast(containerWidth: 232).show(image: UIImage(named: "toast_Icon") ?? UIImage(), message: "일기를 더 작성해 주세요", font: .heading3SemiBold())
+            CustomToast(containerWidth: 232).show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "일기를 더 작성해 주세요", font: .heading3SemiBold())
         } else {
             let userDiary = textDiaryView.diaryTextField.text ?? ""
             let date = textDiaryView.dateLabel.text ?? ""
