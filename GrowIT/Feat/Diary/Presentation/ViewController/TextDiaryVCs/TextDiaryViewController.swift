@@ -63,21 +63,16 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     }
     
     @objc func nextVC() {
-        print(textDiaryView.saveButton.isEnabled)
         if textDiaryView.saveButton.isEnabled == false {
             CustomToast(containerWidth: 232).show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "일기를 더 작성해 주세요", font: .heading3SemiBold())
         } else {
             let userDiary = textDiaryView.diaryTextField.text ?? ""
             let date = textDiaryView.dateLabel.text ?? ""
             
-            let nextVC = TextDiaryLoadingViewController()
-            nextVC.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(nextVC, animated: true)
-            
             callPostTextDiary(userDiary: userDiary, date: date) { diaryId in
-                DispatchQueue.main.async {
-                    nextVC.navigateToNextScreen(with: diaryId)
-                }
+                let nextVC = TextDiaryLoadingViewController(diaryId: diaryId)
+                nextVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(nextVC, animated: true)
             }
         }
     }
@@ -106,19 +101,15 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
         diaryService.postTextDiary(
             data: DiaryRequestDTO(
                 content: userDiary,
-                date: convertedDate ?? ""),
-            completion: { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case.success(let data):
-                    DispatchQueue.main.async {
-                        completion(data.diaryId)
-                    }
-                case.failure(let error):
-                    print("Error")
-                }
+                date: convertedDate ?? "")
+        ){ result in
+            switch result {
+            case .success(let data):
+                completion(data.diaryId)
+            case .failure:
+                print("직접 작성한 일기 저장 실패")
             }
-        )
+        }
     }
     
     func convertDateFormat(from originalDate: String) -> String? {

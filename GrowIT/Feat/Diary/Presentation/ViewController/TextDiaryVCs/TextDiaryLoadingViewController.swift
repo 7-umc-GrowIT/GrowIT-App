@@ -12,11 +12,27 @@ class TextDiaryLoadingViewController: UIViewController {
     //MARK: - Properties
     let textDiaryLoadingView = TextDiaryLoadingView()
     let diaryService = DiaryService()
+    private let diaryId: Int
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = true
         setupUI()
+        
+        fetchDiaryAnalyze(diaryId: diaryId) { result in
+            let nextVC = TextDiaryRecommendChallengeViewController(diaryId: self.diaryId, data: result)
+            nextVC.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(nextVC, animated: true)
+        }
+    }
+    
+    init(diaryId: Int) {
+        self.diaryId = diaryId
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     
@@ -31,9 +47,7 @@ class TextDiaryLoadingViewController: UIViewController {
     
     func navigateToNextScreen(with diaryId: Int) {
         fetchDiaryAnalyze(diaryId: diaryId) { data in
-            let nextVC = TextDiaryRecommendChallengeViewController(diaryId: diaryId, data: data)
-            nextVC.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(nextVC, animated: true)
+            
         }
     }
     
@@ -51,6 +65,4 @@ class TextDiaryLoadingViewController: UIViewController {
                 }
             })
     }
-    
-    //MARK: - @objc methods
 }
