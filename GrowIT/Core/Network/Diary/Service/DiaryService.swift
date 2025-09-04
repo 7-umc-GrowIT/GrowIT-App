@@ -23,8 +23,8 @@ final class DiaryService: NetworkManager {
     }
     
     /// Post Text Diary API
-    func postTextDiary(data: DiaryRequestDTO, completion: @escaping (Result<DiaryTextPostResponseDTO, NetworkError>) -> Void) {
-        request(target: .postTextDiary(data: data), decodingType: DiaryTextPostResponseDTO.self, completion: completion)
+    func postTextDiary(data: DiaryRequestDTO, completion: @escaping (Result<DiaryResponseDTO, NetworkError>) -> Void) {
+        request(target: .postTextDiary(data: data), decodingType: DiaryResponseDTO.self, completion: completion)
     }
     
     /// Post Voice Diary API
@@ -32,8 +32,9 @@ final class DiaryService: NetworkManager {
         request(target: .postVoiceDiary(data: data), decodingType: DiaryVoiceDTO.self, completion: completion)
     }
     
-    func postVoiceDiaryDate(data: DiaryVoiceDateRequestDTO, completion: @escaping (Result<DiaryTextPostResponseDTO, NetworkError>) -> Void) {
-        request(target: .postDiaryDate(data: data), decodingType: DiaryTextPostResponseDTO.self, completion: completion)
+    /// 음성일기 작성 후 요약 응답 DTO
+    func postVoiceDiaryDate(data: DiaryVoiceDateRequestDTO, completion: @escaping (Result<DiaryResponseDTO, NetworkError>) -> Void) {
+        request(target: .postDiaryDate(data: data), decodingType: DiaryResponseDTO.self, completion: completion)
     }
     
     /// Diary Id를 받아 Diary를 삭제하는 API

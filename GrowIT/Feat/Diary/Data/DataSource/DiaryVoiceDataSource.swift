@@ -8,7 +8,7 @@
 protocol DiaryVoiceDataSource {
     func postVoiceDiary(data: DiaryVoiceDTO) async throws -> DiaryVoiceDTO
     
-    func postVoiceDiaryDate(date: String) async throws -> DiaryTextPostResponseDTO
+    func postVoiceDiaryDate(date: String) async throws -> DiaryResponseDTO
 }
 
 class DiaryVoiceDataSourceImpl: DiaryVoiceDataSource {
@@ -32,7 +32,7 @@ class DiaryVoiceDataSourceImpl: DiaryVoiceDataSource {
        }
     }
     
-    func postVoiceDiaryDate(date: String) async throws -> DiaryTextPostResponseDTO {
+    func postVoiceDiaryDate(date: String) async throws -> DiaryResponseDTO {
         return try await withCheckedThrowingContinuation{
             continuation in
             diaryService.postVoiceDiaryDate(data: DiaryVoiceDateRequestDTO(date: date)) { result in

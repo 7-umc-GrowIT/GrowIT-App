@@ -12,7 +12,7 @@ struct Diary {
 }
 
 extension Diary {
-    init(dto: DiaryTextPostResponseDTO) {
+    init(dto: DiaryResponseDTO) {
         self.id = dto.diaryId
         self.content = dto.content
         self.date = dto.date
