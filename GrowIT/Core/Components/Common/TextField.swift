@@ -238,6 +238,7 @@ class CustomTextField: UIView {
         }
         
         titleLabel.textColor = UIColor.black
+        textField.textColor = UIColor.gray900
         clearButton.setImage(UIImage(named: "State=Default"), for: .normal)
     }
     
