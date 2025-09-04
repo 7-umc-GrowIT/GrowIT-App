@@ -28,6 +28,7 @@ class HomeViewController: UIViewController {
         self.view = homeview
         loadGroImage()
         setNotification()
+        homeview.characterArea.showLoadingIndicator()
     }
     
     override func viewDidLayoutSubviews() {
@@ -114,6 +115,8 @@ class HomeViewController: UIViewController {
         }
 
         group.notify(queue: .main) {
+            // 그로 한 번에 로딩 끝 -> 인디케이터 끔
+            self.homeview.characterArea.hideLoadingIndicator()
             if shouldAnimate {
                 // 최초 로딩일 때만 페이드인
                 for (_, pair) in loadedImages {
