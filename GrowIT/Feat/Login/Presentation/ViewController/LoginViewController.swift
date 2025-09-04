@@ -149,13 +149,13 @@ class LoginViewController: UIViewController {
         } else {
             
             // 이메일 로그인인지 소셜 로그인인지 구분
-            let method = loginResponse.result.loginResponseDTO.loginMethod
+            let method = loginResponse.result.loginResponseDTO?.loginMethod
             UserDefaults.standard.set(method, forKey: "loginMethod")
             
             // 회원가입 불필요 → 바로 로그인 완료 처리, 토큰 저장 (false)
             saveTokensAndNavigate(
-                accessToken: loginResponse.result.loginResponseDTO.tokens.accessToken,
-                refreshToken: loginResponse.result.loginResponseDTO.tokens.refreshToken
+                accessToken: loginResponse.result.loginResponseDTO?.tokens?.accessToken,
+                refreshToken: loginResponse.result.loginResponseDTO?.tokens?.refreshToken
             )
         }
     }

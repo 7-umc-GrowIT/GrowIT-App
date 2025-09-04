@@ -46,7 +46,7 @@ extension AuthorizationEndpoints: TargetType {
         case .postKakaoLogin:
             return "/login/kakao"
         case .postAppleLogin:
-            return "/login/apple'"
+            return "/login/apple"
         case .postEmailLogin:
             return "/login"
         case .postSendEmailVerification:

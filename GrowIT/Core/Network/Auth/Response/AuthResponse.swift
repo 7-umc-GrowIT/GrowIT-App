@@ -47,18 +47,18 @@ struct SocialLoginResponse: Codable {
 
 struct SocialLoginResult: Codable {
     let signupRequired: Bool
-    let loginResponseDTO: LoginResponseDTO
+    let loginResponseDTO: LoginResponseDTO?
     let oauthUserInfo: OauthUserInfo?
 }
 
 struct LoginResponseDTO: Codable {
-    let tokens: Tokens
-    let loginMethod: String
+    let tokens: Tokens?
+    let loginMethod: String?
 }
 
 struct OauthUserInfo: Codable {
     let socialId: String
-    let email: String
+    let email: String?
     let name: String
     let provider: String
 }
