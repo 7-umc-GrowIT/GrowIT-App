@@ -33,16 +33,17 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         setupNavigationBar()
         setupActions()
         
-        voiceDiaryRecommendChallengeView.updateChallenges(recommendedChallenges)
+        self.voiceDiaryRecommendChallengeView.updateChallenges(self.recommendedChallenges)
+        self.voiceDiaryRecommendChallengeView.updateEmo(emotionKeywords: self.emotionKeywords)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
         
-        DispatchQueue.main.async {
-            self.voiceDiaryRecommendChallengeView.updateEmo(emotionKeywords: self.emotionKeywords)
-        }
+//        DispatchQueue.main.async {
+//            
+//        }
     }
     
     //MARK: - Setup Navigation Bar
@@ -134,19 +135,19 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     }
     
     // MARK: Setup APIs
-    private func callPostVoiceDiary() {
-        diaryService.postVoiceDiary(data: DiaryVoiceDTO(
-            chat: ""),
-                                    completion: { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case.success(let data):
-                print("Success!!!!!!! \(data)")
-            case.failure(let error):
-                print("Error: \(error)")
-            }
-        })
-    }
+//    private func callPostVoiceDiary() {
+//        diaryService.postVoiceDiary(data: DiaryVoiceDTO(
+//            chat: ""),
+//                                    completion: { [weak self] result in
+//            guard let self = self else { return }
+//            switch result {
+//            case.success(let data):
+//                print("Success!!!!!!! \(data)")
+//            case.failure(let error):
+//                print("Error: \(error)")
+//            }
+//        })
+//    }
     
     func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
         let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""

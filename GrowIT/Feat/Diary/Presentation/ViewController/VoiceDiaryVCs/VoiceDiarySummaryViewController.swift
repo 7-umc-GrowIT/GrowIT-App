@@ -15,6 +15,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
     let diaryContent: String
     let diaryId: Int
     let date: String
+    private var isDiaryAnalyzeCompleted = false
     
     private var recommendedChallenges: [RecommendedDiaryChallengeDTO] = []
     private var emotionKeywords: [EmotionKeyword] = []
@@ -93,6 +94,15 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
     }
     
     @objc func nextVC() {
+        guard isDiaryAnalyzeCompleted else {
+            // 예: 토스트나 얼럿으로 "데이터 로딩 중입니다" 안내
+            CustomToast(containerWidth: 240).show(
+                image: UIImage(named: "toastAlertIcon") ?? UIImage(),
+                message: "분석 데이터가 준비되는 중입니다.",
+                font: .heading3SemiBold()
+            )
+            return
+        }
         let nextVC = VoiceDiaryRecommendChallengeViewController()
         nextVC.diaryId = diaryId
         nextVC.recommendedChallenges = recommendedChallenges
@@ -128,6 +138,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
                         self.voiceDiarySummaryView.updateEmo(emotionKeywords: data.emotionKeywords)
                         self.recommendedChallenges = data.recommendedChallenges
                         self.emotionKeywords = data.emotionKeywords
+                        self.isDiaryAnalyzeCompleted = true
                     }
                 case .failure(let error):
                     print(error)
