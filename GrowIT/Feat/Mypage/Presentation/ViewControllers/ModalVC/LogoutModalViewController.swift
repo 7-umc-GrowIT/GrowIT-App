@@ -63,6 +63,7 @@ class LogoutModalViewController: UIViewController {
     
     private func goToLoginView() {
         // 로그인 화면으로 전환
+        AppLaunchState.isFirstLaunch = true // 홈화면 첫 진입여부 초기화
         let loginVC = LoginViewController()
         let nav = UINavigationController(rootViewController: loginVC)
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
