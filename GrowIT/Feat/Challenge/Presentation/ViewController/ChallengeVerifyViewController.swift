@@ -19,7 +19,6 @@ class ChallengeVerifyViewController: UIViewController {
     private var isImageSelected: Bool = false // 이미지 인증샷 유무
     private var isReviewValidate: Bool = false // 한줄소감 유효성 검증
     private lazy var challengeService = ChallengeService()
-    private lazy var s3Service = S3Service()
     var challenge: UserChallenge?
     private lazy var imageData: Data? = nil
     var review: String = ""

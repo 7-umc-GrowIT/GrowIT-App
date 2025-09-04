@@ -10,8 +10,6 @@ import UIKit
 
 protocol ChallengeVerifyDataSource {
     func uploadImageToS3(imageData: Data, fileName: String, presignedUrl: String) -> AnyPublisher<Void, Error>
-    func getPresignedUrl(fileName: String) -> AnyPublisher<String, Error>
-    func getS3ImageUrl(fileName: String) -> AnyPublisher<String, Error>
     func postChallengeVerification(challengeId: Int, fileName: String, thoughts: String) -> AnyPublisher<Void, Error>
 }
 
@@ -33,34 +31,6 @@ final class ChallengeVerifyDataSourceImpl: ChallengeVerifyDataSource {
                 }
             }
             task.resume()
-        }.eraseToAnyPublisher()
-    }
-
-    func getPresignedUrl(fileName: String) -> AnyPublisher<String, Error> {
-        // S3Service를 Combine으로 래핑
-        Future { promise in
-            S3Service().putS3UploadUrl(fileName: fileName, completion: { result in
-                switch result {
-                case .success(let data):
-                    promise(.success(data.presignedUrl))
-                case .failure(let error):
-                    promise(.failure(error))
-                }
-            })
-        }.eraseToAnyPublisher()
-    }
-
-    func getS3ImageUrl(fileName: String) -> AnyPublisher<String, Error> {
-        Future { promise in
-            S3Service().getS3DownloadUrl(fileName: fileName, completion: { result in
-                switch result {
-                case .success(let data):
-                    let url = data.components(separatedBy: "?").first ?? data
-                    promise(.success(url))
-                case .failure(let error):
-                    promise(.failure(error))
-                }
-            })
         }.eraseToAnyPublisher()
     }
 

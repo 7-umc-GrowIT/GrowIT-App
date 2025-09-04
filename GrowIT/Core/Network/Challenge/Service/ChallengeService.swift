@@ -16,15 +16,15 @@ final class ChallengeService: NetworkManager {
     init(provider: MoyaProvider<ChallengeEndpoint>? = nil) {
         let plugins: [PluginType] = [
             NetworkLoggerPlugin(configuration: .init(logOptions: [.requestBody, .requestMethod, .requestHeaders, .successResponseBody, .errorResponseBody])),
-            AuthPlugin()
+            AuthPlugin.shared
         ]
         
         self.provider = provider ?? MoyaProvider<ChallengeEndpoint>(plugins: plugins)
     }
 
     /// Post Prove Challenge API
-    func postProveChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<Void, NetworkError>) -> Void) {
-        requestStatusCode(target: .postProveChallenge(challengeId: challengeId, data: data), completion: completion)
+    func postProveChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<ChallengeProveResponseDTO, NetworkError>) -> Void) {
+        request(target: .postProveChallenge(challengeId: challengeId, data: data), decodingType: ChallengeProveResponseDTO.self, completion: completion)
     }
     
     /// Fetch Challenge API(단일 챌린지 조회)
@@ -33,8 +33,8 @@ final class ChallengeService: NetworkManager {
     }
     
     /// Delete Challenge API
-    func deleteChallenge(challengeId: Int, completion: @escaping (Result<ChallengeDeleteResponseDTO, NetworkError>) -> Void) {
-        request(target: .deleteChallengeById(challengeId: challengeId), decodingType: ChallengeDeleteResponseDTO.self, completion: completion)
+    func deleteChallenge(challengeId: Int, completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        requestStatusCode(target: .deleteChallengeById(challengeId: challengeId), completion: completion)
     }
     
     /// Patch Challenge API
