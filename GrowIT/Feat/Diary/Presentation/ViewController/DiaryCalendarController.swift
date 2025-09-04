@@ -14,7 +14,7 @@ protocol DiaryCalendarControllerDelegate: AnyObject {
 }
 
 class DiaryCalendarController: UIViewController {
-    private lazy var jDiaryCalendar = DiaryCalendar()
+    private lazy var diaryCalendar = DiaryCalendar()
     private lazy var diaryService = DiaryService()
     private lazy var callendarDiaries : [DiaryDateDTO] = []
     private var numberOfWeeksInMonth = 0  // 주 수를 저장하는 변수
@@ -71,12 +71,12 @@ class DiaryCalendarController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         getDiaryDates()
-        jDiaryCalendar.calendarCollectionView.reloadData()
+        diaryCalendar.calendarCollectionView.reloadData()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view = jDiaryCalendar
+        self.view = diaryCalendar
         view.backgroundColor = .clear
         
         setupNotifications()
@@ -84,12 +84,12 @@ class DiaryCalendarController: UIViewController {
         currentMonthIndex = currentCalendar.component(.month, from: currentDate) - 1
         currentYear = currentCalendar.component(.year, from: currentDate)
         
-        jDiaryCalendar.calendarCollectionView.delegate = self
-        jDiaryCalendar.calendarCollectionView.dataSource = self
+        diaryCalendar.calendarCollectionView.delegate = self
+        diaryCalendar.calendarCollectionView.dataSource = self
         
-        jDiaryCalendar.todayBtn.addTarget(self, action: #selector(todayBtnTapped), for: .touchUpInside)
-        jDiaryCalendar.backMonthBtn.addTarget(self, action: #selector(backMonthTapped), for: .touchUpInside)
-        jDiaryCalendar.nextMonthBtn.addTarget(self, action: #selector(nextMonthTapped), for: .touchUpInside)
+        diaryCalendar.todayBtn.addTarget(self, action: #selector(todayBtnTapped), for: .touchUpInside)
+        diaryCalendar.backMonthBtn.addTarget(self, action: #selector(backMonthTapped), for: .touchUpInside)
+        diaryCalendar.nextMonthBtn.addTarget(self, action: #selector(nextMonthTapped), for: .touchUpInside)
     }
     
     private func setupNotifications() {
@@ -120,7 +120,7 @@ class DiaryCalendarController: UIViewController {
     func configureTheme(isDarkMode: Bool) {
         if isDarkMode {
             isDark = true
-            jDiaryCalendar.onDarkMode()
+            diaryCalendar.onDarkMode()
         } else {
             isDark = false
         }
@@ -165,10 +165,10 @@ class DiaryCalendarController: UIViewController {
     }
     
     private func updateCalendar() {
-        jDiaryCalendar.yearMonthLabel.text = "\(currentYear!)년 \(currentMonthIndex! + 1)월"
+        diaryCalendar.yearMonthLabel.text = "\(currentYear!)년 \(currentMonthIndex! + 1)월"
         calculateWeeksInMonth()
         adjustCalendarHeightBasedOnWeeks()
-        jDiaryCalendar.calendarCollectionView.reloadData()
+        diaryCalendar.calendarCollectionView.reloadData()
         self.view.layoutIfNeeded()
     }
     
@@ -186,7 +186,7 @@ class DiaryCalendarController: UIViewController {
 
     private func adjustCalendarHeightBasedOnWeeks() {
         let totalHeight = CGFloat(numberOfWeeksInMonth) * cellWidth + 88
-        jDiaryCalendar.calendarBg.snp.updateConstraints { make in
+        diaryCalendar.calendarBg.snp.updateConstraints { make in
             make.height.equalTo(totalHeight)
         }
         view.layoutIfNeeded()  // 즉시 레이아웃을 업데이트하여 변경 사항 적용
