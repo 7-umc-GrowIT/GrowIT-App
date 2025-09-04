@@ -168,7 +168,9 @@ class ChangePasswordViewController: UIViewController {
         guard let newPassword = changePasswordView.newPwdTextField.textField.text,
               let confirmPassword = changePasswordView.pwdCheckTextField.textField.text else { return }
         
-        let isPasswordsMatch = !newPassword.isEmpty && newPassword == confirmPassword
+        //  길이 조건 추가
+        let isLengthValid = newPassword.count >= 8 && newPassword.count <= 30
+        let isPasswordsMatch = isLengthValid && !newPassword.isEmpty && newPassword == confirmPassword
         
         changePasswordView.changePwdButton.setButtonState(
             isEnabled: isPasswordsMatch,
@@ -263,36 +265,48 @@ class ChangePasswordViewController: UIViewController {
         guard let newPassword = changePasswordView.newPwdTextField.textField.text,
               let confirmPassword = changePasswordView.pwdCheckTextField.textField.text else { return }
         
-        if confirmPassword.isEmpty {
+        // 비어있으면 초기화
+        if newPassword.isEmpty && confirmPassword.isEmpty {
+            changePasswordView.newPwdTextField.clearError()
             changePasswordView.pwdCheckTextField.clearError()
             return
         }
         
-        if newPassword == confirmPassword {
-            changePasswordView.newPwdTextField.setSuccess()
-            changePasswordView.pwdCheckTextField.setSuccess()
-            
-            changePasswordView.newPwdTextField.titleLabel.textColor = .gray900
-            changePasswordView.pwdCheckTextField.titleLabel.textColor = .gray900
-            changePasswordView.newPwdTextField.textField.textColor = .positive400
-            changePasswordView.pwdCheckTextField.textField.textColor = .positive400
-            
-            // 성공 메시지 표시 부분 수정
-            changePasswordView.pwdCheckTextField.errorLabel.text = "비밀번호가 일치합니다"
-            changePasswordView.pwdCheckTextField.errorLabel.textColor = .positive400
-            changePasswordView.pwdCheckTextField.errorLabel.isHidden = false
-            changePasswordView.pwdCheckTextField.errorLabelTopConstraint?.update(offset: 4) // 간격 조정
-        } else {
-            changePasswordView.newPwdTextField.setError(message: "")
-            changePasswordView.pwdCheckTextField.setError(message: "비밀번호가 일치하지 않습니다")
-            
-            changePasswordView.newPwdTextField.titleLabel.textColor = .negative400
-            changePasswordView.pwdCheckTextField.titleLabel.textColor = .negative400
-            changePasswordView.newPwdTextField.textField.textColor = .negative400
-            changePasswordView.pwdCheckTextField.textField.textColor = .negative400
-            
-            changePasswordView.pwdCheckTextField.errorLabel.isHidden = false
-            changePasswordView.pwdCheckTextField.errorLabelTopConstraint?.update(offset: 4) // 에러 메시지도 동일한 간격 적용
+        //  길이 검사
+        if !newPassword.isEmpty {
+            if newPassword.count < 8 || newPassword.count > 30 {
+                changePasswordView.newPwdTextField.setError(message: "비밀번호는 8~30자 이내로 입력해주세요")
+                changePasswordView.newPwdTextField.titleLabel.textColor = .negative400
+                changePasswordView.newPwdTextField.textField.textColor = .negative400
+                return
+            } else {
+                //  길이가 정상 → 기본색으로 돌려주기
+                changePasswordView.newPwdTextField.clearError()
+                changePasswordView.newPwdTextField.titleLabel.textColor = .gray900
+                changePasswordView.newPwdTextField.textField.textColor = .gray900
+            }
+        }
+        
+        // 두 비밀번호 비교
+        if !confirmPassword.isEmpty {
+            if newPassword == confirmPassword {
+                changePasswordView.newPwdTextField.setSuccess()
+                changePasswordView.pwdCheckTextField.setSuccess()
+                
+                changePasswordView.newPwdTextField.titleLabel.textColor = .gray900
+                changePasswordView.pwdCheckTextField.titleLabel.textColor = .gray900
+                changePasswordView.newPwdTextField.textField.textColor = .positive400
+                changePasswordView.pwdCheckTextField.textField.textColor = .positive400
+                
+                changePasswordView.pwdCheckTextField.errorLabel.text = "비밀번호가 일치합니다"
+                changePasswordView.pwdCheckTextField.errorLabel.textColor = .positive400
+                changePasswordView.pwdCheckTextField.errorLabel.isHidden = false
+                changePasswordView.pwdCheckTextField.errorLabelTopConstraint?.update(offset: 4)
+            } else {
+                changePasswordView.pwdCheckTextField.setError(message: "비밀번호가 일치하지 않습니다")
+                changePasswordView.pwdCheckTextField.titleLabel.textColor = .negative400
+                changePasswordView.pwdCheckTextField.textField.textColor = .negative400
+            }
         }
     }
     
