@@ -259,13 +259,13 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             try audioSession.setActive(true)
             
             let settings: [String: Any] = [
-                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+                AVFormatIDKey: Int(kAudioFormatLinearPCM),
                 AVSampleRateKey: 16000,
                 AVNumberOfChannelsKey: 1,
                 AVLinearPCMBitDepthKey: 16,
                 AVLinearPCMIsBigEndianKey: false,
                 AVLinearPCMIsFloatKey: false,
-                AVEncoderAudioQualityKey: AVAudioQuality.medium.rawValue
+                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
             ]
             
             let tempDir = NSTemporaryDirectory()
