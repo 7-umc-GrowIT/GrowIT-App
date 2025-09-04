@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Lottie
 
 class HomeCharacterView: UIView {
 
@@ -81,6 +82,12 @@ class HomeCharacterView: UIView {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
+    var loadingIndicator = LottieAnimationView(name: "loading-Home").then {
+        $0.frame = CGRect(x: 0, y: 0, width: 200, height: 200)
+        $0.loopMode = .loop
+        $0.isHidden = true
+    }
+    
     // 하단 그라디언트 뷰
     private lazy var bottomGradientView = UIImageView().then{
         $0.image = UIImage(named: "homeGradient")
@@ -140,7 +147,7 @@ class HomeCharacterView: UIView {
     private func addComponents(){
         creditContainer.addSubviews([creditIcon, creditNum, redDot])
         friendContainer.addSubview(friendIcon)
-        [backgroundImageView, groFrameView, creditContainer, friendContainer, bottomGradientView].forEach(self.addSubview)
+        [backgroundImageView, groFrameView, creditContainer, friendContainer, bottomGradientView, loadingIndicator].forEach(self.addSubview)
         
         groFrameView.addSubviews([
             groFaceImageView,
@@ -207,6 +214,26 @@ class HomeCharacterView: UIView {
             $0.height.equalToSuperview().multipliedBy(0.35)
             $0.width.equalToSuperview().multipliedBy(1)
         }
+         
+        loadingIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+    }
+    
+    // MARK: - Loading Indicator Control
+    func showLoadingIndicator() {
+        loadingIndicator.isHidden = false
+        if loadingIndicator.isAnimationPlaying == false {
+            loadingIndicator.play()
+        }
+        bringSubviewToFront(loadingIndicator)
+    }
+    
+    func hideLoadingIndicator() {
+        if loadingIndicator.isAnimationPlaying {
+            loadingIndicator.stop()
+        }
+        loadingIndicator.isHidden = true
     }
     
 }
