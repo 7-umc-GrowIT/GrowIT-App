@@ -19,7 +19,7 @@ class TextDiaryLoadingViewController: UIViewController {
         navigationController?.isNavigationBarHidden = true
         setupUI()
         
-        fetchDiaryAnalyze(diaryId: diaryId) { result in
+        fetchDiaryAnalyze() { result in
             let nextVC = TextDiaryRecommendChallengeViewController(diaryId: self.diaryId, data: result)
             nextVC.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(nextVC, animated: true)
@@ -45,24 +45,15 @@ class TextDiaryLoadingViewController: UIViewController {
         }
     }
     
-    func navigateToNextScreen(with diaryId: Int) {
-        fetchDiaryAnalyze(diaryId: diaryId) { data in
-            
-        }
-    }
-    
-    private func fetchDiaryAnalyze(diaryId: Int, completion: @escaping (DiaryAnalyzeResponseDTO) -> Void) {
-        diaryService.postVoiceDiaryAnalyze(
-            diaryId: diaryId,
-            completion: { [weak self] result in
-                guard let self = self else { return }
-                switch result {
+    private func fetchDiaryAnalyze(completion: @escaping (DiaryAnalyzeResponseDTO) -> Void) {
+        diaryService.postVoiceDiaryAnalyze(diaryId: diaryId) { result in
+            switch result {
                 case .success(let data):
                     print(data)
                     completion(data)
                 case .failure(let error):
                     print(error)
-                }
-            })
+            }
+        }
     }
 }

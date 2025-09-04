@@ -15,17 +15,18 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
     let diaryContent: String
     let diaryId: Int
     let date: String
-    private var isDiaryAnalyzeCompleted = false
     
     private var recommendedChallenges: [RecommendedDiaryChallengeDTO] = []
     private var emotionKeywords: [EmotionKeyword] = []
     
     let diaryService = DiaryService()
     
-    init(diaryContent: String, diaryId: Int, date: String) {
+    init(diaryContent: String, diaryId: Int, date: String, keywords: [EmotionKeyword], recommendedChallenges: [RecommendedDiaryChallengeDTO]) {
         self.diaryContent = diaryContent
         self.diaryId = diaryId
         self.date = date
+        self.emotionKeywords = keywords
+        self.recommendedChallenges = recommendedChallenges
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -35,10 +36,6 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        DispatchQueue.main.async {
-            self.fetchDiaryAnalyze()
-        }
-        
     }
     
     override func viewDidLoad() {
@@ -47,8 +44,10 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         setupUI()
         setupActions()
         
+        
         voiceDiarySummaryView.configure(text: diaryContent)
         voiceDiarySummaryView.updateDate(with: date)
+        voiceDiarySummaryView.updateEmo(emotionKeywords: emotionKeywords)
     }
     
     // MARK: Setup Navigation Bar
@@ -94,15 +93,6 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
     }
     
     @objc func nextVC() {
-        guard isDiaryAnalyzeCompleted else {
-            // 예: 토스트나 얼럿으로 "데이터 로딩 중입니다" 안내
-            CustomToast(containerWidth: 240).show(
-                image: UIImage(named: "toastAlertIcon") ?? UIImage(),
-                message: "분석 데이터가 준비되는 중입니다.",
-                font: .heading3SemiBold()
-            )
-            return
-        }
         let nextVC = VoiceDiaryRecommendChallengeViewController()
         nextVC.diaryId = diaryId
         nextVC.recommendedChallenges = recommendedChallenges
@@ -125,24 +115,4 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         navigationController?.popToRootViewController(animated: true)
     }
     
-    // MARK: Setup APIs
-    private func fetchDiaryAnalyze() {
-        diaryService.postVoiceDiaryAnalyze(
-            diaryId: diaryId,
-            completion: { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success(let data):
-                    print(data)
-                    DispatchQueue.main.async {
-                        self.voiceDiarySummaryView.updateEmo(emotionKeywords: data.emotionKeywords)
-                        self.recommendedChallenges = data.recommendedChallenges
-                        self.emotionKeywords = data.emotionKeywords
-                        self.isDiaryAnalyzeCompleted = true
-                    }
-                case .failure(let error):
-                    print(error)
-                }
-            })
-    }
 }

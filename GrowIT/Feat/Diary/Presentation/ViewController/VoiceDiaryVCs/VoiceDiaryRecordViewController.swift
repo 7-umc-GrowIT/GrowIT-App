@@ -226,18 +226,21 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             }
         } else {
             let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""
-            let nextVC = VoiceDiaryLoadingViewController()
-            nextVC.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(nextVC, animated: true)
             
             Task{
                 do{
                     let diary = try await postVoiceDiaryDateUseCase.execute(date: date)
                     
                     await MainActor.run {
-                        nextVC.navigateToNextScreen(with: diary.content, diaryId: diary.id, date: diary.date)
-
+                        let nextVC = VoiceDiaryLoadingViewController(diary: diary)
+                        nextVC.hidesBottomBarWhenPushed = true
+                        navigationController?.pushViewController(nextVC, animated: true)
                     }
+                    
+//                    await MainActor.run {
+//                        nextVC.navigateToNextScreen(with: diary.content, diaryId: diary.id, date: diary.date)
+//
+//                    }
                 } catch {
                     print("요약된 일기 가져오기 실패: \(error)")
                 }

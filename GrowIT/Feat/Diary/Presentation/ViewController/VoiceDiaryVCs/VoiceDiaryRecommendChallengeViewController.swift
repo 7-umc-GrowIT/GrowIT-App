@@ -41,9 +41,6 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
         
-//        DispatchQueue.main.async {
-//            
-//        }
     }
     
     //MARK: - Setup Navigation Bar
