@@ -183,11 +183,19 @@ class ChallengeHomeArea: UIView {
         
     }
     
-    public func setEmptyChallenge(_ isEmpty: Bool){
-        todayChallengeCollectionView.isHidden = isEmpty
-        emptyChallengeIcon.isHidden = !isEmpty
-        emptyChallengeLabel.isHidden = !isEmpty
-        hashTagStack.isHidden = isEmpty
+    public func setEmptyChallenge(isEmptyChallenge: Bool, isEmptyKeyword: Bool){
+        todayChallengeCollectionView.isHidden = isEmptyChallenge
+        emptyChallengeIcon.isHidden = !isEmptyChallenge
+        emptyChallengeLabel.isHidden = !isEmptyChallenge
+        hashTagStack.isHidden = isEmptyKeyword
+        
+        if(isEmptyChallenge && !isEmptyKeyword) {
+            emptyChallengeLabel.text = "오늘의 챌린지가 존재하지 않습니다."
+            emptyChallengeIcon.snp.updateConstraints {
+                $0.top.equalTo(titleStack.snp.bottom).offset(100)
+            }
+            self.layoutIfNeeded()
+        }
         
         challengeReportTitle.snp.updateConstraints{
             $0.top.equalTo(emptyChallengeLabel.snp.bottom).offset(34)
@@ -238,10 +246,8 @@ class ChallengeHomeArea: UIView {
         todayChallengeCollectionView.snp.makeConstraints{
             $0.top.equalTo(hashTagStack.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
-            //$0.horizontalEdges.equalToSuperview().inset(24)
             $0.height.equalTo(100)
             $0.width.equalToSuperview().multipliedBy(0.88)
-            //$0.width.equalTo(382)
         }
         
         emptyChallengeIcon.snp.makeConstraints {

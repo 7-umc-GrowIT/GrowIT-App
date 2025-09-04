@@ -49,8 +49,8 @@ class ChallengeHomeViewController: UIViewController {
         setupChallengeStatusArea()
         setupNotifications()
         
-        challengeStatusAreaVC.refreshData()
-        challengeHomeAreaVC.refreshData()
+//        challengeStatusAreaVC.refreshData()
+//        challengeHomeAreaVC.refreshData()
         
         challengeHomeAreaVC.view.isHidden = false
         challengeStatusAreaVC.view.isHidden = true
@@ -106,6 +106,7 @@ class ChallengeHomeViewController: UIViewController {
     
     @objc private func handleChallengeStatusReload() {
         // 상태 영역이 현재 안보이는 상태여도 항상 최신 데이터 유지
+        challengeHomeAreaVC.refreshData()
         challengeStatusAreaVC.refreshData()
     }
     
