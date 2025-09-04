@@ -148,7 +148,7 @@ class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControl
         isCalendarOpen.toggle()
         
         // 현재 날짜 선택 상태가 유효한지 확인
-        let isValid = voiceDiaryDateSelectView.dateSelectLabel.text != "일기 날짜를 선택해 주세요"
+        let isValid = voiceDiaryDateSelectView.dateSelectLabel.textColor != .negative100
         
         // 유효할 때만 초록색 테두리 적용
         voiceDiaryDateSelectView.dateView.layer.borderColor = (isCalendarOpen && isValid) ? UIColor.primary500.cgColor : UIColor.clear.cgColor
