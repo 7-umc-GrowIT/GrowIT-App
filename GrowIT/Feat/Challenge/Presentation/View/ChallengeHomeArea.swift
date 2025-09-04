@@ -140,30 +140,19 @@ class ChallengeHomeArea: UIView {
         view.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
         return view
     }
-    private func makeChallengeHashTagButton(title: String) -> UIButton {
-        let button = UIButton()
-        
-        var configuration = UIButton.Configuration.plain()
-        
-        button.setTitle(title, for: .normal)
-        button.setTitleColor(.primary700, for: .disabled)
-        //button.titleLabel?.font = .body2SemiBold()
-        button.backgroundColor = .primary100
-        button.layer.cornerRadius = 6
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
-        button.layer.masksToBounds = true
-        button.isEnabled = false
-        
-        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-            var outgoing = incoming
-            outgoing.font = UIFont.body2SemiBold()// 폰트를 적절하게 설정
-            return outgoing
-        }
-        configuration.contentInsets = .init(top: 6, leading: 16, bottom: 6, trailing: 16)
-        
-        button.configuration = configuration
-        return button
+    
+    private func makeChallengeHashTagLabel(title: String) -> UILabel {
+        let label = PaddingLabel()
+        label.text = title
+        label.textColor = UIColor.primary700
+        label.font = UIFont.body2SemiBold()
+        label.backgroundColor = UIColor.primary100
+        label.layer.cornerRadius = 6
+        label.layer.borderWidth = 1
+        label.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        label.layer.masksToBounds = true
+        label.isUserInteractionEnabled = false
+        return label
     }
     
     public func setupChallengeKeywords(_ values: [String]){
@@ -171,7 +160,7 @@ class ChallengeHomeArea: UIView {
         
         hashTagStack.arrangedSubviews.forEach { $0.removeFromSuperview() }  // 기존 버튼 제거
         keywords.forEach { keyword in
-            let button = makeChallengeHashTagButton(title: keyword)
+            let button = makeChallengeHashTagLabel(title: keyword)
             hashTagStack.addArrangedSubview(button)  // 새 버튼 추가
         }
     }
@@ -212,8 +201,8 @@ class ChallengeHomeArea: UIView {
     private func addStacdk(){
         [title, subTitle].forEach(titleStack.addArrangedSubview)
         keywords.forEach{
-            let button = makeChallengeHashTagButton(title: $0)
-            hashTagStack.addArrangedSubview(button)
+            let keywordBox = makeChallengeHashTagLabel(title: $0)
+            hashTagStack.addArrangedSubview(keywordBox)
         }
         [challengeReportTitle, challengeReportSubTitle].forEach(challengeReportTitleStack.addArrangedSubview)
         [creditNumIcon, creditNum].forEach(creditNumStack1.addArrangedSubview)
@@ -290,6 +279,23 @@ class ChallengeHomeArea: UIView {
     }
     
 }
+
+class PaddingLabel: UILabel {
+    var edgeInsets = UIEdgeInsets(top: 6, left: 16, bottom: 6, right: 16)
+    
+    override func drawText(in rect: CGRect) {
+        super.drawText(in: rect.inset(by: edgeInsets))
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        let size = super.intrinsicContentSize
+        return CGSize(
+            width: size.width + edgeInsets.left + edgeInsets.right,
+            height: size.height + edgeInsets.top + edgeInsets.bottom
+        )
+    }
+}
+
 
 //import SwiftUI
 //
