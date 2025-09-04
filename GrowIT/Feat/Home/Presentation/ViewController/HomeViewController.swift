@@ -28,6 +28,7 @@ class HomeViewController: UIViewController {
         self.view = homeview
         loadGroImage()
         setNotification()
+//        homeview.characterArea.showLoadingIndicator()
     }
     
     override func viewDidLayoutSubviews() {
