@@ -51,8 +51,8 @@ class TermsOfServiceViewController: UIViewController {
 
                     if self.navigationBarTitle == "서비스 이용약관" {
                         matchedTerm = terms.first { $0.title == "그로우잇 이용약관" }
-                    } else if self.navigationBarTitle == "개인정보 처리방침" {
-                        matchedTerm = terms.first { $0.title == "개인정보 처리방침" }
+                    } else if self.navigationBarTitle == "개인정보 수집•이용 동의" {
+                        matchedTerm = terms.first { $0.title == "개인정보 수집•이용 동의" }
                     }
 
                     if let term = matchedTerm {

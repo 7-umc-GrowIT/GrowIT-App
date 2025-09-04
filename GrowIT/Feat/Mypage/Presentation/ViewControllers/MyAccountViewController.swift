@@ -18,7 +18,7 @@ class MyAccountViewController: UIViewController {
         // 섹션 1 : 회원정보 변경
         [("닉네임", "샤샤"), ("비밀번호 변경", "변경하기")],
         // 섹션 2 : 이용약관
-        [("개인정보 처리방침", ""),("서비스 이용약관", "")]
+        [("개인정보 수집•이용 동의", ""),("서비스 이용약관", "")]
     ]
     
     // MARK: - Views
@@ -221,7 +221,8 @@ class MyAccountViewController: UIViewController {
         myAccountView.myAccounttableView.rowHeight = 66
     }
     
-    @objc private func prevVC() {
+    @objc
+    private func prevVC() {
         navigationController?.popViewController(animated: true)
     }
 }
@@ -274,7 +275,7 @@ extension MyAccountViewController: UITableViewDataSource, UITableViewDelegate {
                 present(modalVC, animated: true, completion: nil)
             }
         case (1, 0):
-            didTapTermsOfService("개인정보 처리방침")
+            didTapTermsOfService("개인정보 수집•이용 동의")
         case (1, 1):
             didTapTermsOfService("서비스 이용약관")
         default:
