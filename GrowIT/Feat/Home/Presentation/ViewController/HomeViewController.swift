@@ -42,6 +42,10 @@ class HomeViewController: UIViewController {
             self.view.setNeedsLayout()
             self.view.layoutIfNeeded()
         }
+        
+        if AppLaunchState.isFirstLaunch && self.homeview.characterArea.creditNum.text != "" {
+            AppLaunchState.isFirstLaunch = false
+        }
     }
 
 
@@ -50,7 +54,17 @@ class HomeViewController: UIViewController {
             guard let self = self else { return }
             switch result {
             case .success(let data):
-                homeview.characterArea.creditNum.text = "\(data.currentCredit)개"
+                DispatchQueue.main.async {
+                    let oldValue = Int(self.homeview.characterArea.creditNum.text?.replacingOccurrences(of: "개", with: "") ?? "0") ?? 0
+                    let newValue = data.currentCredit
+                    self.homeview.characterArea.creditNum.text = "\(newValue)개"
+                    
+                    // 값이 달라졌으면 redDot 표시
+                    if(!AppLaunchState.isFirstLaunch) {
+                        self.homeview.characterArea.showDot(oldValue != newValue)
+                    }
+                    
+                }
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
             }

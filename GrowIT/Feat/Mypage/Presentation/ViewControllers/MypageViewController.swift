@@ -102,7 +102,7 @@ class MypageViewController: UIViewController {
     
     @objc
     func didCompleteChangeNickname() {
-        ToastSecond.show(image: UIImage(named: "toast_Icon") ?? UIImage(), message: "닉네임을 변경했어요", font: .heading3SemiBold(), in: self.view)
+        ToastSecond.show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "닉네임을 변경했어요", font: .heading3SemiBold(), in: self.view)
     }
     
     //MARK: - Setup UI

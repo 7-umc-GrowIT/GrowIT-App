@@ -10,7 +10,7 @@ import Then
 import SnapKit
 import Lottie
 
-class JDiaryHomeBanner: UIView {
+class DiaryHomeBanner: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)

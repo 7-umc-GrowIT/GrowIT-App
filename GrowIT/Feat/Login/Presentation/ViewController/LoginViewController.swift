@@ -39,14 +39,9 @@ class LoginViewController: UIViewController {
         super.viewDidAppear(animated)
         
         if UserDefaults.standard.bool(forKey: "shouldShowLogoutToast") {
-               ToastSecond.show(
-                   image: UIImage(named: "toast_Icon") ?? UIImage(),
-                   message: "로그아웃을 완료했어요",
-                   font: .heading3SemiBold(),
-                   in: self.view
-               )
-               UserDefaults.standard.set(false, forKey: "shouldShowLogoutToast")
-           }
+            CustomToast(containerWidth: 225).show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "로그아웃을 완료했어요", font: .heading3Bold())
+           UserDefaults.standard.set(false, forKey: "shouldShowLogoutToast")
+        }
     }
 
     //MARK: - Functional

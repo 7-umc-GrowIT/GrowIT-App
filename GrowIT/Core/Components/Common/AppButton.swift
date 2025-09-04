@@ -25,6 +25,7 @@ class AppButton: UIButton {
         // 안전하게 아이콘 처리
         if let iconName = icon, !iconName.isEmpty {
             self.setImage(UIImage(named: iconName), for: .normal)
+            self.setImage(UIImage(named: iconName), for: .highlighted)
         }
         
         self.titleLabel?.font = UIFont.heading2Bold()

@@ -48,8 +48,8 @@ class CustomToast {
             $0.text = message
             $0.font = font
             $0.textColor = .white
-            $0.textAlignment = .center
-            $0.numberOfLines = 1
+            $0.textAlignment = .left
+            $0.numberOfLines = 0
         }
 
         keyWindow.addSubview(containerView)

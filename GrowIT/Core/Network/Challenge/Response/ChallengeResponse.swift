@@ -14,7 +14,6 @@ struct ChallengeProveResponseDTO: Decodable{
     let title: String
     let certificationImageName: String
     let thoughts: String
-    let time: Int
     let certificationDate: String
     let creditInfo: CreditInfo
 }

@@ -14,7 +14,7 @@ final class WithdrwalService: NetworkManager {
     init(provider: MoyaProvider<WithdrwalEndpoint>? = nil) {
         let plugins: [PluginType] = [
             // NetworkLoggerPlugin(configuration: .init(logOptions: [.requestHeaders, .verbose]))
-            AuthPlugin()
+            AuthPlugin.shared
         ]
         
         self.provider = provider ?? MoyaProvider<WithdrwalEndpoint>(plugins: plugins)

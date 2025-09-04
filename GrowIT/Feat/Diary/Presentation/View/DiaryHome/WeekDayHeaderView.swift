@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class JWeekDayHeaderView: UICollectionReusableView {
+class WeekDayHeaderView: UICollectionReusableView {
 
     static let reuseIdentifier = "WeekdayHeaderView"
     private var dayLabels: [UILabel] = []

@@ -16,7 +16,7 @@ final class DiaryService: NetworkManager {
     init(provider: MoyaProvider<DiaryEndpoint>? = nil) {
         let plugins: [PluginType] = [
             // NetworkLoggerPlugin(configuration: .init(logOptions: [.requestMethod, .successResponseBody])),
-            AuthPlugin()
+            AuthPlugin.shared
         ]
         
         self.provider = provider ?? MoyaProvider<DiaryEndpoint>(plugins: plugins)
@@ -37,8 +37,8 @@ final class DiaryService: NetworkManager {
     }
     
     /// Diary Id를 받아 Diary를 삭제하는 API
-    func deleteDiary(diaryId: Int, completion: @escaping (Result<DiaryDeleteResponseDTO, NetworkError>) -> Void) {
-        request(target: .deleteDiary(diaryId: diaryId), decodingType: DiaryDeleteResponseDTO.self, completion: completion)
+    func deleteDiary(diaryId: Int, completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        requestStatusCode(target: .deleteDiary(diaryId: diaryId), completion: completion)
     }
     
     /// Diary Id를 받아 특정 일기를 조회하는 API

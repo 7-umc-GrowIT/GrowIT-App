@@ -10,8 +10,6 @@ import Foundation
 
 protocol ChallengeVerifyRepository {
     func uploadImage(imageData: Data, fileName: String, presignedUrl: String) -> AnyPublisher<Void, Error>
-    func getPresignedUrl(fileName: String) -> AnyPublisher<String, Error>
-    func getS3ImageUrl(fileName: String) -> AnyPublisher<String, Error>
     func postVerification(challengeId: Int, fileName: String, thoughts: String) -> AnyPublisher<Void, Error>
 }
 
@@ -24,14 +22,6 @@ final class ChallengeVerifyRepositoryImpl: ChallengeVerifyRepository {
 
     func uploadImage(imageData: Data, fileName: String, presignedUrl: String) -> AnyPublisher<Void, Error> {
         dataSource.uploadImageToS3(imageData: imageData, fileName: fileName, presignedUrl: presignedUrl)
-    }
-
-    func getPresignedUrl(fileName: String) -> AnyPublisher<String, Error> {
-        dataSource.getPresignedUrl(fileName: fileName)
-    }
-
-    func getS3ImageUrl(fileName: String) -> AnyPublisher<String, Error> {
-        dataSource.getS3ImageUrl(fileName: fileName)
     }
 
     func postVerification(challengeId: Int, fileName: String, thoughts: String) -> AnyPublisher<Void, Error> {

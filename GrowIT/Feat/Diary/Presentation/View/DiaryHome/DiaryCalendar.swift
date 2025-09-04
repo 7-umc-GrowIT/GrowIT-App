@@ -9,7 +9,7 @@ import UIKit
 import Then
 import SnapKit
 
-class JDiaryCalendar: UIView {
+class DiaryCalendar: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -65,7 +65,7 @@ class JDiaryCalendar: UIView {
         $0.showsHorizontalScrollIndicator = false
         $0.showsVerticalScrollIndicator = false
         $0.register(JDiaryCell.self, forCellWithReuseIdentifier: JDiaryCell.identifier)
-        $0.register(JWeekDayHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: JWeekDayHeaderView.reuseIdentifier)
+        $0.register(WeekDayHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: WeekDayHeaderView.reuseIdentifier)
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     

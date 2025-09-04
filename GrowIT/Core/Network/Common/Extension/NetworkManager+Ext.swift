@@ -1,11 +1,13 @@
-//  NetworkManager+Ext.swift
+//
+//  TokenManager.swift
 //  GrowIT
 //
-//  Created by 이수현 on 1/20/25.
+//  Created by 강희정 on 2/1/25.
 //
 
-import Moya
+import Security
 import Foundation
+import Moya
 
 extension NetworkManager {
     // ✅ 1. 필수 데이터 요청
@@ -17,14 +19,28 @@ extension NetworkManager {
         provider.request(target) { result in
             switch result {
             case .success(let response):
-                // AuthPlugin이 이미 401을 처리했다면 새로운 토큰으로 성공 응답이 올 것임
-                let result: Result<T, NetworkError> = handleResponse(response, decodingType: decodingType)
-                completion(result)
+                if response.statusCode == 401 {
+                    // 401 에러 별도 처리 - 토큰갱신 및 재요청 요청
+                    AuthPlugin.shared.enqueueRequest(target: target) { retryResult in
+                        switch retryResult {
+                        case .success(let retryResponse):
+                            let handled = handleResponse(retryResponse, decodingType: decodingType)
+                            completion(handled)
+                        case .failure(let error):
+                            completion(.failure(.networkError(message: error.localizedDescription)))
+                        }
+                    }
+                    AuthPlugin.shared.refreshTokenIfNeeded()
+                } else {
+                    let handled = handleResponse(response, decodingType: decodingType)
+                    completion(handled)
+                }
             case .failure(let error):
                 completion(.failure(handleNetworkError(error)))
             }
         }
     }
+    
     
     // ✅ 2. 옵셔널 데이터 요청
     func requestOptional<T: Decodable>(
@@ -35,13 +51,27 @@ extension NetworkManager {
         provider.request(target) { result in
             switch result {
             case .success(let response):
-                let result: Result<T?, NetworkError> = handleResponseOptional(response, decodingType: decodingType)
-                completion(result)
+                if response.statusCode == 401 {
+                    AuthPlugin.shared.enqueueRequest(target: target) { retryResult in
+                        switch retryResult {
+                        case .success(let retryResponse):
+                            let handled = handleResponseOptional(retryResponse, decodingType: decodingType)
+                            completion(handled)
+                        case .failure(let error):
+                            completion(.failure(.networkError(message: error.localizedDescription)))
+                        }
+                    }
+                    AuthPlugin.shared.refreshTokenIfNeeded()
+                } else {
+                    let handled = handleResponseOptional(response, decodingType: decodingType)
+                    completion(handled)
+                }
             case .failure(let error):
                 completion(.failure(handleNetworkError(error)))
             }
         }
     }
+    
     
     // ✅ 3. 상태 코드만 확인
     func requestStatusCode(
@@ -51,21 +81,43 @@ extension NetworkManager {
         provider.request(target) { result in
             switch result {
             case .success(let response):
-                let result: Result<ApiResponse<String?>?, NetworkError> = handleResponseOptional(
-                    response,
-                    decodingType: ApiResponse<String?>.self
-                )
-                switch result {
-                case .success:
-                    completion(.success(()))
-                case .failure(let error):
-                    completion(.failure(error))
+                if response.statusCode == 401 {
+                    AuthPlugin.shared.enqueueRequest(target: target) { retryResult in
+                        switch retryResult {
+                        case .success(let retryResponse):
+                            let handled: Result<ApiResponse<String?>?, NetworkError> = handleResponseOptional(
+                                retryResponse,
+                                decodingType: ApiResponse<String?>.self
+                            )
+                            switch handled {
+                            case .success:
+                                completion(.success(()))
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
+                        case .failure(let error):
+                            completion(.failure(.networkError(message: error.localizedDescription)))
+                        }
+                    }
+                    AuthPlugin.shared.refreshTokenIfNeeded()
+                } else {
+                    let handled: Result<ApiResponse<String?>?, NetworkError> = handleResponseOptional(
+                        response,
+                        decodingType: ApiResponse<String?>.self
+                    )
+                    switch handled {
+                    case .success:
+                        completion(.success(()))
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
                 }
             case .failure(let error):
                 completion(.failure(handleNetworkError(error)))
             }
         }
     }
+    
     
     // ✅ 4. 유효기간 파싱 + 데이터 파싱
     func requestWithTime<T: Decodable>(
@@ -76,45 +128,65 @@ extension NetworkManager {
         provider.request(target) { result in
             switch result {
             case .success(let response):
-                let result: Result<(T, TimeInterval?), NetworkError> = handleResponseTimeInterval(response, decodingType: decodingType)
-                completion(result)
+                if response.statusCode == 401 {
+                    AuthPlugin.shared.enqueueRequest(target: target) { retryResult in
+                        switch retryResult {
+                        case .success(let retryResponse):
+                            let handled: Result<(T, TimeInterval?), NetworkError> = handleResponseTimeInterval(
+                                retryResponse,
+                                decodingType: decodingType
+                            )
+                            completion(handled)
+                        case .failure(let error):
+                            completion(.failure(.networkError(message: error.localizedDescription)))
+                        }
+                    }
+                    AuthPlugin.shared.refreshTokenIfNeeded()
+                } else {
+                    let handled: Result<(T, TimeInterval?), NetworkError> = handleResponseTimeInterval(
+                        response,
+                        decodingType: decodingType
+                    )
+                    completion(handled)
+                }
             case .failure(let error):
                 completion(.failure(handleNetworkError(error)))
             }
         }
     }
 }
-
+    
 // MARK: - 상태 코드 처리 헬퍼들
 fileprivate func handleResponse<T: Decodable>(
     _ response: Response,
     decodingType: T.Type
 ) -> Result<T, NetworkError> {
-    do {
-        print("🔍 handleResponse 호출됨 - Status: \(response.statusCode)")
-        
-        // 200-299 성공 응답만 처리
-        // 401 에러가 여기까지 왔다는 것은 AuthPlugin에서 처리하지 못했거나
-        // 토큰 갱신에 실패했다는 뜻
-        guard (200...299).contains(response.statusCode) else {
-            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
-            let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
-            return .failure(.serverError(statusCode: response.statusCode, message: message))
+        do {
+            print("🔍 handleResponse 호출됨 - Status: \(response.statusCode)")
+            
+            // 200-299 성공 응답만 처리
+            // 401 에러가 여기까지 왔다는 것은 AuthPlugin에서 처리하지 못했거나
+            // 토큰 갱신에 실패했다는 뜻
+            guard (200...299).contains(response.statusCode) else {
+                let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
+                let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
+                return .failure(.serverError(statusCode: response.statusCode, message: message))
+            }
+            
+            let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
+            
+            if let result = apiResponse.result {
+                return .success(result)
+            } else if T.self == EmptyResult.self {
+                return .success(EmptyResult() as! T)
+            } else {
+                return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
+            }
+        } catch {
+            return .failure(.decodingError)
         }
-        
-        let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
-        
-        if let result = apiResponse.result {
-            return .success(result)
-        } else if T.self == EmptyResult.self {
-            return .success(EmptyResult() as! T)
-        } else {
-            return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
-        }
-    } catch {
-        return .failure(.decodingError)
     }
-}
+
 
 fileprivate func handleResponseOptional<T: Decodable>(
     _ response: Response,

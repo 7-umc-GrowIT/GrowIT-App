@@ -230,6 +230,18 @@ class ChallengeCompleteView: UIView {
     
     private lazy var challengeTime = makeLabel(title: "", color: .primary600, font: .body2Medium())
     
+    private let completeBox = UIView().then {
+        $0.backgroundColor = .positive50
+        $0.layer.cornerRadius = 16
+    }
+    
+    private let completeText = UILabel().then {
+        $0.text = "인증 완료"
+        $0.textColor = .positive400
+        $0.font = .detail1Medium()
+        $0.adjustsFontSizeToFitWidth = true
+    }
+    
     private lazy var challengeVerifyDate = makeLabel(title: "", color: .gray500, font: .body2Medium()).then{
         $0.textAlignment = .right
     }
@@ -371,18 +383,17 @@ class ChallengeCompleteView: UIView {
         [imageLabel, imageContainer].forEach(imageStack.addArrangedSubview)
         [reviewLabel, reviewContainer].forEach(reviewStack.addArrangedSubview)
         [challengeExitButton, challengeUpdateButton].forEach(buttonStack.addArrangedSubview)
-        [titleIcon, title, challengeStack, imageStack, reviewStack, reviewHintText, buttonStack].forEach(challengeCompleteStack.addArrangedSubview)
+//        [titleIcon, title, challengeStack, imageStack, reviewStack, reviewHintText, buttonStack].forEach(challengeCompleteStack.addArrangedSubview)
     }
     
     private func addComponents(){
         self.addSubview(scrollView)
         [grabberIcon, titleIcon, title, challengeStack, imageStack, reviewStack, reviewHintText, buttonStack].forEach(contentView.addSubview)
         scrollView.addSubview(contentView)
-        [challengeIcon, challengeName, clockIcon, challengeTime].forEach(challengeContainer.addSubview)
+        [challengeIcon, challengeName, clockIcon, challengeTime, completeBox].forEach(challengeContainer.addSubview)
     }
     
     private func constraints(){
-        
         
         
         scrollView.snp.makeConstraints{
@@ -391,8 +402,7 @@ class ChallengeCompleteView: UIView {
         
         contentView.snp.makeConstraints{
             $0.edges.equalToSuperview()
-            $0.width.equalTo(scrollView.snp.width)
-            
+            $0.width.equalTo(scrollView)
         }
         
         grabberIcon.snp.makeConstraints{
@@ -436,9 +446,24 @@ class ChallengeCompleteView: UIView {
             $0.left.equalTo(clockIcon.snp.right).offset(4)
         }
         
+        completeBox.addSubview(completeText)
+        
+        completeBox.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.right.equalToSuperview().inset(24)
+            $0.width.equalToSuperview().multipliedBy(0.222)
+            $0.height.equalToSuperview().multipliedBy(0.32)
+        }
+        
+        completeText.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.width.equalToSuperview().multipliedBy(0.623)
+        }
+        
         challengeStack.snp.makeConstraints{
             $0.top.equalTo(title.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(24)
+            
         }
         
         imageContainer.snp.makeConstraints{
@@ -468,7 +493,7 @@ class ChallengeCompleteView: UIView {
             $0.top.equalTo(reviewHintText.snp.bottom).offset(40)
             //$0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom).inset(20)
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(20)
             $0.height.equalTo(60)
         }
     }

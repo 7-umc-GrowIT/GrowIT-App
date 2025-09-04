@@ -18,7 +18,7 @@ final class AuthService: NetworkManager {
         // 플러그인 추가
         let plugins: [PluginType] = [
             // NetworkLoggerPlugin(configuration: .init(logOptions: [.requestMethod, .successResponseBody])), // 로그 플러그인
-            AuthPlugin()
+            AuthPlugin.shared
         ]
         
         // provider 초기화

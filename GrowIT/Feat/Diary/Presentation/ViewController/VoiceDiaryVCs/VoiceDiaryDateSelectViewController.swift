@@ -7,13 +7,15 @@
 
 import UIKit
 
-class VoiceDiaryDateSelectViewController: UIViewController, JDiaryCalendarControllerDelegate {
+class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControllerDelegate {
     
     // MARK: Properties
     let  voiceDiaryDateSelectView = VoiceDiaryDateSelectView()
     let navigationBarManager = NavigationManager()
     
-    let calVC = JDiaryCalendarController(isDropDown: true)
+    let calVC = DiaryCalendarController(isDropDown: true)
+    
+    var isCalendarOpen: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,7 +57,7 @@ class VoiceDiaryDateSelectViewController: UIViewController, JDiaryCalendarContro
             make.top.equalTo(voiceDiaryDateSelectView.dateView.snp.bottom).offset(8)
             make.leading.equalToSuperview()
             make.centerX.equalToSuperview()
-            make.height.equalTo(Constants.Screen.ScreenHeight * (Constants.Screen.CalenderRatio))
+            make.height.equalTo(self.view.frame.height * 0.4)
         }
         calVC.view.isHidden = true
     }
@@ -143,14 +145,24 @@ class VoiceDiaryDateSelectViewController: UIViewController, JDiaryCalendarContro
     }
     
     @objc func toggleTapped() {
+        isCalendarOpen.toggle()
+        
+        // 현재 날짜 선택 상태가 유효한지 확인
+        let isValid = voiceDiaryDateSelectView.dateSelectLabel.text != "일기 날짜를 선택해 주세요"
+        
+        // 유효할 때만 초록색 테두리 적용
+        voiceDiaryDateSelectView.dateView.layer.borderColor = (isCalendarOpen && isValid) ? UIColor.primary500.cgColor : UIColor.clear.cgColor
+        
         calVC.view.isHidden.toggle()
     }
     
     func didSelectDate(_ date: String) {
         voiceDiaryDateSelectView.updateDateLabel(date)
         UserDefaults.standard.set(date, forKey: "VoiceDate")
+        isCalendarOpen = false
         calVC.view.isHidden = true
         
         updateDateSelectionUI(isValid: true)
     }
+
 }

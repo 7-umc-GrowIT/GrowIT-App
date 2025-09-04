@@ -56,10 +56,15 @@ class ChallengeHomeAreaController: UIViewController {
                 // 빈 챌린지 상태 처리
                 let isEmpty = challenges.isEmpty
                 if isEmpty {
-                    self.challengeHomeArea.setEmptyChallenge(true)
-                    self.pageControl.isHidden = true
+                    if viewModel.keywords.isEmpty {
+                        self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: true, isEmptyKeyword: true)
+                        self.pageControl.isHidden = true
+                    }else {
+                        self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: true, isEmptyKeyword: false)
+                        self.pageControl.isHidden = true
+                    }
                 } else {
-                    self.challengeHomeArea.setEmptyChallenge(false)
+                    self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: false, isEmptyKeyword: false)
                     self.pageControl.isHidden = false
                 }
             }
@@ -96,12 +101,7 @@ class ChallengeHomeAreaController: UIViewController {
     }
     
     private func setupNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(updateChallengeList), name: .challengeReloadNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(navigateToVerify), name: NSNotification.Name("navigateToChallengeVerify"), object: nil)
-    }
-    
-    @objc private func updateChallengeList() {
-        viewModel.refresh()
     }
     
     @objc private func navigateToVerify() {
