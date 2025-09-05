@@ -143,9 +143,12 @@ class EmailLoginViewController: UIViewController {
                         // loginMethod 저장
                         UserDefaults.standard.set(tokenData.loginMethod, forKey: "loginMethod")
 
-                        print("AccessToken 저장됨")
-                        print("RefreshToken 저장됨")
-
+                        if self.emailLoginView.emailSaveButton.isSelected {
+                            UserDefaults.standard.set(email, forKey: "savedEmail")
+                        } else {
+                            UserDefaults.standard.removeObject(forKey: "savedEmail")
+                        }
+                        
                         self.moveToNextScreen()
                     } else {
                         print("로그인 실패: \(response.message)")
@@ -191,6 +194,11 @@ class EmailLoginViewController: UIViewController {
     private func loadCheckBoxState() {
         let isChecked = UserDefaults.standard.bool(forKey: "isCheckBoxChecked")
         emailLoginView.emailSaveButton.isSelected = isChecked
+        
+        if isChecked {
+            let savedEmail = UserDefaults.standard.string(forKey: "savedEmail") ?? ""
+            emailLoginView.emailTextField.textField.text = savedEmail
+        }
     }
 }
 
