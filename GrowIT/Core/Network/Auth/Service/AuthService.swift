@@ -45,7 +45,7 @@ final class AuthService: NetworkManager {
         let requestBody: [String: Any] = [
             "userTerms": userTermsArray,
             "oauthUserInfo": [
-                "id": oauthUserInfo.socialId,
+                "socialId": oauthUserInfo.socialId,
                 "email": oauthUserInfo.email,
                 "name": oauthUserInfo.name
             ]

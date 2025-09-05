@@ -180,8 +180,8 @@ class LoginViewController: UIViewController {
                 case .success(let signupResult):
                     // 토큰 저장
                     TokenManager.shared.saveTokens(
-                        accessToken: signupResult.result.accessToken,
-                        refreshToken: signupResult.result.refreshToken
+                        accessToken: signupResult.result.tokens.accessToken,
+                        refreshToken: signupResult.result.tokens.refreshToken
                     )
                     // 그로 생성 화면으로 이동
                     self.navigateToGroCreation()
