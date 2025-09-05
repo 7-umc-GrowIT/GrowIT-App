@@ -168,11 +168,12 @@ extension ChallengeHomeAreaController: UICollectionViewDelegateFlowLayout, UICol
         
         if challenge.completed {
             let completeVC = ChallengeCompleteViewController()
+            completeVC.challengeId = challenge.id
             presentSheet(completeVC, heightRatio: 1.0, useLargeOnly: true)
         } else {
             let verifyModalVC = ChallengeVerifyModalController()
             verifyModalVC.challengeId = challenge.id
-            presentSheet(verifyModalVC, heightRatio: 0.34)
+            presentSheet(verifyModalVC, heightRatio: 0.4)
         }
     }
 }

@@ -84,6 +84,7 @@ class DiaryPostFixView: UIView {
         diaryIcon.snp.makeConstraints {
             $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
             $0.leading.equalToSuperview().offset(24)
+            $0.height.width.equalTo(28)
         }
         
         addSubview(fixLabel)
@@ -124,6 +125,7 @@ class DiaryPostFixView: UIView {
         deleteLabel.snp.makeConstraints {
             $0.top.equalTo(fixButton.snp.bottom).offset(15.5)
             $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
         }
     }
     

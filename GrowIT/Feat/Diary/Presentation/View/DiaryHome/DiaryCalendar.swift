@@ -110,10 +110,10 @@ class DiaryCalendar: UIView {
         yearMonthHeader.snp.makeConstraints {
             $0.top.equalToSuperview().offset(12)
             $0.left.equalToSuperview().offset(16)
-            $0.height.equalTo(32)
+            //$0.height.equalTo(32)
         }
         
-        backMonthBtn.snp.makeConstraints{
+        backMonthBtn.snp.makeConstraints {
             $0.width.height.equalTo(24)
         }
         

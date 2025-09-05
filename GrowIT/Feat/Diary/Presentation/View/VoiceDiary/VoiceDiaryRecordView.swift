@@ -33,7 +33,6 @@ class VoiceDiaryRecordView: UIView {
         super.init(frame: frame)
         setupUI()
         startAnimation()
-        setupActions()
         hideTipView()
     }
     
@@ -243,17 +242,5 @@ class VoiceDiaryRecordView: UIView {
             make.top.equalTo(endButton.snp.bottom).offset(8)
             make.centerX.equalToSuperview()
         }
-    }
-    
-    private func setupActions() {
-        recordButton.addTarget(self, action: #selector(toggleRecording), for: .touchUpInside)
-        loadingButton.addTarget(self, action: #selector(toggleRecording), for: .touchUpInside)
-    }
-    
-    @objc private func toggleRecording() {
-        let isCurrentlyRecording = !recordButton.isHidden
-        
-        recordButton.isHidden = isCurrentlyRecording
-        loadingButton.isHidden = !isCurrentlyRecording
     }
 }

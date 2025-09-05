@@ -186,13 +186,13 @@ extension ChallengeStatusAreaController: UICollectionViewDelegateFlowLayout, UIC
                 challengeCompleteVC.challengeId = selectedChallenge!.id
                 challengeCompleteVC.modalPresentationStyle = .pageSheet
                 
-                presentSheet(challengeCompleteVC, heightRatio: 0.9)
+                presentSheet(challengeCompleteVC, heightRatio: 1)
             }else{
                 let challengeVerifyModalVC = ChallengeVerifyModalController()
                 
                 challengeVerifyModalVC.modalPresentationStyle = .pageSheet
                 
-                presentSheet(challengeVerifyModalVC, heightRatio: 0.34)
+                presentSheet(challengeVerifyModalVC, heightRatio: 0.4)
                 
                 challengeVerifyModalVC.challengeId = selectedChallenge!.id
             }

@@ -351,7 +351,7 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
                         case.success(let data):
                             print("받은 일기 데이터는 \(data)")
                             let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
-                            presentSheet(diaryPostFixVC, heightRatio: 0.55)
+                            presentSheet(diaryPostFixVC, heightRatio: 0.6)
                         case.failure(let error):
                             print("Error: \(error)")
                         }

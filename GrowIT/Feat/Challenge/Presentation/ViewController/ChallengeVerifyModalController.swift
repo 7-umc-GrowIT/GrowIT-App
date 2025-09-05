@@ -29,7 +29,7 @@ class ChallengeVerifyModalController: UIViewController {
         }
         nextVC.modalPresentationStyle = .pageSheet
         
-        presentSheet(nextVC, heightRatio: 0.32)
+        presentSheet(nextVC, heightRatio: 0.35)
     }
     
     @objc private func dismissModal() {

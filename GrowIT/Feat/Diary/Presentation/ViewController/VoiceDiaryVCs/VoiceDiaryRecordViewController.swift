@@ -73,13 +73,20 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     private func setupAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .measurement, options: .defaultToSpeaker)
+            try audioSession.setCategory(
+                .playAndRecord,
+                mode: .measurement,
+                options: [.allowBluetooth, .allowBluetoothA2DP]
+            )
             try audioSession.setActive(true)
+            try audioSession.overrideOutputAudioPort(.none)
+            print("오디오 세션 및 라우팅 설정 완료")
             print("오디오 세션 초기화 완료")
         } catch {
             print("오디오 세션 초기화 실패: \(error)")
         }
     }
+
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -236,11 +243,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
                         nextVC.hidesBottomBarWhenPushed = true
                         navigationController?.pushViewController(nextVC, animated: true)
                     }
-                    
-//                    await MainActor.run {
-//                        nextVC.navigateToNextScreen(with: diary.content, diaryId: diary.id, date: diary.date)
-//
-//                    }
                 } catch {
                     print("요약된 일기 가져오기 실패: \(error)")
                 }
@@ -258,7 +260,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .measurement, options: .defaultToSpeaker)
+            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth])
             try audioSession.setActive(true)
             
             let settings: [String: Any] = [
@@ -305,6 +307,10 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         
         print("자동 녹음 중지")
         updateConversationUI(state: .processing)
+        
+        DispatchQueue.main.async {
+            self.voiceDiaryRecordView.loadingButton.isHidden = false  // 서버 응답 대기중임을 표시
+        }
     }
     
     // MARK: - Audio Level Monitoring
@@ -415,6 +421,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
                     self.conversationTurnCount += 1
                     self.isProcessingAudio = false
                     
+                    self.voiceDiaryRecordView.loadingButton.isHidden = true
                     Task {
                         await self.synthesizeSpeech(text: responseText)
                     }
@@ -460,7 +467,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     private func playAudio(data: Data) { // TTS 재생
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth])
             try audioSession.setActive(true)
             
             stopCurrentAudio()
