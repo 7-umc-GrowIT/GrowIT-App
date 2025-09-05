@@ -14,6 +14,9 @@ enum GroEndpoint {
     
     // Post
     case postGroCreate(data: GroRequestDTO)
+    
+    // Patch
+    case patchGroChangeNickname(data: GroChangeNicknameRequestDTO)
 }
 
 extension GroEndpoint: TargetType {
@@ -26,6 +29,8 @@ extension GroEndpoint: TargetType {
     
     var path: String {
         switch self {
+        case .patchGroChangeNickname:
+            return "/nickname"
         default:
             return ""
         }
@@ -37,6 +42,8 @@ extension GroEndpoint: TargetType {
             return .get
         case .postGroCreate:
             return .post
+        case .patchGroChangeNickname:
+            return .patch
         }
     }
     
@@ -45,6 +52,8 @@ extension GroEndpoint: TargetType {
         case .getGroImage:
             return .requestPlain
         case .postGroCreate(let data):
+            return .requestJSONEncodable(data)
+        case .patchGroChangeNickname(let data):
             return .requestJSONEncodable(data)
         }
     }

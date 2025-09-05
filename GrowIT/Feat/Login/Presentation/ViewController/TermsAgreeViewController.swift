@@ -26,9 +26,19 @@ class TermsAgreeViewController: UIViewController, UITableViewDelegate {
         setupUI()
         setupDelegate()
         setupActions()
-        fetchTerms()
+        callGetTerms()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        termsAgreeView.termsTableView.snp.updateConstraints {
+            $0.height.equalTo(termsAgreeView.termsTableView.contentSize.height)
+        }
+        termsAgreeView.termsOptTableView.snp.updateConstraints {
+            $0.height.equalTo(termsAgreeView.termsOptTableView.contentSize.height)
+        }
+    }
+
     // MARK: - SetupUI
     private func setupUI() {
         view.addSubview(termsAgreeView)
@@ -87,8 +97,8 @@ class TermsAgreeViewController: UIViewController, UITableViewDelegate {
     }
     
     // MARK: - API 호출 (약관 목록 불러오기)
-    private func fetchTerms() {
-        termsService.fetchTerms { [weak self] result in
+    private func callGetTerms() {
+        termsService.getTerms { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let terms):
@@ -177,12 +187,7 @@ class TermsAgreeViewController: UIViewController, UITableViewDelegate {
     
     @objc private func nextButtonTapped() {
         if !validateAgreements() {
-            let toastImage = UIImage(named: "agreeIcon") ?? UIImage()
-            CustomToast(containerWidth: 250).show(
-                image: toastImage,
-                message: "필수 이용약관 동의가 필요합니다",
-                font: UIFont.body2Medium()
-            )
+            ToastSecond.show(image: UIImage(named: "agreeIcon") ?? UIImage(), message: "필수 이용약관 동의가 필요합니다", font: .body2Medium(), in: self.view)
             return
         }
         
@@ -241,13 +246,20 @@ extension TermsAgreeViewController: UITableViewDataSource {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: TermsAgreeTableViewCell.identifier, for: indexPath) as? TermsAgreeTableViewCell else {
                 return UITableViewCell()
             }
-            
+        
             let term = termsList[indexPath.row]
-            let numberedTitle = "이용약관 (\(indexPath.row + 1))"
+            let numberedTitle: String
+            if term.termId == 7 {
+                numberedTitle = "서비스 이용약관"
+            } else {
+                numberedTitle = "개인정보 수집•이용 동의"
+            }
+            
             
             // 화살표 버튼을 눌렀을 때 상세 화면으로 이동
             cell.detailButton.addTarget(self, action: #selector(showTermsDetail(_:)), for: .touchUpInside)
             cell.detailButton.tag = term.termId
+            cell.detailButton.accessibilityLabel = numberedTitle
         
             cell.configure(
                 title: numberedTitle,
@@ -299,10 +311,11 @@ extension TermsAgreeViewController: UITableViewDataSource {
     
     @objc private func showTermsDetail(_ sender: UIButton) {
         let termId = sender.tag
+        let title = sender.accessibilityLabel ?? "약관 상세"
 
         guard let term = (termsList + optionalTermsList).first(where: { $0.termId == termId }) else { return }
 
-        let detailVC = TermsDetailViewController()
+        let detailVC = TermsDetailViewController(navigationBarTitle: title)
         detailVC.termsContent = term.content
         detailVC.termId = term.termId
         

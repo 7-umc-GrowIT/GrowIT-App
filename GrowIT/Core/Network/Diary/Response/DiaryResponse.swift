@@ -28,14 +28,15 @@ struct DiaryDateDTO: Decodable {
 }
 
 struct DiaryGetAllResponseDTO: Decodable {
-    let diaryList: [DiaryDTO]
+    let diaryList: [DiaryResponseDTO]
     let listSize: Int
 }
 
-struct DiaryDTO: Decodable {
+struct DiaryResponseDTO: Decodable {
     let diaryId: Int
     let content: String
     let date: String
+    let creditInfo: CreditInfo
 }
 
 struct DiaryPatchResponseDTO: Decodable {
@@ -49,7 +50,7 @@ struct DiaryDeleteResponseDTO: Decodable {
 
 struct DiaryAnalyzeResponseDTO: Decodable {
     let emotionKeywords: [EmotionKeyword]
-    let recommendedChallenges: [RecommendedChallenge]
+    let recommendedChallenges: [RecommendedDiaryChallengeDTO]
 }
 
 struct EmotionKeyword: Decodable {
@@ -57,20 +58,10 @@ struct EmotionKeyword: Decodable {
     let keyword: String
 }
 
-struct RecommendedChallenge: Decodable {
+struct RecommendedDiaryChallengeDTO: Decodable {
     let id: Int
     let title: String
     let content: String
     let time: Int
-    let type: String
-}
-
-extension RecommendedChallenge {
-    init(dto: RecommendedChallengeDTO){
-        self.id = dto.id
-        self.title = dto.title
-        self.content = dto.content
-        self.time = dto.time
-        self.type = dto.dtype
-    }
+    let challengeType: String
 }

@@ -30,10 +30,6 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
             view.addGestureRecognizer(tapGesture)
         
-        print("✅ 사용자 정보 입력 화면으로 전달된 이메일: \(email)")
-        print("✅ 사용자 정보 입력 화면으로 전달된 인증 여부: \(isVerified)")
-        print("✅ 사용자 정보 입력 화면으로 전달된 약관 목록: \(agreeTerms)") // 디버깅용 로그
-        
         // 약관 데이터가 정상적으로 유지되었는지 확인
         if agreeTerms.isEmpty {
             print("❌ 약관 데이터가 전달되지 않았습니다.")
@@ -91,10 +87,12 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
               let confirmPassword = userInfoView.passwordCheckTextField.textField.text
         else { return }
         
-        // 비밀번호가 일치하고 둘 다 비어 있지 않을 경우 버튼 활성화
-        let isPasswordsMatch = !password.isEmpty && password == confirmPassword
+        // 길이 조건
+        let isLengthValid = password.count >= 8 && password.count <= 30
         
-        // 버튼 상태 업데이트
+        // 비밀번호가 일치하고 둘 다 비어 있지 않으며 길이도 유효할 경우 버튼 활성화
+        let isPasswordsMatch = isLengthValid && !password.isEmpty && password == confirmPassword
+        
         userInfoView.nextButton.setButtonState(
             isEnabled: isPasswordsMatch,
             enabledColor: .black,
@@ -114,7 +112,18 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
               let confirmPassword = userInfoView.passwordCheckTextField.textField.text
         else { return }
         
-        // 두 필드 모두 비어있으면 초기 상태로
+        // 길이 검사
+        if !password.isEmpty {
+            if password.count < 8 || password.count > 30 {
+                userInfoView.passwordTextField.setError(message: "비밀번호는 8~30자 이내로 입력해 주세요")
+                userInfoView.passwordTextField.titleLabel.textColor = .negative400
+                userInfoView.passwordTextField.textField.textColor = .negative400
+            } else {
+                userInfoView.passwordTextField.clearError()
+            }
+        }
+        
+        // 두 필드 모두 비어있으면 초기화
         if password.isEmpty && confirmPassword.isEmpty {
             [userInfoView.passwordTextField, userInfoView.passwordCheckTextField].forEach {
                 $0.clearError()
@@ -124,7 +133,7 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         
         // 비밀번호 확인 필드가 비어있지 않을 때만 검증
         if !confirmPassword.isEmpty {
-            if password == confirmPassword {
+            if password == confirmPassword && password.count >= 8 && password.count <= 30 {
                 [userInfoView.passwordTextField, userInfoView.passwordCheckTextField].forEach {
                     $0.setSuccess()
                     $0.titleLabel.textColor = .gray900
@@ -133,7 +142,7 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
                 userInfoView.passwordCheckTextField.errorLabel.text = "비밀번호가 일치합니다"
                 userInfoView.passwordCheckTextField.errorLabel.textColor = .positive400
                 userInfoView.passwordCheckTextField.errorLabel.isHidden = false
-            } else {
+            } else if password != confirmPassword {
                 userInfoView.passwordCheckTextField.setError(message: "비밀번호가 일치하지 않습니다")
                 userInfoView.passwordCheckTextField.titleLabel.textColor = .negative400
                 userInfoView.passwordCheckTextField.textField.textColor = .negative400
@@ -143,6 +152,7 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         // 버튼 상태 업데이트
         nextButtonState()
     }
+
  
     
     @objc private func nextButtonTap() {
@@ -192,7 +202,7 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
             switch result {
             case .success(let response):
                 print("✅ 회원가입 성공: \(response.message)")
-                self.handleSignUpSuccess(accessToken: response.result.accessToken)
+                self.handleSignUpSuccess(accessToken: response.result.tokens.accessToken)
 
             case .failure(let error):
                 print("❌ 회원가입 실패: \(error.localizedDescription)")

@@ -10,18 +10,23 @@ import SnapKit
 import Then
 
 class AppButton: UIButton {
-
+    
     init(
         title: String = "",
         titleColor: UIColor = .black,
         isEnabled: Bool = true,
-        icon: String = ""
+        icon: String? = nil
     ) {
         super.init(frame: .zero)
         self.setTitle(title, for: .normal)
         self.setTitleColor(titleColor, for: .normal)
         self.backgroundColor = isEnabled ? UIColor.primary400 : UIColor.primary50
-        self.setImage(UIImage(named: icon), for: .normal)
+        
+        // 안전하게 아이콘 처리
+        if let iconName = icon, !iconName.isEmpty {
+            self.setImage(UIImage(named: iconName), for: .normal)
+            self.setImage(UIImage(named: iconName), for: .highlighted)
+        }
         
         self.titleLabel?.font = UIFont.heading2Bold()
         self.layer.cornerRadius = 16

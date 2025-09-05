@@ -12,8 +12,9 @@ class VoiceDiaryLoadingViewController: UIViewController {
     //MARK: - Properties
     let voiceDiaryLoadingView = VoiceDiaryLoadingView()
     let navigationBarManager = NavigationManager()
+    let diaryService = DiaryService()
     
-    private var diaryContent: String?
+    private let diary: Diary
     
     weak var delegate: VoiceDiaryRecordDelegate?
     
@@ -21,6 +22,23 @@ class VoiceDiaryLoadingViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupNavigationBar()
+        
+        fetchDiaryAnalyze() { result in
+            let nextVC = VoiceDiarySummaryViewController(diaryContent: self.diary.content, diaryId: self.diary.id, date: self.diary.date, keywords: result.emotionKeywords, recommendedChallenges: result.recommendedChallenges)
+            nextVC.hidesBottomBarWhenPushed = true
+            
+            self.navigationController?.pushViewController(nextVC, animated: true)
+        }
+    }
+    
+    init(diary: Diary) {
+        self.diary = diary
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: Setup Navigation Bar
@@ -51,13 +69,16 @@ class VoiceDiaryLoadingViewController: UIViewController {
     @objc func prevVC() {
         // navigationController?.popViewController(animated: true)
     }
-
-    func navigateToNextScreen(with content: String, diaryId: Int, date: String) {
-        self.diaryContent = content
-        
-        let nextVC = VoiceDiarySummaryViewController(diaryContent: diaryContent ?? "", diaryId: diaryId, date: date)
-        nextVC.hidesBottomBarWhenPushed = true
-        
-        navigationController?.pushViewController(nextVC, animated: true)
+    
+    private func fetchDiaryAnalyze(completion: @escaping (DiaryAnalyzeResponseDTO) -> Void) {
+        diaryService.postVoiceDiaryAnalyze(diaryId: diary.id) { result in
+            switch result {
+            case .success(let data):
+                print(data)
+                completion(data)
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
 }

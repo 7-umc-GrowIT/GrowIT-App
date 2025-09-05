@@ -33,6 +33,7 @@ final class ChallengeStatusAreaController: UIViewController {
         view.backgroundColor = .gray50
         
         setupCollectionView()
+        setupNotifications()
         bindViewModel()
         viewModel.moveToPage(1) // 진입 시 1페이지 조회
     }
@@ -51,6 +52,16 @@ final class ChallengeStatusAreaController: UIViewController {
         challengeStatusArea.onPageSelected = { [weak self] page in
             self?.viewModel.moveToPage(page)
         }
+    }
+    
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(navigateToVerify), name: NSNotification.Name("navigateToChallengeVerify"), object: nil)
+    }
+    
+    @objc private func navigateToVerify() {
+        guard !view.isHidden else { return }
+        let challengeVerifyVC = ChallengeVerifyViewController(challenge: selectedChallenge)
+        navigationController?.pushViewController(challengeVerifyVC, animated: true)
     }
     
     private func bindViewModel() {
@@ -175,110 +186,24 @@ extension ChallengeStatusAreaController: UICollectionViewDelegateFlowLayout, UIC
                 challengeCompleteVC.challengeId = selectedChallenge!.id
                 challengeCompleteVC.modalPresentationStyle = .pageSheet
                 
-                if let sheet = challengeCompleteVC.sheetPresentationController {
-                    
-                    //지원할 크기 지정
-                    if #available(iOS 16.0, *){
-                        sheet.detents = [.large()]
-                    }else{
-                        sheet.detents = [.medium(), .large()]
-                    }
-                    
-                    // 시트의 상단 둥근 모서리 설정
-                    if #available(iOS 15.0, *) {
-                        sheet.preferredCornerRadius = 40
-                    }
-                    
-                    //크기 변하는거 감지
-                    sheet.delegate = self
-                    
-                    //시트 상단에 그래버 표시 (기본 값은 false)
-                    sheet.prefersGrabberVisible = false
-                    
-                    //처음 크기 지정 (기본 값은 가장 작은 크기)
-                    sheet.selectedDetentIdentifier = .large
-                }
-                
-                self.present(challengeCompleteVC, animated: true, completion: nil)
+                presentSheet(challengeCompleteVC, heightRatio: 1)
             }else{
                 let challengeVerifyModalVC = ChallengeVerifyModalController()
                 
                 challengeVerifyModalVC.modalPresentationStyle = .pageSheet
-                challengeVerifyModalVC.delegate = self
                 
-                if let sheet = challengeVerifyModalVC.sheetPresentationController {
-                    
-                    //지원할 크기 지정
-                    if #available(iOS 16.0, *){
-                        sheet.detents = [
-                            .custom{ _ in
-                                358.0
-                            }]
-                    }else{
-                        sheet.detents = [.medium(), .large()]
-                    }
-                    
-                    // 시트의 상단 둥근 모서리 설정
-                    if #available(iOS 15.0, *) {
-                        sheet.preferredCornerRadius = 40
-                    }
-                    
-                    //크기 변하는거 감지
-                    sheet.delegate = self
-                    
-                    //시트 상단에 그래버 표시 (기본 값은 false)
-                    sheet.prefersGrabberVisible = false
-                }
+                presentSheet(challengeVerifyModalVC, heightRatio: 0.4)
                 
                 challengeVerifyModalVC.challengeId = selectedChallenge!.id
-                self.present(challengeVerifyModalVC, animated: true, completion: nil)
             }
         case 2:
             selectedStatusIndex = indexPath.row
-            switch indexPath.row {
-            case 0: // 전체
-                viewModel.selectedType = .all
-                viewModel.completed = false
-            case 1: // 완료
-                viewModel.selectedType = .all
-                viewModel.completed = true
-            case 2: // 랜덤 챌린지
-                viewModel.selectedType = .random
-                viewModel.completed = false
-            case 3: // 데일리 챌린지
-                viewModel.selectedType = .daily
-                viewModel.completed = false
-            default:
-                break
-            }
-            
-            viewModel.page = 1
-            
+            viewModel.fetchChallengesForStatus(index: selectedStatusIndex)
             collectionView.reloadData()
             challengeStatusArea.challengeAllList.reloadData()
             scrollToTop()
         default:
             break
-        }
-    }
-}
-
-extension ChallengeStatusAreaController: UISheetPresentationControllerDelegate {
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        print(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")
-    }
-}
-
-extension ChallengeStatusAreaController: ChallengeVerifyModalDelegate {
-    func didRequestVerification() {
-        if let challenge = selectedChallenge {
-            self.dismiss(animated: true, completion: {
-                let nextVC = ChallengeVerifyViewController()
-                
-                self.navigationController?.pushViewController(
-                    nextVC, animated: true
-                )
-            })
         }
     }
 }

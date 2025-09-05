@@ -35,7 +35,7 @@ class ChallengeHomeAreaController: UIViewController {
         
         setupCollectionView()
         setupNotifications()
-        //bindViewModel()
+        bindViewModel()
         viewModel.refresh()
     }
     
@@ -44,49 +44,44 @@ class ChallengeHomeAreaController: UIViewController {
         challengeHomeArea.todayChallengeCollectionView.dataSource = self
     }
     
-//    private func bindViewModel() {
-//        viewModel.$todayChallenges
-//            .receive(on: RunLoop.main)
-//            .sink { [weak self] challenges in
-//                guard let self = self else { return }
-//                self.todayChallenges = challenges
-//                self.challengeHomeArea.todayChallengeCollectionView.reloadData()
-//                self.setupPageControl()
-//            }
-//            .store(in: &cancellables)
-//        
-//        viewModel.$challengeKeywords
-//            .sink { [weak self] in self?.challengeHomeArea.setupChallengeKeywords($0) }
-//            .store(in: &cancellables)
-//        
-//        viewModel.$challengeReport
-//            .sink { [weak self] in
-//                guard let report = $0 else { return }
-//                self?.challengeHomeArea.setupChallengeReport(report: report)
-//            }
-//            .store(in: &cancellables)
-//        
-//        viewModel.$isEmptyChallenge
-//            .sink { [weak self] isEmpty in
-//                if isEmpty {
-//                    self?.challengeHomeArea.setEmptyChallenge()
-//                    self?.pageControl.isHidden = true
-//                }
-//            }
-//            .store(in: &cancellables)
-//        
-//        viewModel.$isEmptyTodayChallenge
-//            .sink { [weak self] isEmpty in
-//                self?.challengeHomeArea.todayChallengeCollectionView.isHidden = isEmpty
-//                self?.pageControl.isHidden = isEmpty
-//            }
-//            .store(in: &cancellables)
-//        
-//        viewModel.$errorMessage
-//            .sink { if let msg = $0 { print("에러 발생: \(msg)") } }
-//            .store(in: &cancellables)
-//    }
-//    
+    private func bindViewModel() {
+        viewModel.$todayChallenges
+            .receive(on: RunLoop.main)
+            .sink { [weak self] challenges in
+                guard let self = self else { return }
+                self.todayChallenges = challenges
+                self.challengeHomeArea.todayChallengeCollectionView.reloadData()
+                self.setupPageControl()
+                
+                // 빈 챌린지 상태 처리
+                let isEmpty = challenges.isEmpty
+                if isEmpty {
+                    if viewModel.keywords.isEmpty {
+                        self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: true, isEmptyKeyword: true)
+                        self.pageControl.isHidden = true
+                    }else {
+                        self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: true, isEmptyKeyword: false)
+                        self.pageControl.isHidden = true
+                    }
+                } else {
+                    self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: false, isEmptyKeyword: false)
+                    self.pageControl.isHidden = false
+                }
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$keywords
+            .sink { [weak self] in self?.challengeHomeArea.setupChallengeKeywords($0) }
+            .store(in: &cancellables)
+        
+        viewModel.$report
+            .sink { [weak self] in
+                guard let report = $0 else { return }
+                self?.challengeHomeArea.setupChallengeReport(report: report)
+            }
+            .store(in: &cancellables)
+    }
+    
     private func setupPageControl() {
         pageControl.numberOfPages = todayChallenges.count
         pageControl.currentPage = selectedIndex
@@ -106,11 +101,14 @@ class ChallengeHomeAreaController: UIViewController {
     }
     
     private func setupNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(updateChallengeList), name: .challengeDidDelete, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(navigateToVerify), name: NSNotification.Name("navigateToChallengeVerify"), object: nil)
     }
     
-    @objc private func updateChallengeList() {
-        viewModel.refresh()
+    @objc private func navigateToVerify() {
+        guard !view.isHidden else { return }
+        let challengeVerifyVC = ChallengeVerifyViewController(challenge: UserChallenge(dto: todayChallenges[selectedIndex]))
+        navigationController?.pushViewController(challengeVerifyVC, animated: true)
+    
     }
     
     public func refreshData(){
@@ -170,41 +168,13 @@ extension ChallengeHomeAreaController: UICollectionViewDelegateFlowLayout, UICol
         
         if challenge.completed {
             let completeVC = ChallengeCompleteViewController()
+            completeVC.challengeId = challenge.id
             presentSheet(completeVC, heightRatio: 1.0, useLargeOnly: true)
         } else {
             let verifyModalVC = ChallengeVerifyModalController()
-            verifyModalVC.delegate = self
             verifyModalVC.challengeId = challenge.id
-            presentSheet(verifyModalVC, heightRatio: 0.45)
+            presentSheet(verifyModalVC, heightRatio: 0.4)
         }
-    }
-}
-
-// MARK: - Sheet Presentation
-extension ChallengeHomeAreaController: UISheetPresentationControllerDelegate {
-    private func presentSheet(_ viewController: UIViewController, heightRatio: CGFloat, useLargeOnly: Bool = false) {
-        viewController.modalPresentationStyle = .pageSheet
-        if let sheet = viewController.sheetPresentationController {
-            if #available(iOS 16.0, *) {
-                sheet.detents = useLargeOnly ? [.large()] : [.custom { _ in self.view.frame.height * heightRatio }]
-            } else {
-                sheet.detents = [.medium(), .large()]
-            }
-            
-            if #available(iOS 15.0, *) {
-                sheet.preferredCornerRadius = 40
-            }
-            
-            sheet.delegate = self
-            sheet.prefersGrabberVisible = false
-            sheet.selectedDetentIdentifier = .large
-        }
-        
-        present(viewController, animated: true, completion: nil)
-    }
-    
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        print("시트 상태 변경: \(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")")
     }
 }
 
@@ -216,19 +186,5 @@ extension ChallengeHomeAreaController: UIScrollViewDelegate {
             selectedIndex = indexPath.row
             pageControl.currentPage = indexPath.row
         }
-    }
-}
-
-// MARK: - ChallengeVerifyModalDelegate
-extension ChallengeHomeAreaController: ChallengeVerifyModalDelegate {
-    func presentChallengeVerifyModal() {
-        let modalVC = ChallengeVerifyModalController()
-        modalVC.delegate = self
-        present(modalVC, animated: true, completion: nil)
-    }
-    
-    func didRequestVerification() {
-        let verifyVC = ChallengeVerifyViewController()
-        navigationController?.pushViewController(verifyVC, animated: true)
     }
 }

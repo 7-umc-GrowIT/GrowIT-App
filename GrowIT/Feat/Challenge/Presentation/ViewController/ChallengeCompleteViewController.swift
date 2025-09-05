@@ -18,6 +18,7 @@ class ChallengeCompleteViewController: UIViewController {
     private var newImageData: Data?
     private var initialReview: String?
     private var originalImageUrl: String?
+    private var originalImageName: String?
     var challengeId: Int?
     
     
@@ -80,18 +81,21 @@ class ChallengeCompleteViewController: UIViewController {
         if(!isReviewModified && !isImageModified){
             CustomToast().show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "수정사항이 없습니다", font: .heading3SemiBold())
         }else if(isReviewModified && !isImageModified){
-            if let id = challengeId, let url = originalImageUrl{
-                print("출력한 url \(url)")
+            if let id = challengeId, let imageName = originalImageName{
+                print("출력한 imageName \(imageName)")
                 print("출력한 텍스트 \(challengeCompleteView.reviewContainer.text!)")
-                updateChallenge(id: id, url: String(url), thoughts: challengeCompleteView.reviewContainer.text!)
+                updateChallenge(id: id, imageName: imageName, thoughts: challengeCompleteView.reviewContainer.text ?? "")
             }
         }else{
             if let imageData = newImageData, let id = challengeId{
                 ChallengeImageManager(imageData: imageData).uploadImage{ result in
                     DispatchQueue.main.async{
+                        
                         switch result{
-                        case .success(let url):
-                            self.updateChallenge(id: id, url: url, thoughts: self.challengeCompleteView.reviewContainer.text)
+                        case .success(let imageName):
+                            print("updateChallenge 호출 → id:\(id), imageName:\(imageName), thoughts:\(self.challengeCompleteView.reviewContainer.text ?? "nil")")
+
+                            self.updateChallenge(id: id, imageName: imageName, thoughts: self.initialReview ?? "")
                         case .failure(let error):
                             print("S3 이미지 URL 반환 실패: \(error)")
                         }
@@ -151,6 +155,7 @@ class ChallengeCompleteViewController: UIViewController {
                     }
                 }
                 originalImageUrl = data.certificationImageUrl
+                originalImageName = data.certificationImageName
                 initialReview = data.thoughts
                 challengeCompleteView.setupChallenge(challenge: data)
                 
@@ -172,38 +177,12 @@ class ChallengeCompleteViewController: UIViewController {
         let challengeImageModalController = ChallengeImageModalController()
         challengeImageModalController.modalPresentationStyle = .pageSheet
         
-        if let sheet = challengeImageModalController.sheetPresentationController {
-                    
-            //지원할 크기 지정
-            if #available(iOS 16.0, *){
-                sheet.detents = [.custom{ _ in
-                    360.0
-                }]
-            }else{
-                sheet.detents = [.medium(), .large()]
-            }
-            
-            // 시트의 상단 둥근 모서리 설정
-            if #available(iOS 15.0, *) {
-                sheet.preferredCornerRadius = 40
-            }
-            
-            //크기 변하는거 감지
-            sheet.delegate = self
-           
-            //시트 상단에 그래버 표시 (기본 값은 false)
-            sheet.prefersGrabberVisible = false
-            
-            //처음 크기 지정 (기본 값은 가장 작은 크기)
-            sheet.selectedDetentIdentifier = .large
-        }
-        
-        self.present(challengeImageModalController, animated: true, completion: nil)
+        presentSheet(challengeImageModalController, heightRatio: 0.39)
     }
     
     /// 챌린지 수정 API
-    private func updateChallenge(id: Int, url: String, thoughts: String){
-        challengeService.patchChallenge(challengeId: id, data: ChallengeRequestDTO(certificationImageUrl: url, thoughts: thoughts), completion: { [weak self] result in
+    private func updateChallenge(id: Int, imageName: String, thoughts: String){
+        challengeService.patchChallenge(challengeId: id, data: ChallengeRequestDTO(certificationImageName: imageName, thoughts: thoughts), completion: { [weak self] result in
             guard let self = self else {return}
             switch result {
             case .success(let data):
@@ -213,15 +192,8 @@ class ChallengeCompleteViewController: UIViewController {
             case .failure(let error):
                 print("챌린지 수정 에러:\(error)")
             }
-            
+             
         })
-    }
-}
-
-extension ChallengeCompleteViewController: UISheetPresentationControllerDelegate {
-    func sheetPresentationControllerDidChangeSelectedDetentIdentifier(_ sheetPresentationController: UISheetPresentationController) {
-        //크기 변경 됐을 경우
-        print(sheetPresentationController.selectedDetentIdentifier == .large ? "large" : "medium")
     }
 }
 
@@ -257,6 +229,7 @@ extension ChallengeCompleteViewController: UITextViewDelegate{
                 .black.withAlphaComponent(0.1), hintColor: .gray500)
             challengeCompleteView.setUpdateBtnActivate(false)
             if(initialReview != textView.text){
+                initialReview = textView.text
                 isReviewModified = true
                 challengeCompleteView.setUpdateBtnActivate(true)
             }

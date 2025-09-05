@@ -20,6 +20,7 @@ struct Constants {
 
         static let authURL = "\(baseURL)/auth"
         static let userURL = "\(baseURL)/users"
+        static let withdrawalURL = "\(baseURL)/withdrawal"
         static let challengeURL = "\(baseURL)/challenges"
         static let s3URL = "\(baseURL)/s3"
     }

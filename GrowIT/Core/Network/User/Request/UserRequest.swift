@@ -21,3 +21,6 @@ struct UserPatchRequestDTO: Codable {
     let passwordCheck: String
 }
 
+struct UserDeleteRequestDTO: Codable {
+    let reasonId: Int
+}

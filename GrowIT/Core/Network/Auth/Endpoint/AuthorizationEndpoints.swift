@@ -9,13 +9,18 @@ import Foundation
 import Moya
 
 enum AuthorizationEndpoints {
-    case postVerification(data: EmailVerifyRequest)
-    case postEmailSignUp(data: EmailSignUpRequest)
-    case postSocialSignUp(data: SocialSignUpRequest)
-    case postReissueToken(data: ReissueTokenRequest)
-    case postKakaoLogin(code: String)
+    // Post
+    case postVerification(data: EmailVerifyRequest) // 이메일 인증번호 확인 api
+    case postEmailSignUp(data: EmailSignUpRequest) // 이메일 회원가입 api
+    case postSocialSignUp(data: SocialSignUpRequest) // 소셜 간편 가입 api
+    case postReissueToken(data: ReissueTokenRequest) // 토큰 재발급 api
+    case postKakaoLogin(data: SocialLoginRequest)
+    case postAppleLogin(data: SocialLoginRequest)
     case postEmailLogin(data: EmailLoginRequest)
-    case postSendEmailVerification(type: String, data: SendEmailVerifyRequest)
+    case postSendEmailVerification(type: String, data: SendEmailVerifyRequest) // 인증 메일 전송 api
+    case postLogout
+   
+    // Patch
     case patchSignOut
     case fetchSignUpTerms
 }
@@ -40,10 +45,14 @@ extension AuthorizationEndpoints: TargetType {
             return "/reissue"
         case .postKakaoLogin:
             return "/login/kakao"
+        case .postAppleLogin:
+            return "/login/apple"
         case .postEmailLogin:
             return "/login"
         case .postSendEmailVerification:
             return "/email"
+        case .postLogout:
+            return "/logout"
         case .patchSignOut:
             return "/signout"
         case .fetchSignUpTerms:
@@ -70,8 +79,10 @@ extension AuthorizationEndpoints: TargetType {
             return .requestJSONEncodable(data)
         case .postReissueToken(let data):
             return .requestJSONEncodable(data)
-        case .postKakaoLogin(let code):
-            return .requestParameters(parameters: ["code": code], encoding: URLEncoding.queryString)
+        case .postKakaoLogin(let data):
+            return .requestJSONEncodable(data)
+        case .postAppleLogin(let data) :
+            return .requestJSONEncodable(data)
         case .postEmailLogin(let data):
             return .requestJSONEncodable(data)
         case .postSendEmailVerification(let type, let data):
@@ -86,6 +97,8 @@ extension AuthorizationEndpoints: TargetType {
             return .requestPlain
         case .postSocialSignUp(data: let data):
             return .requestJSONEncodable(data)
+        case .postLogout:
+            return .requestPlain
         }
     }
     

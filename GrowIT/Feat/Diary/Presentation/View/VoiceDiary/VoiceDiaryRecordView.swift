@@ -32,9 +32,7 @@ class VoiceDiaryRecordView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        startTimer()
         startAnimation()
-        setupActions()
         hideTipView()
     }
     
@@ -48,6 +46,15 @@ class VoiceDiaryRecordView: UIView {
         // 그라데이션 적용
         setGradient(color1: .gray700, color2: .gray900)
         recordButton.setGradient(color1: .primary400, color2: .primary600)
+    }
+    
+    // 타이머 제어 메서드를 public으로
+    func startConversationTimer() {
+        startTimer()
+    }
+    
+    func stopConversationTimer() {
+        stopTimer()
     }
     
     private func hideTipView() {
@@ -235,17 +242,5 @@ class VoiceDiaryRecordView: UIView {
             make.top.equalTo(endButton.snp.bottom).offset(8)
             make.centerX.equalToSuperview()
         }
-    }
-    
-    private func setupActions() {
-        recordButton.addTarget(self, action: #selector(toggleRecording), for: .touchUpInside)
-        loadingButton.addTarget(self, action: #selector(toggleRecording), for: .touchUpInside)
-    }
-    
-    @objc private func toggleRecording() {
-        let isCurrentlyRecording = !recordButton.isHidden
-        
-        recordButton.isHidden = isCurrentlyRecording
-        loadingButton.isHidden = !isCurrentlyRecording
     }
 }

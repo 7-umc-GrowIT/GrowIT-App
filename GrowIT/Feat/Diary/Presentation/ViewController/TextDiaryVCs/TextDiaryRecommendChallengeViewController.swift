@@ -13,11 +13,12 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
     let textDiaryRecommendChallengeView = TextDiaryRecommendChallengeView()
     let navigationBarManager = NavigationManager()
     
-    private var recommendedChallenges: [RecommendedChallenge] = []
+    private var recommendedChallenges: [RecommendedDiaryChallengeDTO] = []
     private var emotionKeywords: [EmotionKeyword] = []
     
     private var buttonCount: Int = 0
     let diaryId: Int
+    let data: DiaryAnalyzeResponseDTO
     
     let diaryService = DiaryService()
     let challengeService = ChallengeService()
@@ -26,8 +27,9 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         return textDiaryRecommendChallengeView.challengeStackView.challengeViews
     }
     
-    init(diaryId: Int) {
+    init(diaryId: Int, data: DiaryAnalyzeResponseDTO) {
         self.diaryId = diaryId
+        self.data = data
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -41,7 +43,14 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         setupUI()
         setupNavigationBar()
         setupActions()
-        fetchDiaryAnalyze(diaryId: diaryId)
+        initialize()
+    }
+    
+    private func initialize() {
+        self.textDiaryRecommendChallengeView.updateEmo(emotionKeywords: data.emotionKeywords)
+        self.recommendedChallenges = data.recommendedChallenges
+        self.emotionKeywords = data.emotionKeywords
+        self.textDiaryRecommendChallengeView.updateChallenges(self.recommendedChallenges)
     }
     
     //MARK: - Setup Navigation Bar
@@ -84,14 +93,14 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         prevVC.diaryId = diaryId
         let navController = UINavigationController(rootViewController: prevVC)
         navController.modalPresentationStyle = .fullScreen
-        presentPageSheet(viewController: navController, detentFraction: 0.37)
+        presentSheet(navController, heightRatio: 0.37)
     }
     
     @objc func nextVC() {
         let selectedChallenges = getSelectedChallenges()
         
         if selectedChallenges.isEmpty {
-            CustomToast(containerWidth: 314).show(image: UIImage(named: "toast_Icon") ?? UIImage(),
+            CustomToast(containerWidth: 314).show(image: UIImage(named: "toastIcon") ?? UIImage(),
                        message: "한 개 이상의 챌린지를 선택해 주세요",
                        font: .heading3SemiBold())
             return
@@ -106,7 +115,7 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
                 nextVC.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(nextVC, animated: true)
             case .failure(let error):
-                print("Error: \(error)")
+                print("선택한 챌린지 저장 실패: \(error)")
             }
         }
     }
@@ -132,33 +141,31 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         navigationController?.popToRootViewController(animated: true)
     }
     
-    // MARK: API func
-    private func fetchDiaryAnalyze(diaryId: Int) {
-        diaryService.postVoiceDiaryAnalyze(
-            diaryId: diaryId,
-            completion: { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success(let data):
-                    print(data)
-                    DispatchQueue.main.async {
-                        self.textDiaryRecommendChallengeView.updateEmo(emotionKeywords: data.emotionKeywords)
-                        self.recommendedChallenges = data.recommendedChallenges
-                        self.emotionKeywords = data.emotionKeywords
-                        self.textDiaryRecommendChallengeView.updateChallenges(self.recommendedChallenges)
-                    }
-                case .failure(let error):
-                    print(error)
-                }
-            })
-    }
-    
     func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
         let date = UserDefaults.standard.string(forKey: "TextDate") ?? ""
-        return challengeViews.enumerated().compactMap { index, challengeView in
-            guard index < recommendedChallenges.count, challengeView.button.isSelectedState() else { return nil }
-            let challenge = recommendedChallenges[index]
-            return ChallengeSelectRequestDTO(challengeIds: [challenge.id], dtype: challenge.type, date: date)
+        
+        // 선택된 챌린지들 필터링
+        let selectedChallenges = challengeViews.enumerated()
+            .filter { index, challengeView in
+                index < recommendedChallenges.count && challengeView.button.isSelectedState()
+            }
+            .map { index, _ in
+                recommendedChallenges[index]
+            }
+        
+        // 챌린지 타입별로 그룹핑
+        let groupedChallenges = Dictionary(grouping: selectedChallenges) { challenge in
+            challenge.challengeType
+        }
+        
+        // 각 그룹을 DTO로 변환
+        return groupedChallenges.map { (challengeType, challenges) in
+            let challengeIds = challenges.map { $0.id }
+            return ChallengeSelectRequestDTO(
+                challengeIds: challengeIds,
+                challengeType: challengeType,
+                date: date
+            )
         }
     }
 }

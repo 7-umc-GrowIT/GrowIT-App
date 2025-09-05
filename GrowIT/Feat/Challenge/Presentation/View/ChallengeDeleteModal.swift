@@ -110,6 +110,7 @@ class ChallengeDeleteModal: UIView {
         
         btnStack.snp.makeConstraints{
             $0.top.equalTo(title2.snp.bottom).offset(20)
+            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
             $0.horizontalEdges.equalToSuperview().inset(24)
             $0.height.equalTo(60)
         }

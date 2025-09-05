@@ -20,7 +20,7 @@ class ItemBackgroundModalViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view = itemBackgroundModalView
-        ToastSecond.show(image: UIImage(named: "toast_Icon") ?? UIImage(), message: "캐릭터를 생성해 주세요!", font: .heading3SemiBold(), in: self.view)
+        ToastSecond.show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "캐릭터를 생성해 주세요!", font: .heading3SemiBold(), in: self.view)
         
         setDelegate()
     }

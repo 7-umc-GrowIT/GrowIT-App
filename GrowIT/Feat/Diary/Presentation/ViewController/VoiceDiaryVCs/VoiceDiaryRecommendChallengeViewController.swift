@@ -19,7 +19,7 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     
     var diaryId = 0
         
-    var recommendedChallenges: [RecommendedChallenge] = []
+    var recommendedChallenges: [RecommendedDiaryChallengeDTO] = []
     var emotionKeywords: [EmotionKeyword] = []
     
     private var challengeViews: [VoiceChallengeItemView] {
@@ -33,16 +33,14 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         setupNavigationBar()
         setupActions()
         
-        voiceDiaryRecommendChallengeView.updateChallenges(recommendedChallenges)
+        self.voiceDiaryRecommendChallengeView.updateChallenges(self.recommendedChallenges)
+        self.voiceDiaryRecommendChallengeView.updateEmo(emotionKeywords: self.emotionKeywords)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
         
-        DispatchQueue.main.async {
-            self.voiceDiaryRecommendChallengeView.updateEmo(emotionKeywords: self.emotionKeywords)
-        }
     }
     
     //MARK: - Setup Navigation Bar
@@ -85,14 +83,14 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         prevVC.diaryId = diaryId
         let navController = UINavigationController(rootViewController: prevVC)
         navController.modalPresentationStyle = .fullScreen
-        presentPageSheet(viewController: navController, detentFraction: 0.37)
+        presentSheet(navController, heightRatio: 0.37)
     }
     
     @objc func nextVC() {
         let selectedChallenges = getSelectedChallenges()
         
         if selectedChallenges.isEmpty {
-            CustomToast(containerWidth: 314).show(image: UIImage(named: "toast_Icon") ?? UIImage(),
+            CustomToast(containerWidth: 314).show(image: UIImage(named: "toastIcon") ?? UIImage(),
                        message: "한 개 이상의 챌린지를 선택해 주세요",
                        font: .heading3SemiBold())
             return
@@ -134,26 +132,36 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     }
     
     // MARK: Setup APIs
-    private func callPostVoiceDiary() {
-        diaryService.postVoiceDiary(data: DiaryVoiceRequestDTO(
-            chat: ""),
-                                    completion: { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case.success(let data):
-                print("Success!!!!!!! \(data)")
-            case.failure(let error):
-                print("Error: \(error)")
-            }
-        })
-    }
+//    private func callPostVoiceDiary() {
+//        diaryService.postVoiceDiary(data: DiaryVoiceDTO(
+//            chat: ""),
+//                                    completion: { [weak self] result in
+//            guard let self = self else { return }
+//            switch result {
+//            case.success(let data):
+//                print("Success!!!!!!! \(data)")
+//            case.failure(let error):
+//                print("Error: \(error)")
+//            }
+//        })
+//    }
     
     func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
         let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""
-        return challengeViews.enumerated().compactMap { index, challengeView in
-            guard index < recommendedChallenges.count, challengeView.button.isSelectedState() else { return nil }
+        
+        return challengeViews.enumerated().compactMap { (index, challengeView) -> ChallengeSelectRequestDTO? in
+            // 인덱스 범위 확인
+            guard index < recommendedChallenges.count else { return nil }
+            
+            // 선택 상태 확인
+            guard challengeView.button.isSelectedState() else { return nil }
+            
             let challenge = recommendedChallenges[index]
-            return ChallengeSelectRequestDTO(challengeIds: [challenge.id], dtype: challenge.type, date: date)
+            return ChallengeSelectRequestDTO(
+                challengeIds: [challenge.id],
+                challengeType: challenge.challengeType,
+                date: date
+            )
         }
     }
 }

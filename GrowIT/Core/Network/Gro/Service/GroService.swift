@@ -16,7 +16,7 @@ final class GroService: NetworkManager {
     init(provider: MoyaProvider<GroEndpoint>? = nil) {
         let plugins: [PluginType] = [
             // NetworkLoggerPlugin(configuration: .init(logOptions: [.requestMethod, .successResponseBody])),
-            AuthPlugin()
+            AuthPlugin.shared
         ]
         
         self.provider = provider ?? MoyaProvider<GroEndpoint>(plugins: plugins)
@@ -39,4 +39,14 @@ final class GroService: NetworkManager {
             completion: completion
         )
     }
+    
+    // 그로 닉네임 변경 API
+    func patchGroChangeNickname(data: GroChangeNicknameRequestDTO, completion: @escaping (Result<EmptyResult, NetworkError>) -> Void) {
+        request(
+            target: .patchGroChangeNickname(data: data),
+            decodingType: EmptyResult.self,
+            completion: completion
+        )
+    }
+
 }

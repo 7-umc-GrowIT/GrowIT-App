@@ -132,23 +132,24 @@ class EmailLoginViewController: UIViewController {
                 switch result {
                 case .success(let response):
                     if response.isSuccess {
-                        // 옵셔널 해제 없이 바로 접근 가능
                         let tokenData = response.result
-
                         print("로그인 성공")
 
-                        // 토큰 저장
-                        UserDefaults.standard.set(tokenData.accessToken, forKey: "accessToken")
-                        UserDefaults.standard.set(tokenData.refreshToken, forKey: "refreshToken")
+                        TokenManager.shared.saveTokens(
+                            accessToken: tokenData.tokens.accessToken,
+                            refreshToken: tokenData.tokens.refreshToken
+                        )
+
+                        // loginMethod 저장
+                        UserDefaults.standard.set(tokenData.loginMethod, forKey: "loginMethod")
 
                         print("AccessToken 저장됨")
                         print("RefreshToken 저장됨")
 
-                        // 로그인 성공 후 다음 화면으로 이동
                         self.moveToNextScreen()
                     } else {
                         print("로그인 실패: \(response.message)")
-                        self.emailLoginView.pwdTextField.setError(message: "비밀번호가 일치하지 않습니다.")
+                        self.emailLoginView.pwdTextField.setError(message: response.message)
                     }
 
                 case .failure(let error):
@@ -157,7 +158,6 @@ class EmailLoginViewController: UIViewController {
                 }
             }
         }
-
     }
     
     @objc private func dismissKeyboard() {

@@ -11,11 +11,28 @@ class TextDiaryLoadingViewController: UIViewController {
     
     //MARK: - Properties
     let textDiaryLoadingView = TextDiaryLoadingView()
+    let diaryService = DiaryService()
+    private let diaryId: Int
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = true
         setupUI()
+        
+        fetchDiaryAnalyze() { result in
+            let nextVC = TextDiaryRecommendChallengeViewController(diaryId: self.diaryId, data: result)
+            nextVC.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(nextVC, animated: true)
+        }
+    }
+    
+    init(diaryId: Int) {
+        self.diaryId = diaryId
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     
@@ -28,11 +45,15 @@ class TextDiaryLoadingViewController: UIViewController {
         }
     }
     
-    func navigateToNextScreen(with diaryId: Int) {
-        let nextVC = TextDiaryRecommendChallengeViewController(diaryId: diaryId)
-        nextVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(nextVC, animated: true)
+    private func fetchDiaryAnalyze(completion: @escaping (DiaryAnalyzeResponseDTO) -> Void) {
+        diaryService.postVoiceDiaryAnalyze(diaryId: diaryId) { result in
+            switch result {
+                case .success(let data):
+                    print(data)
+                    completion(data)
+                case .failure(let error):
+                    print(error)
+            }
+        }
     }
-    
-    //MARK: - @objc methods
 }

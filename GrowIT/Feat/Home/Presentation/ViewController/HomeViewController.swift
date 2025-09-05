@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class HomeViewController: UIViewController {
     let groService = GroService()
@@ -16,7 +17,10 @@ class HomeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        
+        callGetCredit()
     }
     
     override func viewDidLoad() {
@@ -24,15 +28,11 @@ class HomeViewController: UIViewController {
         self.view = homeview
         loadGroImage()
         setNotification()
-        callGetCredit()
-        
-        navigationController?.navigationBar.isHidden = true
+        homeview.characterArea.showLoadingIndicator()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-        //setupGradientView()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -42,6 +42,10 @@ class HomeViewController: UIViewController {
             self.view.setNeedsLayout()
             self.view.layoutIfNeeded()
         }
+        
+        if AppLaunchState.isFirstLaunch && self.homeview.characterArea.creditNum.text != "" {
+            AppLaunchState.isFirstLaunch = false
+        }
     }
 
 
@@ -50,7 +54,17 @@ class HomeViewController: UIViewController {
             guard let self = self else { return }
             switch result {
             case .success(let data):
-                homeview.characterArea.creditNum.text = "\(data.currentCredit)개"
+                DispatchQueue.main.async {
+                    let oldValue = Int(self.homeview.characterArea.creditNum.text?.replacingOccurrences(of: "개", with: "") ?? "0") ?? 0
+                    let newValue = data.currentCredit
+                    self.homeview.characterArea.creditNum.text = "\(newValue)개"
+                    
+                    // 값이 달라졌으면 redDot 표시
+                    if(!AppLaunchState.isFirstLaunch) {
+                        self.homeview.characterArea.showDot(oldValue != newValue)
+                    }
+                    
+                }
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
             }
@@ -77,14 +91,6 @@ class HomeViewController: UIViewController {
 
     
     private func updateCharacterViewImage(with data: GroGetResponseDTO) {
-        // 얼굴 이미지 업데이트
-        if let groImageUrl = URL(string: data.gro.groImageUrl) {
-            homeview.characterArea.groFaceImageView.kf.setImage(with: groImageUrl, options: [.transition(.fade(0.3)), .cacheOriginalImage])
-        } else {
-            print("얼굴 이미지 URL이 유효하지 않음")
-        }
-
-        // 카테고리별 이미지 뷰 매핑
         let categoryImageViews: [String: UIImageView] = [
             "BACKGROUND": homeview.characterArea.backgroundImageView,
             "OBJECT": homeview.characterArea.groObjectImageView,
@@ -92,16 +98,57 @@ class HomeViewController: UIViewController {
             "HEAD_ACCESSORY": homeview.characterArea.groAccImageView
         ]
         
-        // 기존 이미지 초기화 (이미 착용한 아이템 제거)
-        for (_, imageView) in categoryImageViews {
-            imageView.image = nil
+        let shouldAnimate = isFirstAppear   // 처음 진입일 때만 true
+
+        let group = DispatchGroup()
+        var loadedImages: [String: (UIImageView, UIImage)] = [:]
+
+        // 얼굴
+        if let faceUrl = URL(string: data.gro.groImageUrl) {
+            group.enter()
+            KingfisherManager.shared.retrieveImage(with: faceUrl) { result in
+                if case .success(let value) = result {
+                    loadedImages["FACE"] = (self.homeview.characterArea.groFaceImageView, value.image)
+                }
+                group.leave()
+            }
         }
 
+        // 아이템들
         for item in data.equippedItems {
-            if let imageView = categoryImageViews[item.category], let imageUrl = URL(string: item.itemImageUrl) {
-                imageView.kf.setImage(with: imageUrl, options: [.transition(.fade(0.3)), .cacheOriginalImage])
+            if let imageView = categoryImageViews[item.category],
+               let url = URL(string: item.itemImageUrl) {
+                group.enter()
+                KingfisherManager.shared.retrieveImage(with: url) { result in
+                    if case .success(let value) = result {
+                        loadedImages[item.category] = (imageView, value.image)
+                    }
+                    group.leave()
+                }
+            }
+        }
+
+        group.notify(queue: .main) {
+            // 그로 한 번에 로딩 끝 -> 인디케이터 끔
+            self.homeview.characterArea.hideLoadingIndicator()
+            if shouldAnimate {
+                // 최초 로딩일 때만 페이드인
+                for (_, pair) in loadedImages {
+                    let (imageView, image) = pair
+                    imageView.alpha = 0.0
+                    imageView.image = image
+                }
+                UIView.animate(withDuration: 0.8) {
+                    for (_, pair) in loadedImages {
+                        pair.0.alpha = 1.0
+                    }
+                }
+                self.isFirstAppear = false   // 이후부턴 애니메이션 X
             } else {
-                print("잘못된 카테고리: \(item.category) 또는 유효하지 않은 URL")
+                // 그냥 즉시 반영
+                for (_, pair) in loadedImages {
+                    pair.0.image = pair.1
+                }
             }
         }
     }
@@ -129,7 +176,10 @@ class HomeViewController: UIViewController {
     
     private lazy var homeview = HomeView().then {
         $0.topNavBar.itemShopBtn.addTarget(self, action: #selector(goToItemShop), for: .touchUpInside)
-        $0.topNavBar.settingBtn.addTarget(self, action: #selector(logout), for: .touchUpInside)
+        $0.topNavBar.settingBtn.addTarget(self, action: #selector(goToMypage), for: .touchUpInside)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(friendBtnTapped))
+        $0.characterArea.friendContainer.addGestureRecognizer(tapGesture)
+        $0.characterArea.friendContainer.isUserInteractionEnabled = true
     }
     
     @objc private func goToItemShop() {
@@ -137,16 +187,18 @@ class HomeViewController: UIViewController {
         navigationController?.pushViewController(itemShopVC, animated: false)
     }
     
-    @objc private func logout(){
-        TokenManager.shared.clearTokens()
-        let nextVC = LoginViewController()
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = nextVC
-            window.makeKeyAndVisible()
-            
-            // 뷰 컨트롤러 전환 시 애니메이션을 제공합니다.
-            UIView.transition(with: window, duration: 0.1, options: .transitionCrossDissolve, animations: nil, completion: nil)
-        }
+    @objc private func goToMypage() {
+        let nextVC = MypageViewController()
+        navigationController?.pushViewController(nextVC, animated: true)
+    }
+    
+    @objc private func friendBtnTapped() {
+        let modalVC = FriendReadyModalViewController()
+        
+        // 바텀 시트 설정
+        modalVC.modalPresentationStyle = .pageSheet
+        
+        presentSheet(modalVC, heightRatio: 0.33)
     }
         
     //MARK: Notification

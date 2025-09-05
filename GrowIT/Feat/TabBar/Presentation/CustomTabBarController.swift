@@ -40,7 +40,7 @@ class CustomTabBarController: UIViewController, UINavigationControllerDelegate {
     }
     
     private func setupViewControllers() {
-        let firstVC = JDiaryHomeViewController()
+        let firstVC = DiaryHomeViewController()
         let secondVC = HomeViewController()
         let thirdVC = ChallengeHomeViewController()
         

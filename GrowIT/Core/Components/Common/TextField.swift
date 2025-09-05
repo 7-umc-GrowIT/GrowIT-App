@@ -14,6 +14,7 @@ class CustomTextField: UIView {
     let textField = UITextField()
     let titleLabel = UILabel()
     let errorLabel = UILabel()
+    let hintLabel = UILabel() // 사용자 안내용 라벨 추가
     let clearButton = UIButton()
     let eyeButton = UIButton()
     
@@ -57,6 +58,7 @@ class CustomTextField: UIView {
         self.addSubview(titleLabel)
         self.addSubview(textField)
         self.addSubview(errorLabel)
+        self.addSubview(hintLabel)
         self.addSubview(clearButton)
         
         if showEyeButton {
@@ -81,6 +83,7 @@ class CustomTextField: UIView {
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 12.0, height: 0.0))
         textField.leftViewMode = .always
         textField.autocorrectionType = .no
+        textField.autocapitalizationType = .none
         textField.translatesAutoresizingMaskIntoConstraints = false
         
         // Clear Button 설정
@@ -102,6 +105,13 @@ class CustomTextField: UIView {
         errorLabel.text = ""
         errorLabel.isHidden = true
         errorLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Hint Label 설정
+        hintLabel.font = UIFont.detail2Regular()
+        hintLabel.textColor = UIColor.gray400
+        hintLabel.text = ""
+        hintLabel.isHidden = true
+        hintLabel.translatesAutoresizingMaskIntoConstraints = false
         
         setupConstraints()
     }
@@ -139,6 +149,12 @@ class CustomTextField: UIView {
             $0.leading.equalToSuperview()
             $0.trailing.equalToSuperview()
         }
+        
+        hintLabel.snp.makeConstraints {
+            $0.top.equalTo(textField.snp.bottom).offset(4)
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview()
+        }
     }
     
     
@@ -156,6 +172,20 @@ class CustomTextField: UIView {
     // MARK: - Public Methods
     func setTitleLabel(_ text: String) {
         titleLabel.text = text
+    }
+    
+    // 타이틀 폰트 설정 메서드 추가
+    func setTitleFont(_ font: UIFont) {
+        titleLabel.font = font
+    }
+    
+    func setTitleLabeloffset(_ offset: Int) {
+        textField.snp.updateConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(offset)
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview()
+            $0.height.equalTo(48)
+        }
     }
     
     func setPlaceholder(_ text: String) {
@@ -179,6 +209,9 @@ class CustomTextField: UIView {
         errorLabel.text = message
         errorLabel.isHidden = false
         errorLabelTopConstraint?.update(offset: 4)
+        
+        // 에러 발생 시 힌트 라벨 숨기기
+        hideHint()
         
         UIView.animate(withDuration: 0.2) {
             self.layoutIfNeeded()
@@ -205,7 +238,19 @@ class CustomTextField: UIView {
         }
         
         titleLabel.textColor = UIColor.black
+        textField.textColor = UIColor.gray900
         clearButton.setImage(UIImage(named: "State=Default"), for: .normal)
+    }
+    
+    // 힌트 메시지 설정 함수 추가
+    func setHint(message: String) {
+        hintLabel.text = message
+        hintLabel.isHidden = false
+    }
+    
+    // 힌트 메시지 숨기기 함수 추가
+    func hideHint() {
+        hintLabel.isHidden = true
     }
     
     func setSuccess() {

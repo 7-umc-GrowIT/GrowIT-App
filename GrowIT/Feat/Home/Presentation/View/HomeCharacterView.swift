@@ -6,13 +6,13 @@
 //
 
 import UIKit
+import Lottie
 
 class HomeCharacterView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addStackView()
         addComponents()
         constraints()
         setGroLayer()
@@ -35,7 +35,7 @@ class HomeCharacterView: UIView {
     
     // 크레딧 개수
     public lazy var creditNum = UILabel().then{
-        $0.text = "1개"
+        $0.text = ""
         $0.font = UIFont.heading2Bold()
         $0.textColor = .white
     }
@@ -43,11 +43,18 @@ class HomeCharacterView: UIView {
     // 크레딧 컨테이너
     private lazy var creditContainer = makeContainer()
     
+    public var redDot = UIView().then {
+        $0.backgroundColor = .negative400
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.layer.cornerRadius = 3   // 6/2 → 완전한 원
+        $0.clipsToBounds = true
+    }
+    
     // 친구보기 버튼 아이콘
     private lazy var friendIcon = makeIcon("friend")
     
     // 친구보기 버튼 컨테이너
-    private lazy var friendContainer = makeContainer()
+    public lazy var friendContainer = makeContainer()
     
     // 캐릭터 이미지
     private lazy var groFrameView = UIView().then {
@@ -75,17 +82,17 @@ class HomeCharacterView: UIView {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
+    var loadingIndicator = LottieAnimationView(name: "loading-Home").then {
+        $0.frame = CGRect(x: 0, y: 0, width: 200, height: 200)
+        $0.loopMode = .loop
+        $0.isHidden = true
+    }
+    
     // 하단 그라디언트 뷰
     private lazy var bottomGradientView = UIImageView().then{
         $0.image = UIImage(named: "homeGradient")
         $0.contentMode = .scaleAspectFill
     }
-    
-    // MARK: - Stack
-    
-    // 크레딧 개수 가로 스택
-    private lazy var creditBoxStack = makeStackView(axis: .horizontal, spacing: 12)
-    
     
     // MARK: - Function
     
@@ -123,16 +130,24 @@ class HomeCharacterView: UIView {
         groObjectImageView.layer.zPosition = 3
     }
     
+    public func showDot(_ showStatus: Bool) {
+        if showStatus {
+            redDot.snp.updateConstraints {
+                $0.width.height.equalTo(6)
+            }
+        }else{
+            redDot.snp.updateConstraints {
+                $0.width.height.equalTo(0)
+            }
+        }
+        
+    }
     // MARK: - add Function & Constraints
     
-    private func addStackView(){
-        [creditIcon, creditNum].forEach(creditBoxStack.addArrangedSubview)
-    }
-    
     private func addComponents(){
-        creditContainer.addSubview(creditBoxStack)
+        creditContainer.addSubviews([creditIcon, creditNum, redDot])
         friendContainer.addSubview(friendIcon)
-        [backgroundImageView, groFrameView, creditContainer, friendContainer, bottomGradientView].forEach(self.addSubview)
+        [backgroundImageView, groFrameView, creditContainer, friendContainer, bottomGradientView, loadingIndicator].forEach(self.addSubview)
         
         groFrameView.addSubviews([
             groFaceImageView,
@@ -153,8 +168,22 @@ class HomeCharacterView: UIView {
             $0.left.equalToSuperview().offset(24)
         }
         
-        creditBoxStack.snp.makeConstraints{
-            $0.edges.equalToSuperview().inset(15)
+        creditIcon.snp.makeConstraints {
+            $0.verticalEdges.equalToSuperview().inset(14)
+            $0.left.equalToSuperview().offset(16)
+            $0.width.height.equalTo(28)
+        }
+        
+        creditNum.snp.makeConstraints {
+            $0.verticalEdges.equalToSuperview().inset(14)
+            $0.left.equalTo(creditIcon.snp.right).offset(12)
+        }
+        
+        redDot.snp.makeConstraints {
+            $0.top.equalTo(creditNum.snp.top)
+            $0.left.equalTo(creditNum.snp.right).offset(4)
+            $0.right.equalToSuperview().inset(16)
+            $0.width.height.equalTo(0)
         }
         
         friendContainer.snp.makeConstraints{
@@ -185,6 +214,26 @@ class HomeCharacterView: UIView {
             $0.height.equalToSuperview().multipliedBy(0.35)
             $0.width.equalToSuperview().multipliedBy(1)
         }
+         
+        loadingIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+    }
+    
+    // MARK: - Loading Indicator Control
+    func showLoadingIndicator() {
+        loadingIndicator.isHidden = false
+        if loadingIndicator.isAnimationPlaying == false {
+            loadingIndicator.play()
+        }
+        bringSubviewToFront(loadingIndicator)
+    }
+    
+    func hideLoadingIndicator() {
+        if loadingIndicator.isAnimationPlaying {
+            loadingIndicator.stop()
+        }
+        loadingIndicator.isHidden = true
     }
     
 }

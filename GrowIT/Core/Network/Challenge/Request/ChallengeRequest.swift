@@ -8,14 +8,18 @@
 import Foundation
 
 struct ChallengeRequestDTO: Codable {
-    let certificationImageUrl: String
+    let certificationImageName: String
     let thoughts: String
 }
 
 struct ChallengeSelectRequestDTO: Codable {
     let challengeIds: [Int]
-    let dtype: String
+    let challengeType: String
     let date: String
 }
 
 typealias ChallengeSelectRequestListDTO = [ChallengeSelectRequestDTO]
+
+struct PresignedUrlRequestDTO: Codable {
+    let contentType: String
+}

@@ -7,10 +7,6 @@
 
 import UIKit
 
-extension Notification.Name {
-    static let challengeDidDelete = Notification.Name("challengeDidDeleteNotification")
-}
-
 class ChallengeDeleteModalController: UIViewController {
     private lazy var challengeDeleteModal = ChallengeDeleteModal()
     private lazy var challengeService = ChallengeService()
@@ -39,10 +35,11 @@ class ChallengeDeleteModalController: UIViewController {
     private func deleteChallenge(){
         if let id = challengeId{
             challengeService.deleteChallenge(challengeId: id, completion:{ [weak self] result in
-                guard let self = self else {return}
+                guard self != nil else {return}
                 switch result{
-                case.success(let data):
-                    NotificationCenter.default.post(name: .challengeStatusReload, object: nil)
+                case.success(_):
+                    NotificationCenter.default.post(name: .challengeReloadNotification, object: nil)
+                    
                     CustomToast().show(image: UIImage(named: "toasttrash") ?? UIImage(), message: "챌린지를 삭제했어요", font: .heading3SemiBold())
                     UIApplication.shared.keyWindow?.rootViewController?.dismiss(animated: true, completion: nil)
                 case.failure(let error):
@@ -55,5 +52,5 @@ class ChallengeDeleteModalController: UIViewController {
 }
 
 extension Notification.Name {
-    static let challengeStatusReload = Notification.Name("challengeStatusReload")
+    static let challengeReloadNotification = Notification.Name("challengeReloadNotification")
 }

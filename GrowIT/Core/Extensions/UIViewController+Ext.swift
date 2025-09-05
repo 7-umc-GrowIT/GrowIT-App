@@ -7,29 +7,30 @@
 
 import UIKit
 
-extension UIViewController {
-    func presentPageSheet(
-        viewController: UIViewController,
-        detentFraction: CGFloat = 0.5,
-        grabberVisible: Bool = true,
-        animated: Bool = true,
-        completion: (() -> Void)? = nil
+extension UIViewController: @retroactive UISheetPresentationControllerDelegate {
+    func presentSheet(
+        _ viewController: UIViewController,
+        heightRatio: CGFloat,
+        useLargeOnly: Bool = false
     ) {
         viewController.modalPresentationStyle = .pageSheet
-        
+            
         if let sheet = viewController.sheetPresentationController {
             if #available(iOS 16.0, *) {
-                sheet.detents = [
-                    .custom { context in
-                        detentFraction * context.maximumDetentValue
-                    }
-                ]
+                sheet.detents = useLargeOnly ? [.large()] : [.custom { _ in UIScreen.main.bounds.height * heightRatio }]
             } else {
-                sheet.detents = [.medium()]
+                sheet.detents = [.medium(), .large()]
             }
-            sheet.prefersGrabberVisible = grabberVisible
+            
+            if #available(iOS 15.0, *) {
+                sheet.preferredCornerRadius = 40
+            }
+            
+            sheet.delegate = self
+            sheet.prefersGrabberVisible = false
+            sheet.selectedDetentIdentifier = .large
         }
         
-        present(viewController, animated: animated, completion: completion)
+        present(viewController, animated: true, completion: nil)
     }
 }

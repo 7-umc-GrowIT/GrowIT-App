@@ -12,7 +12,7 @@ struct UserPostResponseDTO: Decodable {
     let status, paidAt: String
 }
 
-struct UserPatchResponseDTO: Decodable {
+struct UserPatchResponseDTO: Decodable { // 비밀번호 변경 API
     let isSuccess: Bool
     let code: String
     let message: String
@@ -24,8 +24,7 @@ struct UserPatchResponseDTO: Decodable {
     }
 }
 
-
-struct EmptyResult: Decodable {}
+struct EmptyResult: Decodable {} // 비밀번호 변경 API
 
 
 struct UserGetCreditResponseDTO: Decodable {
@@ -35,3 +34,10 @@ struct UserGetCreditResponseDTO: Decodable {
 struct UserGetTotalCreditResponseDTO: Decodable {
     let totalCredit: Int
 }
+
+struct UserGetMypageResponseDTO: Decodable {
+    let userId: Int
+    let name: String
+}
+
+struct UserDeleteResponseDTO: Decodable { }

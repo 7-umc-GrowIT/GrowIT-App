@@ -36,12 +36,30 @@ class GroSetNameViewController: UIViewController {
     
     // MARK: - NetWork
     func callPostGroCreate() {
-        groService.postGroCreate(data: GroRequestDTO(name: groName ?? "", backgroundItem: backgrounItem[selectedBackground]), completion: {
-            [weak self] result in
-                guard let self = self else { return }
+        let requestDTO = GroRequestDTO(
+            name: groName ?? "",
+            backgroundItem: backgrounItem[selectedBackground]
+        )
+        
+        groService.postGroCreate(data: requestDTO) { [weak self] result in
+            guard let self = self else { return }
+            
             switch result {
             case .success(let data):
-                print("Success: \(data)")
+                // 캐시까지 리프레시
+                GroImageCacheManager.shared.refreshGroImage { _ in
+                    print("✅ Gro 캐시 갱신 완료")
+        
+                    DispatchQueue.main.async {
+                        let homeVC = CustomTabBarController(initialIndex: 1)
+                        let navigationController = UINavigationController(rootViewController: homeVC)
+                        
+                        if let window = UIApplication.shared.windows.first {
+                            window.rootViewController = navigationController
+                            window.makeKeyAndVisible()
+                        }
+                    }
+                }
             case .failure(let error):
                 switch error {
                 case .serverError(_, let message):
@@ -52,7 +70,7 @@ class GroSetNameViewController: UIViewController {
                     break
                 }
             }
-        })
+        }
     }
     
     //MARK: - Views
@@ -119,14 +137,6 @@ class GroSetNameViewController: UIViewController {
     @objc
     private func nextVC() {
         callPostGroCreate()
-        
-        let homeVC = CustomTabBarController(initialIndex: 1)
-        let navigationController = UINavigationController(rootViewController: homeVC)
-        
-        // 루트 뷰 컨트롤러 교체
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = navigationController
-            window.makeKeyAndVisible()
-        }
     }
+    
 }

@@ -15,7 +15,7 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
     let termsService = TermsService()
     
     var completionHandler: (([UserTermDTO]) -> Void)?
-    var oauthUserInfo: KakaoUserInfo
+    var oauthUserInfo: OauthUserInfo
     
     // 약관 관련 데이터
     var termsList: [TermsData] = [] // 필수 약관
@@ -25,7 +25,7 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
     private var mandatoryTermIds: Set<Int> = [] // 필수 약관 ID 저장
     
     // MARK: - Initializer
-    init(oauthUserInfo: KakaoUserInfo) {
+    init(oauthUserInfo: OauthUserInfo) {
         self.oauthUserInfo = oauthUserInfo
         super.init(nibName: nil, bundle: nil)
     }
@@ -39,7 +39,17 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
         setupUI()
         setupDelegate()
         setupActions()
-        fetchTerms()
+        callGetTerms()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        termsAgreeView.termsTableView.snp.updateConstraints {
+            $0.height.equalTo(termsAgreeView.termsTableView.contentSize.height)
+        }
+        termsAgreeView.termsOptTableView.snp.updateConstraints {
+            $0.height.equalTo(termsAgreeView.termsOptTableView.contentSize.height)
+        }
     }
     
     // MARK: - SetupUI
@@ -90,12 +100,11 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
     }
     
     // MARK: - API 호출 (약관 목록 불러오기)
-    private func fetchTerms() {
-        termsService.fetchTerms { [weak self] result in
+    private func callGetTerms() {
+        termsService.getTerms { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let terms):
-                    print("서버에서 받은 약관 데이터: \(terms)")
                     
                     // 필수 약관과 선택 약관으로 분리
                     self?.termsList = terms.filter { $0.type.uppercased() == "MANDATORY" }
@@ -106,9 +115,6 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
                     
                     // 약관 내용 저장 (약관 확인 뷰에서 사용)
                     self?.termsContentMap = terms.reduce(into: [:]) { $0[$1.termId] = $1.content }
-                    
-                    print("필수 약관 필터링 결과: \(self?.termsList ?? [])")
-                    print("선택 약관 필터링 결과: \(self?.optionalTermsList ?? [])")
                     
                     // 약관 동의 상태 초기화
                     self?.setupTermsView()
@@ -188,13 +194,7 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
         let agreedList = (termsList + optionalTermsList).map { term in
             UserTermDTO(termId: term.termId, agreed: agreedTerms[term.termId] ?? false)
         }
-        
-        print("필수 약관: \(termsList.map { "\($0.termId): \($0.title)" })")
-        print("선택 약관: \(optionalTermsList.map { "\($0.termId): \($0.title)" })")
-        print("agreedTerms 상태: \(agreedTerms)")
-        
         completionHandler?(agreedList)
-        navigationController?.popViewController(animated: true)
     }
     
     @objc private func prevVC() {
@@ -220,7 +220,17 @@ extension KakaoTermsAgreeViewController: UITableViewDataSource {
             }
             
             let term = termsList[indexPath.row]
-            let numberedTitle = "이용약관 (\(indexPath.row + 1))"
+            let numberedTitle: String
+            if term.termId == 7 {
+                numberedTitle = "서비스 이용약관"
+            } else {
+                numberedTitle = "개인정보 수집•이용 동의"
+            }
+            
+            // 화살표 버튼을 눌렀을 때 상세 화면으로 이동
+            cell.detailButton.addTarget(self, action: #selector(showTermsDetail(_:)), for: .touchUpInside)
+            cell.detailButton.tag = term.termId
+            cell.detailButton.accessibilityLabel = numberedTitle
             
             cell.configure(
                 title: numberedTitle,
@@ -263,5 +273,26 @@ extension KakaoTermsAgreeViewController: UITableViewDataSource {
             
             return cell
         }
+    }
+    
+    @objc private func showTermsDetail(_ sender: UIButton) {
+        let termId = sender.tag
+        let title = sender.accessibilityLabel ?? "약관 상세"
+
+        guard let term = (termsList + optionalTermsList).first(where: { $0.termId == termId }) else { return }
+
+        let detailVC = TermsDetailViewController(navigationBarTitle: title)
+        detailVC.termsContent = term.content
+        detailVC.termId = term.termId
+        
+        detailVC.onAgreeCompletion = { [weak self] agreedTermId in
+            guard let self = self else { return }
+            self.agreedTerms[agreedTermId] = true
+            
+            self.termsAgreeView.termsTableView.reloadData()
+            self.termsAgreeView.termsOptTableView.reloadData()
+        }
+
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }

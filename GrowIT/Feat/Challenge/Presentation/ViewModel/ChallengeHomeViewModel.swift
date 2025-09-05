@@ -10,7 +10,7 @@ import Foundation
 
 final class ChallengeHomeViewModel: ObservableObject {
     
-    @Published var todayChallenges: [RecommendedChallenge] = []
+    @Published var todayChallenges: [RecommendedChallengeDTO] = []
     @Published var keywords: [String] = []
     @Published var report: ChallengeReportDTO?
     
@@ -40,7 +40,7 @@ final class ChallengeHomeViewModel: ObservableObject {
     
     private func updateData(with response: ChallengeHomeResponseDTO) {
         keywords = response.challengeKeywords
-        todayChallenges = response.recommendedChallenges.map{ RecommendedChallenge(dto: $0)}
+        todayChallenges = response.recommendedChallenges
         report = response.challengeReport
     }
     
