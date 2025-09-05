@@ -48,12 +48,11 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     init(speechToTextUseCase: SpeechToTextUseCase,
          getSTTResponseUseCase: GetSTTResponseUseCase,
          textToSpeechUseCase: TextToSpeechUseCase,
-         postVoiceDiaryDateUseCase: PostVoiceDiaryDateUseCase) {
+         postVoiceDiaryUseCase: PostVoiceDiaryDateUseCase) {
         self.speechToTextUseCase = speechToTextUseCase
         self.getSTTResponseUseCase = getSTTResponseUseCase
         self.textToSpeechUseCase = textToSpeechUseCase
-        self.postVoiceDiaryDateUseCase = postVoiceDiaryDateUseCase
-        
+        self.postVoiceDiaryDateUseCase = postVoiceDiaryUseCase
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -467,12 +466,13 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     private func playAudio(data: Data) { // TTS 재생
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth])
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
             try audioSession.setActive(true)
             
             stopCurrentAudio()
             
             audioPlayer = try AVAudioPlayer(data: data)
+            audioPlayer?.volume = 1.0
             audioPlayer?.delegate = self
             audioPlayer?.play()
             print("응답 음성 재생 시작")
