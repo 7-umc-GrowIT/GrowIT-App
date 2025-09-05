@@ -57,7 +57,7 @@ class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControl
             make.top.equalTo(voiceDiaryDateSelectView.dateView.snp.bottom).offset(8)
             make.leading.equalToSuperview()
             make.centerX.equalToSuperview()
-            make.height.equalTo(self.view.frame.height * 0.4)
+            make.height.equalTo(Constants.Screen.ScreenHeight * (Constants.Screen.CalenderRatio))
         }
         calVC.view.isHidden = true
     }
@@ -123,7 +123,7 @@ class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControl
                         dataSource: GoogleSpeechDataSourceImpl()
                     )
                 ),
-                postVoiceDiaryDateUseCase: PostVoiceDiaryDateUseCase(
+                postVoiceDiaryUseCase: PostVoiceDiaryDateUseCase(
                     repository: DiaryVoiceRepositoryImpl(
                         dataSource: DiaryVoiceDataSourceImpl(
                             diaryService: DiaryService()
