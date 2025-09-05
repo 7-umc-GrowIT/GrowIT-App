@@ -58,7 +58,7 @@ struct LoginResponseDTO: Codable {
 
 struct OauthUserInfo: Codable {
     let socialId: String
-    let email: String?
+    let email: String
     let name: String
     let provider: String
 }
@@ -68,9 +68,13 @@ struct SocialSignUpResponse: Codable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: Tokens
+    let result: SocialSignUpResponseDTO
 }
 
+struct SocialSignUpResponseDTO: Codable {
+    let tokens: Tokens
+    let loginMethod: String
+}
 
 struct AuthResult: Codable {
     let accessToken: String
