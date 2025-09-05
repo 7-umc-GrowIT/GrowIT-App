@@ -87,7 +87,7 @@ class LoginViewController: UIViewController {
     func appleLoginTapped() {
         let provider = ASAuthorizationAppleIDProvider()
         let request = provider.createRequest()
-        request.requestedScopes = [.fullName]
+        request.requestedScopes = [.fullName, .email]
         let controller = ASAuthorizationController(authorizationRequests: [request])
         
         controller.delegate = self
@@ -174,6 +174,7 @@ class LoginViewController: UIViewController {
     private func signupWithKakao(oauthUserInfo: OauthUserInfo, userTerms: [UserTermDTO]) {
         authService.signupWithKakao(oauthUserInfo: oauthUserInfo, userTerms: userTerms) { [weak self] signupResponse in
             guard let self = self else { return }
+            print("😎 oauthUserInfo : \(oauthUserInfo)\n userTerms: \(userTerms) ")
             DispatchQueue.main.async {
                 switch signupResponse {
                 case .success(let signupResult):
