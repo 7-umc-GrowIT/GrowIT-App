@@ -325,6 +325,9 @@ extension TermsAgreeViewController: UITableViewDataSource {
             
             self.termsAgreeView.termsTableView.reloadData()
             self.termsAgreeView.termsOptTableView.reloadData()
+            
+            // 👉 여기서 버튼 상태 갱신 추가
+            self.updateCheckButtonState()
         }
 
         navigationController?.pushViewController(detailVC, animated: true)

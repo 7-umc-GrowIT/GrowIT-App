@@ -47,7 +47,8 @@ final class AuthService: NetworkManager {
             "oauthUserInfo": [
                 "id": oauthUserInfo.socialId,
                 "email": oauthUserInfo.email,
-                "name": oauthUserInfo.name
+                "name": oauthUserInfo.name,
+                "provider": oauthUserInfo.provider
             ]
         ]
         
