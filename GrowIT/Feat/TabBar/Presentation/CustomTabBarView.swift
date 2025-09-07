@@ -56,11 +56,9 @@ class CustomTabBarView: UIView {
     // 첫번째 아이템 라벨
     private lazy var firstTabLabel = makeLabel(name:"일기", color: UIColor.grayColor400!)
 
-    
-    
-    private lazy var secondTabItem = UIImageView().then{
-        $0.image = UIImage(named: "homeSelected")
-        $0.contentMode = .scaleAspectFit
+    private lazy var secondTabItem = UIButton().then{
+        $0.setImage(UIImage(named: "homeSelected"), for: .normal)
+        $0.imageView?.contentMode = .scaleAspectFit
     }
     
     // 세번째 아이템 아이콘
@@ -171,9 +169,8 @@ class CustomTabBarView: UIView {
         
         secondTabItem.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            //$0.top.equalTo(tabBarBg.snp.top).offset(self.frame.height * 0.54 * -1)
             $0.top.equalTo(tabBarBg.snp.top).offset(-54)
-            $0.width.equalToSuperview().multipliedBy(0.3)
+            $0.width.height.equalTo(108)
         }
     }
     
@@ -195,7 +192,13 @@ class CustomTabBarView: UIView {
         firstTabIcon.tintColor = (index == 0) ? .primaryColor600 : .grayColor300
         firstTabLabel.textColor = (index == 0) ? .grayColor900 : .grayColor400
         
-        secondTabItem.image = (index == 1) ? UIImage(named: "homeSelected") : UIImage(named: "homedeSelected")
+        if(index == 1) {
+            secondTabItem.setImage(UIImage(named: "homeSelected"), for: .normal)
+            secondTabItem.setImage(UIImage(named: "homeSelected"), for: .highlighted)
+        }else {
+            secondTabItem.setImage(UIImage(named: "homeDeSelected"), for: .normal)
+            secondTabItem.setImage(UIImage(named: "homeDeSelected"), for: .highlighted)
+        }
         
         thirdTabIcon.tintColor = (index == 2) ? .primaryColor600 : .grayColor300
         thirdTabLabel.textColor = (index == 2) ? .grayColor900 : .grayColor400
