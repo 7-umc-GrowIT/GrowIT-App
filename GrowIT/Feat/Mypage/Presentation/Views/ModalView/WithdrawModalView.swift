@@ -21,7 +21,7 @@ class WithdrawModalView: UIView {
     
     private let descLabel = AppLabel(
         text: "탈퇴하면 그로우잇 내 모든 기록이 사라집니다\n또한 삭제한 데이터는 복구가 어렵습니다",
-        font: .body1Regular(),
+        font: .heading3SemiBold(),
         textColor: .gray500
     ).then {
         $0.numberOfLines = 0
