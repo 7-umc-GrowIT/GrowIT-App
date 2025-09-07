@@ -75,7 +75,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             try audioSession.setCategory(
                 .playAndRecord,
                 mode: .measurement,
-                options: [.allowBluetooth, .allowBluetoothA2DP]
+                options: [.defaultToSpeaker]
             )
             try audioSession.setActive(true)
             try audioSession.overrideOutputAudioPort(.none)
@@ -259,7 +259,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth])
+            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker])
             try audioSession.setActive(true)
             
             let settings: [String: Any] = [
