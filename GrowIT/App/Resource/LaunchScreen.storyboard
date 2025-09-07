@@ -18,23 +18,30 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="loginTitle" translatesAutoresizingMaskIntoConstraints="NO" id="qoH-Rj-PCd">
-                                <rect key="frame" x="77" y="312.66666666666669" width="286" height="54"/>
+                                <rect key="frame" x="77" y="329" width="286" height="54"/>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="maintext" translatesAutoresizingMaskIntoConstraints="NO" id="nQw-Dl-XI0">
-                                <rect key="frame" x="122.66666666666667" y="268" width="194.66666666666663" height="20.666666666666686"/>
+                                <rect key="frame" x="122" y="268" width="196" height="33"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="33" id="UpU-Df-PTI"/>
+                                    <constraint firstAttribute="width" constant="196" id="Ziz-Bz-xOG"/>
+                                </constraints>
                             </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchScreen_Gro" translatesAutoresizingMaskIntoConstraints="NO" id="Svg-Tr-hVZ">
-                                <rect key="frame" x="5" y="324" width="430" height="632"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Gro" translatesAutoresizingMaskIntoConstraints="NO" id="Svg-Tr-hVZ">
+                                <rect key="frame" x="5" y="476" width="430" height="480"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="Svg-Tr-hVZ" secondAttribute="height" multiplier="430:480" id="FXb-pa-mWk"/>
+                                </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="qoH-Rj-PCd" firstAttribute="centerX" secondItem="nQw-Dl-XI0" secondAttribute="centerX" id="FWs-ru-DBS"/>
+                            <constraint firstItem="qoH-Rj-PCd" firstAttribute="top" secondItem="nQw-Dl-XI0" secondAttribute="bottom" constant="28" id="bGT-Oq-c0M"/>
                             <constraint firstItem="nQw-Dl-XI0" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="144" id="h3S-MW-Q19"/>
                             <constraint firstItem="Svg-Tr-hVZ" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="iDW-3w-1t1"/>
-                            <constraint firstItem="qoH-Rj-PCd" firstAttribute="top" secondItem="nQw-Dl-XI0" secondAttribute="bottom" constant="24" id="m4F-pY-w0Y"/>
                             <constraint firstItem="nQw-Dl-XI0" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="nMP-CM-IQC"/>
-                            <constraint firstItem="qoH-Rj-PCd" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="vKD-xs-l7b"/>
                             <constraint firstItem="Svg-Tr-hVZ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="5" id="wof-NB-vdI"/>
                             <constraint firstItem="Svg-Tr-hVZ" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="xe0-2O-eew"/>
                         </constraints>
@@ -46,7 +53,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchScreen_Gro" width="430" height="632"/>
+        <image name="Gro" width="215" height="240"/>
         <image name="loginTitle" width="286" height="54"/>
         <image name="maintext" width="194.5" height="20.5"/>
         <systemColor name="systemBackgroundColor">
