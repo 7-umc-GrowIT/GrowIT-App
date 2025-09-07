@@ -10,8 +10,8 @@ import SnapKit
 
 class DiaryHomeViewController: UIViewController {
     
-    private lazy var jDiaryHomeView = DiaryHomeView()
-    private lazy var jDiaryCalendarVC = DiaryCalendarController(isDropDown: false)
+    private lazy var diaryHomeView = DiaryHomeView()
+    private lazy var diaryCalendarVC = DiaryCalendarController(isDropDown: false)
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = true
@@ -23,11 +23,13 @@ class DiaryHomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view = jDiaryHomeView
+        self.view = diaryHomeView
         view.backgroundColor = .white
         navigationController?.navigationBar.isHidden = true
         setupCalendarView()
         setupActions()
+        
+        diaryHomeView.diaryHomeNavbar.settingBtn.addTarget(self, action: #selector(goToMyPage), for: .touchUpInside)
     }
     
     @objc private func diaryDirectWriteButtonTapped() {
@@ -38,17 +40,17 @@ class DiaryHomeViewController: UIViewController {
     
     private func setupCalendarView() {
         // 캘린더 뷰 컨트롤러를 자식으로 추가
-        addChild(jDiaryCalendarVC)
-        jDiaryCalendarVC.didMove(toParent: self)
-        jDiaryCalendarVC.configureTheme(isDarkMode: false)
+        addChild(diaryCalendarVC)
+        diaryCalendarVC.didMove(toParent: self)
+        diaryCalendarVC.configureTheme(isDarkMode: false)
         
         // 캘린더 뷰를 JDiaryHomeView에 추가
-        jDiaryHomeView.diaryHomeStack.addArrangedSubview(jDiaryCalendarVC.view)
+        diaryHomeView.diaryHomeStack.addArrangedSubview(diaryCalendarVC.view)
         setupCalendarViewConstraints()
     }
     
     private func setupCalendarViewConstraints() {
-        jDiaryCalendarVC.view.snp.makeConstraints{
+        diaryCalendarVC.view.snp.makeConstraints{
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
@@ -59,9 +61,9 @@ class DiaryHomeViewController: UIViewController {
         let voiceAction = UITapGestureRecognizer(target: self, action: #selector(voiceVC))
         let textAction = UITapGestureRecognizer(target: self, action: #selector(textVC))
         
-        jDiaryHomeView.diaryHomeBanner.diaryDirectWriteButton.addGestureRecognizer(textAction)
-        jDiaryHomeView.diaryHomeBanner.diaryWriteButton.addGestureRecognizer(voiceAction)
-        jDiaryHomeView.diaryHomeCalendarHeader.collectBtn.addTarget(self, action: #selector(diaryAllVC), for: .touchUpInside)
+        diaryHomeView.diaryHomeBanner.diaryDirectWriteButton.addGestureRecognizer(textAction)
+        diaryHomeView.diaryHomeBanner.diaryWriteButton.addGestureRecognizer(voiceAction)
+        diaryHomeView.diaryHomeCalendarHeader.collectBtn.addTarget(self, action: #selector(diaryAllVC), for: .touchUpInside)
     }
     
     // MARK: Diary View
@@ -81,6 +83,11 @@ class DiaryHomeViewController: UIViewController {
         let nextVC = DiaryAllViewController()
         nextVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(nextVC, animated: true)
+    }
+    
+    @objc private func goToMyPage() {
+        let myPageVC = MypageViewController()
+        navigationController?.pushViewController(myPageVC, animated: true)
     }
 }
 

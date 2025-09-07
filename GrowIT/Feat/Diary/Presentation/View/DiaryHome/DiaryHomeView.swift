@@ -14,7 +14,6 @@ class DiaryHomeView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        
         addComponents()
         addStack()
         constraints()
@@ -34,7 +33,7 @@ class DiaryHomeView: UIView {
     }
     
     // 일기 홈화면 상단 네비게이션바
-    private lazy var diaryHomeNavbar = DiaryHomeNavbar()
+    public lazy var diaryHomeNavbar = DiaryHomeNavbar()
     
     // 일기 홈화면 배너
     public lazy var diaryHomeBanner = DiaryHomeBanner()

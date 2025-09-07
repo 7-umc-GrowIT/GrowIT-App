@@ -30,7 +30,7 @@ class DiaryHomeNavbar: UIView {
         $0.font = .title1Bold()
     }
     
-    private lazy var settingBtn = UIButton().then {
+    public lazy var settingBtn = UIButton().then {
         $0.setImage(UIImage(named: "setting"), for: .normal)
         $0.imageView?.contentMode = .scaleAspectFit
     }
