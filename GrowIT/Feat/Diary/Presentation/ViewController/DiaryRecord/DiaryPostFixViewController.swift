@@ -33,14 +33,19 @@ class DiaryPostFixViewController: UIViewController {
         setupUI()
         setupDelegate()
         setupActions()
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false // 터치 이벤트가 다른 뷰에도 전달되도록 함
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     // MARK: Setup UI
     private func setupUI() {
-        view.addSubview(diaryPostFixView)
-        diaryPostFixView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        self.view = diaryPostFixView
         
         diaryPostFixView.configure(text: text, date: date)
     }

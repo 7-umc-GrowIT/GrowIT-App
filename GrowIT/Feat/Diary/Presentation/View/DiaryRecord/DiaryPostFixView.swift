@@ -72,7 +72,8 @@ class DiaryPostFixView: UIView {
     private func setupUI() {
         backgroundColor = .white
         
-        addSubview(grabberIcon)
+        self.addSubviews([grabberIcon, diaryIcon, fixLabel, label1, textView, cancelButton, fixButton, deleteLabel])
+    
         grabberIcon.snp.makeConstraints {
             $0.width.equalTo(80)
             $0.height.equalTo(4)
@@ -80,48 +81,42 @@ class DiaryPostFixView: UIView {
             $0.centerX.equalToSuperview()
             
         }
-        addSubview(diaryIcon)
+    
         diaryIcon.snp.makeConstraints {
             $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
             $0.leading.equalToSuperview().offset(24)
             $0.height.width.equalTo(28)
         }
         
-        addSubview(fixLabel)
         fixLabel.snp.makeConstraints {
             $0.leading.equalTo(diaryIcon.snp.leading)
             $0.top.equalTo(diaryIcon.snp.bottom).offset(8)
         }
         
-        addSubview(label1)
         label1.snp.makeConstraints {
             $0.leading.equalTo(fixLabel.snp.leading)
             $0.top.equalTo(fixLabel.snp.bottom).offset(16)
         }
         
-        addSubview(textView)
         textView.snp.makeConstraints {
             $0.leading.equalTo(label1.snp.leading)
             $0.top.equalTo(label1.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
-            $0.height.equalTo(200)
+            $0.height.equalToSuperview().multipliedBy(0.42)
         }
         
-        addSubview(cancelButton)
         cancelButton.snp.makeConstraints {
             $0.leading.equalTo(textView.snp.leading)
             $0.top.equalTo(textView.snp.bottom).offset(40)
             $0.width.equalTo(88)
         }
         
-        addSubview(fixButton)
         fixButton.snp.makeConstraints {
             $0.leading.equalTo(cancelButton.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().offset(-24)
             $0.top.equalTo(cancelButton.snp.top)
         }
         
-        addSubview(deleteLabel)
         deleteLabel.snp.makeConstraints {
             $0.top.equalTo(fixButton.snp.bottom).offset(15.5)
             $0.centerX.equalToSuperview()

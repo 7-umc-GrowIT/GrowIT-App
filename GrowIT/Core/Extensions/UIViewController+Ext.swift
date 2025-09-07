@@ -28,7 +28,7 @@ extension UIViewController: @retroactive UISheetPresentationControllerDelegate {
             
             sheet.delegate = self
             sheet.prefersGrabberVisible = false
-            sheet.selectedDetentIdentifier = .large
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
         }
         
         present(viewController, animated: true, completion: nil)
