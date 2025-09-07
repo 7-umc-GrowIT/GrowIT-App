@@ -72,19 +72,6 @@ class VoiceDiaryEntryViewController: UIViewController {
         let nextVC = VoiceDiaryTipViewController()
         nextVC.modalPresentationStyle = .pageSheet
         
-        if let sheet = nextVC.sheetPresentationController {
-            //지원할 크기 지정
-            if #available(iOS 16.0, *) {
-                sheet.detents = [
-                    .custom{ context in
-                        0.37 * context.maximumDetentValue
-                    }
-                ]
-            } else {
-                sheet.detents = [.medium()]
-            }
-            sheet.prefersGrabberVisible = true
-        }
-        present(nextVC, animated: true, completion: nil)
+        presentSheet(nextVC, heightRatio: 0.336)
     }
 }

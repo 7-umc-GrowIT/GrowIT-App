@@ -29,6 +29,7 @@ class ErrorView: UIView {
     private lazy var diaryIcon = UIImageView().then {
         $0.image = UIImage(named: "diaryIcon")
         $0.backgroundColor = .clear
+        $0.contentMode = .scaleAspectFit
     }
     
     private lazy var label1 = UILabel().then {
@@ -41,7 +42,7 @@ class ErrorView: UIView {
         let allText = "페이지를 이탈하면 현재 기록된 일기가 사라져요\n그래도 처음 화면으로 돌아갈까요?"
         $0.text = allText
         $0.font = .heading3SemiBold()
-        $0.textColor = .gray700
+        $0.textColor = .gray600
         $0.numberOfLines = 0
         $0.setPartialTextStyle(text: allText, targetText: "처음 화면", color: .primary600, font: .heading3SemiBold())
     }
@@ -71,6 +72,7 @@ class ErrorView: UIView {
         diaryIcon.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(24)
             $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
+            $0.width.height.equalTo(28)
         }
         
         addSubview(label1)
@@ -97,6 +99,7 @@ class ErrorView: UIView {
             $0.leading.equalTo(exitButton.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().offset(-24)
             $0.top.equalTo(exitButton.snp.top)
+            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
         }
     }
     

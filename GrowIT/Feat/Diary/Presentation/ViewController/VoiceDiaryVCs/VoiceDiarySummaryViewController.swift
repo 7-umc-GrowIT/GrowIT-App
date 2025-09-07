@@ -112,7 +112,14 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
     }
     
     func didTapExitButton() {
-        navigationController?.popToRootViewController(animated: true)
+        if let navigationController = self.navigationController {
+            var viewControllers = navigationController.viewControllers
+            // 루트 다음 뷰컨트롤러 인덱스는 1
+            if viewControllers.count > 1 {
+                let targetVC = viewControllers[1]
+                navigationController.setViewControllers([viewControllers[0], targetVC], animated: true)
+            }
+        }
     }
     
 }

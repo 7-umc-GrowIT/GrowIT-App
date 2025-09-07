@@ -95,7 +95,10 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
 
     // MARK: - Setup Actions
     private func setupActions() {
-        termsAgreeView.checkButton.addTarget(self, action: #selector(allCheck), for: .touchUpInside)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(allCheck))
+        termsAgreeView.allAgreeView.isUserInteractionEnabled = true
+        termsAgreeView.allAgreeView.addGestureRecognizer(tapGesture)
+        
         termsAgreeView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
     }
     
@@ -148,15 +151,17 @@ class KakaoTermsAgreeViewController: UIViewController, UITableViewDelegate {
 
     // MARK: @objc methods
     @objc private func allCheck() {
-        let isSelected = termsAgreeView.checkButton.isSelectedState()
-        
-        // 모든 필수 및 선택 약관을 `true` 또는 `false`로 설정
+        // 현재 상태 토글
+        let newState = !(termsAgreeView.checkButton.isSelectedState())
+        termsAgreeView.checkButton.setSelectedState(newState)
+
+        // 모든 필수 및 선택 약관을 newState 로 변경
         for term in termsList + optionalTermsList {
-            agreedTerms[term.termId] = isSelected
+            agreedTerms[term.termId] = newState
         }
-        
+
         print("전체 동의 상태 업데이트: \(agreedTerms)")
-        
+
         termsAgreeView.termsTableView.reloadData()
         termsAgreeView.termsOptTableView.reloadData()
         updateNextButtonState()
@@ -291,6 +296,9 @@ extension KakaoTermsAgreeViewController: UITableViewDataSource {
             
             self.termsAgreeView.termsTableView.reloadData()
             self.termsAgreeView.termsOptTableView.reloadData()
+            
+            // 👉 여기서 버튼 상태 갱신 추가
+            self.updateCheckButtonState()
         }
 
         navigationController?.pushViewController(detailVC, animated: true)

@@ -26,7 +26,7 @@ class ShortageModalView: UIView {
     private lazy var subtitleLabel = UILabel().then {
         $0.text = "일기나 챌린지를 통해 크레딧을 모아보세요!"
         $0.font = UIFont.heading3SemiBold()
-        $0.textColor = UIColor.grayColor700
+        $0.textColor = UIColor.grayColor600
         $0.textAlignment = .left
         $0.numberOfLines = 0
         $0.translatesAutoresizingMaskIntoConstraints = false

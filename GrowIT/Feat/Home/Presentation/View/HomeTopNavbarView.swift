@@ -73,7 +73,7 @@ class HomeTopNavbarView: UIView {
     private func constraints(){
         
         titleLogo.snp.makeConstraints {
-            $0.top.equalTo(self.safeAreaLayoutGuide).offset(18)
+            $0.centerY.equalToSuperview()
             $0.left.equalToSuperview()
             $0.width.equalToSuperview().multipliedBy(0.2)
             $0.height.equalToSuperview().multipliedBy(0.4)
@@ -88,7 +88,7 @@ class HomeTopNavbarView: UIView {
         }
         
         topNavIconsStackView.snp.makeConstraints {
-            $0.top.equalTo(self.safeAreaLayoutGuide).offset(12)
+            $0.centerY.equalToSuperview()
             $0.right.equalToSuperview()
         }
     }

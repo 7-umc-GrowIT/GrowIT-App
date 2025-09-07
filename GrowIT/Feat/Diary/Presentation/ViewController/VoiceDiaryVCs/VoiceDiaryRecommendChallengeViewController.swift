@@ -83,7 +83,7 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         prevVC.diaryId = diaryId
         let navController = UINavigationController(rootViewController: prevVC)
         navController.modalPresentationStyle = .fullScreen
-        presentSheet(navController, heightRatio: 0.37)
+        presentSheet(navController, heightRatio: 0.336)
     }
     
     @objc func nextVC() {
@@ -128,23 +128,15 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     }
     
     func didTapExitButton() {
-        navigationController?.popToRootViewController(animated: true)
+        if let navigationController = self.navigationController {
+            var viewControllers = navigationController.viewControllers
+            // 루트 다음 뷰컨트롤러 인덱스는 1
+            if viewControllers.count > 1 {
+                let targetVC = viewControllers[1]
+                navigationController.setViewControllers([viewControllers[0], targetVC], animated: true)
+            }
+        }
     }
-    
-    // MARK: Setup APIs
-//    private func callPostVoiceDiary() {
-//        diaryService.postVoiceDiary(data: DiaryVoiceDTO(
-//            chat: ""),
-//                                    completion: { [weak self] result in
-//            guard let self = self else { return }
-//            switch result {
-//            case.success(let data):
-//                print("Success!!!!!!! \(data)")
-//            case.failure(let error):
-//                print("Error: \(error)")
-//            }
-//        })
-//    }
     
     func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
         let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""

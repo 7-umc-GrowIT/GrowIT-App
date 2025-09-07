@@ -48,12 +48,11 @@ class ChallengeHomeViewController: UIViewController {
         setupChallengeHomeArea()
         setupChallengeStatusArea()
         setupNotifications()
-        
-//        challengeStatusAreaVC.refreshData()
-//        challengeHomeAreaVC.refreshData()
-        
+
         challengeHomeAreaVC.view.isHidden = false
         challengeStatusAreaVC.view.isHidden = true
+        
+        challengeHomeView.settingBtn.addTarget(self, action: #selector(goToMyPage), for: .touchUpInside)
     }
     
     private func setupChallengeHomeArea(){
@@ -130,5 +129,10 @@ class ChallengeHomeViewController: UIViewController {
         challengeStatusAreaVC.view.isHidden = false
         
         challengeHomeAreaVC.refreshData()
+    }
+    
+    @objc private func goToMyPage() {
+        let myPageVC = MypageViewController()
+        navigationController?.pushViewController(myPageVC, animated: true)
     }
 }

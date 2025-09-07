@@ -22,7 +22,7 @@ class TwoButtonModalView: UIView {
     private let descLabel = AppLabel(
         text: "",
         font: .body1Regular(),
-        textColor: .gray500
+        textColor: .gray600
     ).then {
         $0.numberOfLines = 0
     }
@@ -99,7 +99,7 @@ class TwoButtonModalView: UIView {
         
         buttonStackView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.top.equalTo(descLabel.snp.bottom).offset(40)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
         }
     }
 }

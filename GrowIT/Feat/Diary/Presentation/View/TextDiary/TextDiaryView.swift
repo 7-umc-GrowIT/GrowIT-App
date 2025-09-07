@@ -35,11 +35,7 @@ class TextDiaryView: UIView, UITextViewDelegate {
     }
     
     let dateLabel = UILabel().then {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy년 M월 d일"
-        let currentDate = dateFormatter.string(from: Date())
-        
-        $0.text = "\(currentDate)"
+        $0.text = "날짜를 선택해주세요"
         $0.font = .heading2Bold()
         $0.textColor = .gray900
         $0.isUserInteractionEnabled = false
@@ -103,7 +99,8 @@ class TextDiaryView: UIView, UITextViewDelegate {
     
     private func checkButtonState() {
         let isDateSelected = dateLabel.text != "날짜를 선택해 주세요"
-        let isTextValid = !diaryTextField.text.isEmpty && diaryTextField.text != placeholder && diaryTextField.text.count > 100
+        let trimmedText = diaryTextField.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let isTextValid = !trimmedText.isEmpty && trimmedText != placeholder && trimmedText.count > 100
         
         saveButton.setButtonState(
             isEnabled: isDateSelected && isTextValid,

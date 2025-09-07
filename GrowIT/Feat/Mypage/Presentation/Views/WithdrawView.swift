@@ -136,7 +136,7 @@ class WithdrawView: UIView {
         
         dropDownView.addSubviews([dropDownLabel, dropdownIcon])
         bottomGrayView.addSubviews([bottomTitleLabel, subLabel])
-        buttonStackView.addArrangedSubViews([withdrawButton, cancleButton])
+        buttonStackView.addArrangedSubViews([cancleButton, withdrawButton])
     }
     
     private func setConstraints() {

@@ -25,7 +25,7 @@ class HomeView: UIView {
     // MARK: - Property
     
     // 상단 네비게이션 바
-    lazy var topNavBar = HomeTopNavbarView()
+    public lazy var topNavBar = HomeTopNavbarView()
 
     
     // 하단 캐릭터 영역
@@ -45,7 +45,8 @@ class HomeView: UIView {
         
         topNavBar.snp.makeConstraints{
             $0.top.equalTo(self.safeAreaLayoutGuide.snp.top)
-            $0.height.equalToSuperview().multipliedBy(0.065)
+            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.height.equalToSuperview().multipliedBy(0.07)
         }
         
         characterArea.snp.makeConstraints{

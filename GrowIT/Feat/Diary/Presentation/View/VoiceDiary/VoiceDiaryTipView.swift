@@ -19,6 +19,11 @@ class VoiceDiaryTipView: UIView {
     }
     
     //MARK: - UI Components
+    private let grabberIcon = UIImageView().then {
+        $0.image = UIImage(named: "grabberIcon")
+        $0.contentMode = .scaleAspectFit
+    }
+    
     private lazy var diaryIcon = UIImageView().then {
         $0.image = UIImage(named: "bulbIcon")
         $0.backgroundColor = .clear
@@ -33,7 +38,7 @@ class VoiceDiaryTipView: UIView {
     private lazy var label2 = UILabel().then {
         $0.text = "오늘 느낀 감정을 솔직하게 작성해 주세요!\n구체적인 챌린지 추천이 가능합니다"
         $0.font = .heading3SemiBold()
-        $0.textColor = .gray300
+        $0.textColor = .gray100
         $0.numberOfLines = 0
     }
     
@@ -44,10 +49,18 @@ class VoiceDiaryTipView: UIView {
     //MARK: - Setup UI
     private func setupUI() {
         backgroundColor = .gray700
+        addSubview(grabberIcon)
+        grabberIcon.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(80)
+            $0.height.equalTo(4)
+        }
+        
         addSubview(diaryIcon)
         diaryIcon.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
-            make.top.equalToSuperview().offset(52)
+            make.top.equalTo(grabberIcon.snp.bottom).offset(24)
         }
         
         addSubview(label1)

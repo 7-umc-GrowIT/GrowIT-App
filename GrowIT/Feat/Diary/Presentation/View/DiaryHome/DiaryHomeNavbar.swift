@@ -30,9 +30,9 @@ class DiaryHomeNavbar: UIView {
         $0.font = .title1Bold()
     }
     
-    private lazy var settingBtn = UIImageView().then {
-        $0.image = UIImage(named: "setting")
-        $0.contentMode = .scaleAspectFit
+    public lazy var settingBtn = UIButton().then {
+        $0.setImage(UIImage(named: "setting"), for: .normal)
+        $0.imageView?.contentMode = .scaleAspectFit
     }
     
     // MARK: - addFunction & Constraints
@@ -51,7 +51,7 @@ class DiaryHomeNavbar: UIView {
         settingBtn.snp.makeConstraints{
             $0.centerY.equalToSuperview()
             $0.right.equalToSuperview().inset(24)
-            $0.height.width.equalTo(34)
+            $0.height.width.equalTo(36)
         }
     }
 }
