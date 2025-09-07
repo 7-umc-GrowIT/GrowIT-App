@@ -56,6 +56,7 @@ class LoginViewController: UIViewController {
         loginView.emailLoginButton.addTarget(self, action: #selector(emailLoginBtnTap), for: .touchUpInside)
         loginView.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginTapped), for: .touchUpInside)
         loginView.appleLoginButton.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
+        loginView.findAccountButton.addTarget(self, action: #selector(findAccountTapped), for: .touchUpInside)
     }
     
     // 이메일 로그인 버튼
@@ -93,6 +94,13 @@ class LoginViewController: UIViewController {
         controller.delegate = self
         controller.presentationContextProvider = self
         controller.performRequests()
+    }
+    
+    // 계정 찾기 버튼
+    @objc
+    func findAccountTapped() {
+        let accountInquiryVC = AccountInquiryViewController()
+        presentSheet(accountInquiryVC, heightRatio: 0.336)
     }
     
     // MARK: - 서버 요청 로직

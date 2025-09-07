@@ -186,8 +186,8 @@ class EmailLoginViewController: UIViewController {
     }
     
     @objc func findEmailBtnTap() {
-        let findEmailVC = FindEmailViewController()
-        self.navigationController?.pushViewController(findEmailVC, animated: true)
+        let accountInquiryVC = AccountInquiryViewController()
+        presentSheet(accountInquiryVC, heightRatio: 0.336)
     }
     
     // MARK: - Load State

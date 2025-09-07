@@ -131,7 +131,7 @@ class LoginView: UIView {
     }
     
     // 계정 찾기 버튼
-    private lazy var findAccountButton = UIButton().then {
+    public lazy var findAccountButton = UIButton().then {
         
         // 타이틀 속성
         let titleAttribute = NSAttributedString(
