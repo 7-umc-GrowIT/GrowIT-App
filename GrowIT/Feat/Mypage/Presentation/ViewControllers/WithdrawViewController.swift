@@ -61,24 +61,6 @@ class WithdrawViewController: UIViewController {
             }
         })
     }
-    
-    // 회원 탈퇴
-    private func deleteUser() {
-        guard let reasonId = selectedReasonId else { return }
-    
-        let requestDTO = UserDeleteRequestDTO(reasonId: reasonId)
-        userService.deleteUser(data: requestDTO) { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let data):
-                finishDeleteUser()
-                print("탈퇴 성공, 이유번호 : \(reasonId)")
-            case .failure(let error):
-                print("회원 탈퇴 실패: \(error.localizedDescription)")
-            }
-        }
-    }
 
     // MARK: - SetUI
     private func setupNavigationBar() {
@@ -108,33 +90,6 @@ class WithdrawViewController: UIViewController {
     }
     
     // MARK: - Functional
-    private func finishDeleteUser() {
-        // 토큰 삭제
-        TokenManager.shared.clearTokens()
-        GroImageCacheManager.shared.clearAll()
-        ImageCache.default.clearMemoryCache()
-        ImageCache.default.clearDiskCache {
-            print("🗑️ Kingfisher 디스크 캐시 초기화 완료")
-        }
-        
-        // 네트워크 요청 취소
-        self.authService.provider.session.cancelAllRequests()
-        
-        // 로그인 화면으로 전환
-        let loginVC = LoginViewController()
-        let nav = UINavigationController(rootViewController: loginVC)
-        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = scene.windows.first {
-            window.rootViewController = nav
-            window.makeKeyAndVisible()
-            UIView.transition(with: window,
-                              duration: 0.1,
-                              options: .transitionCrossDissolve,
-                              animations: nil,
-                              completion: nil)
-        }
-    }
-    
     // MARK: Event
     @objc
     private func prevVC() {
@@ -147,7 +102,11 @@ class WithdrawViewController: UIViewController {
     
     @objc
     private func didTapWithdraw() {
-        deleteUser()
+        guard let reasonId = selectedReasonId else { return }
+
+        let finalModalVC = WithdrawFinalViewController(reasonId: reasonId)
+        presentSheet(finalModalVC, heightRatio: 0.32)
+
     }
     
     @objc
