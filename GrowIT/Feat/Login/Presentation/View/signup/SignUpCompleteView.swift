@@ -33,7 +33,7 @@ class SignUpCompleteView: UIView {
     }
     
     public lazy var mainImage = UIImageView().then {
-        $0.image = UIImage(named: "grow")
+        $0.image = UIImage(named: "gro_long")
         $0.contentMode = .scaleAspectFill
     }
     
@@ -61,6 +61,7 @@ class SignUpCompleteView: UIView {
         mainImage.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.bottom.equalToSuperview()
+            $0.height.equalToSuperview().multipliedBy(0.58)
         }
         
         loginButton.snp.makeConstraints {
