@@ -38,12 +38,14 @@ class TermsAgreeView: UIView {
         $0.setPartialTextStyle(text: allText, targetText: "그로우잇", color: .primary500, font: .subHeading1())
     }
     
-    private let allAgreeView = UIView().then {
+    let allAgreeView = UIView().then {
         $0.backgroundColor = .gray50
         $0.layer.cornerRadius = 8
     }
     
-    let checkButton = CircleCheckButton(isEnabled: false)
+    let checkButton = CircleCheckButton(isEnabled: false).then {
+        $0.isUserInteractionEnabled = false
+    }
     
     private let allAgreeLabel = UILabel().then {
         $0.text = "약관 모두 동의하기"
