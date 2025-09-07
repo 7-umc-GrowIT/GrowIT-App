@@ -99,7 +99,8 @@ class TextDiaryView: UIView, UITextViewDelegate {
     
     private func checkButtonState() {
         let isDateSelected = dateLabel.text != "날짜를 선택해 주세요"
-        let isTextValid = !diaryTextField.text.isEmpty && diaryTextField.text != placeholder && diaryTextField.text.count > 100
+        let trimmedText = diaryTextField.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let isTextValid = !trimmedText.isEmpty && trimmedText != placeholder && trimmedText.count > 100
         
         saveButton.setButtonState(
             isEnabled: isDateSelected && isTextValid,
