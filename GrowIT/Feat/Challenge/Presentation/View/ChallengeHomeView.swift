@@ -30,9 +30,9 @@ class ChallengeHomeView: UIView {
         $0.font = .title1Bold()
     }
     
-    private lazy var settingBtn = UIImageView().then {
-        $0.image = UIImage(named: "setting")
-        $0.contentMode = .scaleAspectFit
+    private lazy var settingBtn = UIButton().then {
+        $0.setImage(UIImage(named: "setting"), for: .normal)
+        $0.imageView?.contentMode = .scaleAspectFit
     }
     
     public lazy var challengeHomeBtn = makeButton(title: "홈")
@@ -81,6 +81,10 @@ class ChallengeHomeView: UIView {
     }
     
     private func constraints(){
+        
+        settingBtn.snp.makeConstraints {
+            $0.height.width.equalTo(36)
+        }
         
         challengeHomeNavbar.snp.makeConstraints{
             $0.top.equalTo(self.safeAreaLayoutGuide.snp.top)
