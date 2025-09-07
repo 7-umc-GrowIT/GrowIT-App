@@ -54,7 +54,18 @@ class AccountInquiryModalView: UIView {
         $0.layer.cornerRadius = 16
     }
     
+    public func setDark() {
+        self.backgroundColor = .gray900
+        self.title.text = "문제 발생 문의는 아래 이메일로 부탁드려요"
+        self.title.textColor = .white
+        self.subTitle.textColor = .gray100
+        self.confirmBtn.backgroundColor = .primary400
+        self.confirmBtn.setTitleColor(.gray900, for: .normal)
+        self.backgroundColor = .gray800
+    }
+    
     private func setUpView() {
+        self.backgroundColor = .white
         self.addSubviews([grabberIcon, mainIcon, title, subTitle, confirmBtn])
         
         grabberIcon.snp.makeConstraints {

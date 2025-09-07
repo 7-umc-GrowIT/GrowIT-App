@@ -15,12 +15,15 @@ class AccountInquiryViewController: UIViewController {
         super.viewDidLoad()
 
         self.view = accountInquiryModalView
-        view.backgroundColor = .white
         
         accountInquiryModalView.confirmBtn.addTarget(self, action: #selector(confirmTapped), for: .touchUpInside)
     }
     
     @objc private func confirmTapped() {
         self.dismiss(animated: true)
+    } 
+    
+    public func setDarkMode() {
+        accountInquiryModalView.setDark()
     }
 }

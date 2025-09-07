@@ -33,7 +33,7 @@ class ChallengeDeleteModal: UIView {
     
     private lazy var title1 = makeLabel(title: "정말 챌린지를 삭제할까요?", color: .gray900, font: .heading2Bold())
     
-    private lazy var title2 = makeLabel(title: "삭제한 챌린지는 다시 복구하기 어렵습니다\n그래도 챌린지를 삭제할까요?", color: .gray700, font: .heading3SemiBold()).then{
+    private lazy var title2 = makeLabel(title: "삭제한 챌린지는 다시 복구하기 어렵습니다\n그래도 챌린지를 삭제할까요?", color: .gray600, font: .heading3SemiBold()).then{
         $0.numberOfLines = 2
     }
     

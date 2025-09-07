@@ -164,6 +164,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         voiceDiaryRecordView.loadingButton.isHidden = true
         
         voiceDiaryRecordView.endButton.addTarget(self, action: #selector(nextVC), for: .touchUpInside)
+        voiceDiaryRecordView.helpLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(helpTapped)))
     }
     
     // MARK: @objc methods
@@ -180,8 +181,21 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         finishConversation()
     }
     
+    @objc func helpTapped() {
+        let accountInquiryVC = AccountInquiryViewController()
+        accountInquiryVC.setDarkMode()
+        presentSheet(accountInquiryVC, heightRatio: 0.336)
+    }
+    
     func didTapExitButton() {
-        navigationController?.popToRootViewController(animated: true)
+        if let navigationController = self.navigationController {
+            var viewControllers = navigationController.viewControllers
+            // 루트 다음 뷰컨트롤러 인덱스는 1
+            if viewControllers.count > 1 {
+                let targetVC = viewControllers[1]
+                navigationController.setViewControllers([viewControllers[0], targetVC], animated: true)
+            }
+        }
     }
     
     // MARK: - Conversation Management

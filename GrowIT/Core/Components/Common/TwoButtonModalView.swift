@@ -21,8 +21,8 @@ class TwoButtonModalView: UIView {
     
     private let descLabel = AppLabel(
         text: "",
-        font: .heading3SemiBold(),
-        textColor: .gray500
+        font: .body1Regular(),
+        textColor: .gray600
     ).then {
         $0.numberOfLines = 0
     }

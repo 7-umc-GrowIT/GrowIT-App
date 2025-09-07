@@ -35,11 +35,7 @@ class TextDiaryView: UIView, UITextViewDelegate {
     }
     
     let dateLabel = UILabel().then {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy년 M월 d일"
-        let currentDate = dateFormatter.string(from: Date())
-        
-        $0.text = "\(currentDate)"
+        $0.text = "날짜를 선택해주세요"
         $0.font = .heading2Bold()
         $0.textColor = .gray900
         $0.isUserInteractionEnabled = false

@@ -29,7 +29,7 @@ class PurchaseModalView: UIView {
     private lazy var subtitleLabel = UILabel().then {
         $0.text = "구매 후 바로 착용해 보세요!"
         $0.font = UIFont.heading3SemiBold()
-        $0.textColor = UIColor.grayColor700
+        $0.textColor = UIColor.grayColor600
         $0.textAlignment = .left
         $0.translatesAutoresizingMaskIntoConstraints = false
     }

@@ -15,7 +15,7 @@ class ChangePasswordErrorViewController: UIViewController {
             fisrtLabel: "비밀번호 재설정을 그만할까요?",
             secondLabel: "해당 화면을 나가면 이메일 인증을 다시 진행합니다\n그래도 화면을 나갈까요?",
             firstColor: .gray900,
-            secondColor: .gray700,
+            secondColor: .gray600,
             title1: "나가기",
             title1Color1: .gray400,
             title1Background: .gray100,
