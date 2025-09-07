@@ -28,8 +28,14 @@ struct DiaryDateDTO: Decodable {
 }
 
 struct DiaryGetAllResponseDTO: Decodable {
-    let diaryList: [DiaryResponseDTO]
+    let diaryList: [DiaryDTO]
     let listSize: Int
+}
+
+struct DiaryDTO: Decodable {
+    let diaryId: Int
+    let content: String
+    let date: String
 }
 
 struct DiaryResponseDTO: Decodable {
