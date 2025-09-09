@@ -51,7 +51,7 @@ class OnboardingViewController: UIViewController {
     }
     
     @objc private func goToLogin() {
-        let nextVC = LoginViewController()
+        let nextVC = MainLoginViewController()
         navigationController?.pushViewController(nextVC, animated: true)
     }
 }
