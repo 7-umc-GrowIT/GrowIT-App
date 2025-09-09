@@ -32,7 +32,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             if let _ = TokenManager.shared.getAccessToken() {
                 mainVC = CustomTabBarController(initialIndex: 1)
             } else {
-                mainVC = LoginViewController()
+                mainVC = MainLoginViewController()
             }
         }
         

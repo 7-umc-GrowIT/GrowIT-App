@@ -72,7 +72,7 @@ class WithdrawFinalViewController: UIViewController {
         self.authService.provider.session.cancelAllRequests()
         
         // 로그인 화면으로 전환
-        let loginVC = LoginViewController()
+        let loginVC = MainLoginViewController()
         let nav = UINavigationController(rootViewController: loginVC)
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = scene.windows.first {
