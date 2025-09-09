@@ -9,9 +9,11 @@ import UIKit
 
 class WithdrawView: UIView {
     //MARK: - Data
+    var nickname: String
+    
     //MARK: - Components
     private lazy var mainLabel = AppLabel(
-        text: "샤샤 님, 탈퇴하신다니 아쉬워요",
+        text: "\(nickname) 님, 탈퇴하신다니 아쉬워요",
         font: .heading1Bold(),
         textColor: .gray900
     )
@@ -117,8 +119,9 @@ class WithdrawView: UIView {
     }
     
     //MARK: - init
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(nickname: String) {
+        self.nickname = nickname
+        super.init(frame: .zero)
         self.backgroundColor = .white
         
         setView()
