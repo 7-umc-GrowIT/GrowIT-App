@@ -70,36 +70,35 @@ class ErrorView: UIView {
         }
         addSubview(diaryIcon)
         diaryIcon.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(24)
             $0.top.equalTo(grabberIcon.snp.bottom).offset(24)
-            $0.width.height.equalTo(28)
+            $0.leading.equalToSuperview().inset(24)
+            $0.size.equalTo(28)
         }
         
         addSubview(label1)
         label1.snp.makeConstraints {
-            $0.leading.equalTo(diaryIcon.snp.leading)
             $0.top.equalTo(diaryIcon.snp.bottom).offset(8)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         addSubview(label2)
         label2.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(24)
             $0.top.equalTo(label1.snp.bottom).offset(16)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         addSubview(exitButton)
         exitButton.snp.makeConstraints {
-            $0.leading.equalTo(label2.snp.leading)
-            $0.top.equalTo(label2.snp.bottom).offset(42)
+            $0.leading.equalToSuperview().inset(24)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
             $0.width.equalTo(88)
         }
         
         addSubview(continueButton)
         continueButton.snp.makeConstraints { 
             $0.leading.equalTo(exitButton.snp.trailing).offset(8)
-            $0.trailing.equalToSuperview().offset(-24)
-            $0.top.equalTo(exitButton.snp.top)
-            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
+            $0.trailing.equalToSuperview().inset(24)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
         }
     }
     

@@ -104,7 +104,10 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - Actions
     @objc private func prevVC() {
-        navigationController?.popViewController(animated: true)
+        let emailErrorVC = EmailVerificationErrorViewController()
+        let navController = UINavigationController(rootViewController: emailErrorVC)
+        navController.modalPresentationStyle = .pageSheet
+        presentSheet(navController, heightRatio: 314/932)
     }
     
     @objc private func passwordFieldsDidChange() {

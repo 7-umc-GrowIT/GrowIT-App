@@ -56,8 +56,9 @@ class EmailVerificationErrorViewController: UIViewController {
         if let navigationController = self.presentingViewController as? UINavigationController {
             dismiss(animated: true) {
                 // LoginViewController로 이동
+                let emailLoginVC = EmailLoginViewController()
                 let loginVC = LoginViewController()
-                navigationController.setViewControllers([loginVC], animated: true)
+                navigationController.setViewControllers([loginVC, emailLoginVC], animated: false)
             }
         }
     }
