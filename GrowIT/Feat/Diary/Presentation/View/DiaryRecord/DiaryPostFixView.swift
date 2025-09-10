@@ -102,12 +102,12 @@ class DiaryPostFixView: UIView {
             $0.leading.equalTo(label1.snp.leading)
             $0.top.equalTo(label1.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
-            $0.height.equalToSuperview().multipliedBy(0.42)
+            $0.bottom.equalTo(cancelButton.snp.top).offset(-40)
         }
         
         cancelButton.snp.makeConstraints {
             $0.leading.equalTo(textView.snp.leading)
-            $0.top.equalTo(textView.snp.bottom).offset(40)
+            $0.top.equalTo(textView.snp.bottom)
             $0.width.equalTo(88)
         }
         
@@ -118,7 +118,7 @@ class DiaryPostFixView: UIView {
         }
         
         deleteLabel.snp.makeConstraints {
-            $0.top.equalTo(fixButton.snp.bottom).offset(15.5)
+            $0.top.equalTo(fixButton.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
             $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
         }
