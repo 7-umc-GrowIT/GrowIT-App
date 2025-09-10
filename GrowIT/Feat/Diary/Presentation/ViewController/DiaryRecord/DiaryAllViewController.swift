@@ -185,16 +185,6 @@ extension DiaryAllViewController: DiaryAllViewCellDelegate {
         
         let navController = UINavigationController(rootViewController: fixVC)
         
-        if let sheet = navController.sheetPresentationController {
-            if #available(iOS 16.0, *) {
-                sheet.detents = [.custom { _ in 0.6 * UIScreen.main.bounds.height }]
-            } else {
-                // Fallback on earlier versions
-            }
-            sheet.prefersGrabberVisible = false
-            sheet.preferredCornerRadius = 24   // 🔥 모달 둥근 모서리 적용
-        }
-        
-        present(navController, animated: true)
+        presentSheet(navController, heightRatio: 0.65)
     }
 }

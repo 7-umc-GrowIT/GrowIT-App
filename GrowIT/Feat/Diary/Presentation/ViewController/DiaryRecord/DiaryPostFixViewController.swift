@@ -104,7 +104,9 @@ class DiaryPostFixViewController: UIViewController {
                     DispatchQueue.main.async {
                         NotificationCenter.default.post(name: .diaryReloadNotification, object: nil)
                         CustomToast(containerWidth: 195).show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "일기를 수정했어요", font: .heading3SemiBold())
-                        self.dismiss(animated: true, completion: nil)
+                        self.dismiss(animated: true) {
+                            self.onDismiss?()  // 모달 해제 후 onDismiss 호출
+                        }
                     }
                 case .failure(let error):
                     print("Error: \(error)")
