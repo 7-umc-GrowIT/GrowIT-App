@@ -32,6 +32,7 @@ class WeekDayHeaderView: UICollectionReusableView {
         
         stackView.snp.makeConstraints{
             $0.top.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(32)
             $0.bottom.equalToSuperview().inset(12)
         }
         
