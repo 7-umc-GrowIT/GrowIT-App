@@ -113,48 +113,81 @@ final class AuthPlugin: PluginType {
 
     // MARK: - 재시도 (핵심: completion 전달)
     private func retry(target: TargetType, completion: @escaping (Result<Response, MoyaError>) -> Void) {
-        switch target {
-        case let authTarget as AuthorizationEndpoints:
+        if let authTarget = target as? AuthorizationEndpoints {
             let provider = MoyaProvider<AuthorizationEndpoints>(plugins: [AuthPlugin.shared])
             provider.request(authTarget, completion: completion)
-
-        case let challengeTarget as ChallengeEndpoint:
+        } else if let challengeTarget = target as? ChallengeEndpoint {
             let provider = MoyaProvider<ChallengeEndpoint>(plugins: [AuthPlugin.shared])
             provider.request(challengeTarget, completion: completion)
-
-        case let diaryTarget as DiaryEndpoint:
+        } else if let diaryTarget = target as? DiaryEndpoint {
             let provider = MoyaProvider<DiaryEndpoint>(plugins: [AuthPlugin.shared])
             provider.request(diaryTarget, completion: completion)
-
-        case let userTarget as UserEndpoint:
+        } else if let userTarget = target as? UserEndpoint {
             let provider = MoyaProvider<UserEndpoint>(plugins: [AuthPlugin.shared])
             provider.request(userTarget, completion: completion)
-
-        case let groTarget as GroEndpoint:
+        } else if let groTarget = target as? GroEndpoint {
             let provider = MoyaProvider<GroEndpoint>(plugins: [AuthPlugin.shared])
             provider.request(groTarget, completion: completion)
-            
-        case let itemTarget as ItemEndpoint:
+        } else if let itemTarget = target as? ItemEndpoint {
             let provider = MoyaProvider<ItemEndpoint>(plugins: [AuthPlugin.shared])
             provider.request(itemTarget, completion: completion)
-            
-        case let termsTarget as TermsEndpoints:
+        } else if let termsTarget = target as? TermsEndpoints {
             let provider = MoyaProvider<TermsEndpoints>(plugins: [AuthPlugin.shared])
             provider.request(termsTarget, completion: completion)
-        
-        case let withDrawTarget as WithdrwalEndpoint:
+        } else if let withdrawalTarget = target as? WithdrwalEndpoint {
             let provider = MoyaProvider<WithdrwalEndpoint>(plugins: [AuthPlugin.shared])
-            provider.request(withDrawTarget, completion: completion)
-
-
-        default:
-            print("Unsupported target type: \(type(of: target))")
+            provider.request(withdrawalTarget, completion: completion)
+        } else {
             completion(.failure(MoyaError.underlying(
-                NSError(domain: "AuthPlugin", code: -1,
-                        userInfo: [NSLocalizedDescriptionKey: "Unsupported target type: \(type(of: target))"]),
-                nil)))
+                NSError(domain: "AuthPlugin", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unsupported target"]),
+                nil
+            )))
         }
     }
+
+//    private func retry(target: TargetType, completion: @escaping (Result<Response, MoyaError>) -> Void) {
+//        switch target {
+//        case let authTarget as AuthorizationEndpoints:
+//            let provider = MoyaProvider<AuthorizationEndpoints>(plugins: [AuthPlugin.shared])
+//            provider.request(authTarget, completion: completion)
+//
+//        case let challengeTarget as ChallengeEndpoint:
+//            let provider = MoyaProvider<ChallengeEndpoint>(plugins: [AuthPlugin.shared])
+//            provider.request(challengeTarget, completion: completion)
+//
+//        case let diaryTarget as DiaryEndpoint:
+//            let provider = MoyaProvider<DiaryEndpoint>(plugins: [AuthPlugin.shared])
+//            provider.request(diaryTarget, completion: completion)
+//
+//        case let userTarget as UserEndpoint:
+//            let provider = MoyaProvider<UserEndpoint>(plugins: [AuthPlugin.shared])
+//            provider.request(userTarget, completion: completion)
+//
+//        case let groTarget as GroEndpoint:
+//            let provider = MoyaProvider<GroEndpoint>(plugins: [AuthPlugin.shared])
+//            provider.request(groTarget, completion: completion)
+//            
+//        case let itemTarget as ItemEndpoint:
+//            let provider = MoyaProvider<ItemEndpoint>(plugins: [AuthPlugin.shared])
+//            provider.request(itemTarget, completion: completion)
+//            
+//        case let termsTarget as TermsEndpoints:
+//            let provider = MoyaProvider<TermsEndpoints>(plugins: [AuthPlugin.shared])
+//            provider.request(termsTarget, completion: completion)
+//        
+//        case let withDrawTarget as WithdrwalEndpoint:
+//            let provider = MoyaProvider<WithdrwalEndpoint>(plugins: [AuthPlugin.shared])
+//            provider.request(withDrawTarget, completion: completion)
+//
+//
+//        default:
+//            print("Unsupported target type: \(type(of: target))")
+//            completion(.failure(MoyaError.underlying(
+//                NSError(domain: "AuthPlugin", code: -1,
+//                        userInfo: [NSLocalizedDescriptionKey: "Unsupported target type: \(type(of: target))"]),
+//                nil)))
+//        }
+//    }
 
 
     private func failQueuedRequests(_ queued: [(TargetType, (Result<Response, MoyaError>) -> Void)]) {
