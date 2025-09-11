@@ -25,6 +25,7 @@ class EmailVerificationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        emailVerificationView.nextButton.isEnabled = false
         setupView()
         setupActions()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -268,6 +269,7 @@ class EmailVerificationViewController: UIViewController {
         ToastSecond.show(image: UIImage(named: "Style=check") ?? UIImage(), message: "인증번호 인증을 완료했어요", font: .heading3SemiBold(), in: self.view)
         
         // 버튼 상태 업데이트
+        emailVerificationView.nextButton.isEnabled = true
         self.emailVerificationView.nextButton.setButtonState(
             isEnabled: true,
             enabledColor: .black,

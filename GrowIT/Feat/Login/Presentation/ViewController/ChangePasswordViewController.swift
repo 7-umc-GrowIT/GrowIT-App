@@ -172,6 +172,7 @@ class ChangePasswordViewController: UIViewController {
         let isLengthValid = newPassword.count >= 8 && newPassword.count <= 30
         let isPasswordsMatch = isLengthValid && !newPassword.isEmpty && newPassword == confirmPassword
         
+        changePasswordView.changePwdButton.isEnabled = isPasswordsMatch
         changePasswordView.changePwdButton.setButtonState(
             isEnabled: isPasswordsMatch,
             enabledColor: .black,
