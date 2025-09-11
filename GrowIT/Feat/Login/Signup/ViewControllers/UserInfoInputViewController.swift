@@ -206,8 +206,10 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
             switch result {
             case .success(let response):
                 print("✅ 회원가입 성공: \(response.message)")
-                self.handleSignUpSuccess(accessToken: response.result.tokens.accessToken)
-
+                if let tokens = response.result?.tokens {
+                    self.handleSignUpSuccess(accessToken: tokens.accessToken)
+                }
+                
             case .failure(let error):
                 print("❌ 회원가입 실패: \(error.localizedDescription)")
             }

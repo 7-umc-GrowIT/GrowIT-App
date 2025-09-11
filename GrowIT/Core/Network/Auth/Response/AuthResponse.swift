@@ -24,7 +24,7 @@ struct EmailSignUpResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: EmailResult
+    let result: EmailResult?
 }
 
 struct EmailResult: Codable {
