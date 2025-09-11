@@ -130,7 +130,7 @@ class EmailLoginViewController: UIViewController {
                             UserDefaults.standard.removeObject(forKey: "savedEmail")
                         }
                         
-                        self.moveToNextScreen()
+                        self.navigateToMainScreen()
                     } else {
                         switch response.message {
                         case "이메일 또는 비밀번호가 일치하지 않습니다.":
@@ -152,9 +152,15 @@ class EmailLoginViewController: UIViewController {
     
     // MARK: - Functional
     // 로그인 성공 후 다음 화면으로 이동
-    private func moveToNextScreen() {
+    private func navigateToMainScreen() {
         let homeVC = CustomTabBarController(initialIndex: 1)
-        self.navigationController?.pushViewController(homeVC, animated: true)
+        let nav = UINavigationController(rootViewController: homeVC)
+        
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
+            window.rootViewController = nav
+            window.makeKeyAndVisible()
+        }
     }
     
     //MARK: Event
