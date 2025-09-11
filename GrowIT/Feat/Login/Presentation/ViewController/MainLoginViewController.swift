@@ -10,7 +10,7 @@ import Foundation
 import SnapKit
 import AuthenticationServices
 
-class LoginViewController: UIViewController {
+class MainLoginViewController: UIViewController {
     // MARK: - Properties
     let authService = AuthService()
     private lazy var kakaoLoginHelper = KakaoLoginHelper()
@@ -225,14 +225,13 @@ class LoginViewController: UIViewController {
     }
     
     private func navigateToMainScreen() {
-        let tabBar = CustomTabBarController(initialIndex: 1)
-        let nav = UINavigationController(rootViewController: tabBar)
-        if let window = UIApplication.shared.windows.first {
+        let homeVC = CustomTabBarController(initialIndex: 1)
+        let nav = UINavigationController(rootViewController: homeVC)
+        
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
             window.rootViewController = nav
             window.makeKeyAndVisible()
-        } else {
-            // 폴백: 현재 내비 스택 교체
-            navigationController?.setViewControllers([tabBar], animated: true)
         }
     }
     
@@ -243,14 +242,14 @@ class LoginViewController: UIViewController {
     
 }
 
-extension LoginViewController: ASAuthorizationControllerPresentationContextProviding {
+extension MainLoginViewController: ASAuthorizationControllerPresentationContextProviding {
     // 인증창을 보여주기 위한 메서드 (인증창을 보여 줄 화면을 설정)
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         self.view.window ?? UIWindow()
     }
 }
 
-extension LoginViewController: ASAuthorizationControllerDelegate {
+extension MainLoginViewController: ASAuthorizationControllerDelegate {
     // 로그인 실패 시
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: any Error) {
         print("로그인 실패", error.localizedDescription)

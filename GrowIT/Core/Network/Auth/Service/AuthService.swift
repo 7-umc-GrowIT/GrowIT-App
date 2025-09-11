@@ -130,21 +130,7 @@ final class AuthService: NetworkManager {
                     let decodedResponse = try JSONDecoder().decode(EmailLoginResponse.self, from: response.data)
                     print("로그인 응답: \(decodedResponse)")
                     
-                    if decodedResponse.isSuccess {
-                        let tokenData = decodedResponse.result.tokens
-                        TokenManager.shared.saveTokens(
-                            accessToken: tokenData.accessToken,
-                            refreshToken: tokenData.refreshToken
-                        )
-                        
-                        UserDefaults.standard.set(decodedResponse.result.loginMethod, forKey: "loginMethod")
-                        
-                        print("로그인 성공 & 토큰 저장 완료")
-                        completion(.success(decodedResponse))
-                    } else {
-                        print("로그인 실패: \(decodedResponse.message)")
-                        completion(.failure(.serverError(statusCode: 400, message: decodedResponse.message)))
-                    }
+                    completion(.success(decodedResponse))
                     
                 } catch {
                     print("로그인 응답 디코딩 실패: \(error)")

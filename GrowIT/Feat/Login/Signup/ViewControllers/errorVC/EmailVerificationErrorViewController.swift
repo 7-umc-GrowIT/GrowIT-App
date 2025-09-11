@@ -1,5 +1,5 @@
 //
-//  ChangePasswordErrorViewController.swift
+//  EmailVerificationErrorViewController.swift
 //  GrowIT
 //
 //  Created by 강희정 on 1/26/25.
@@ -7,15 +7,15 @@
 
 import UIKit
 
-class ChangePasswordErrorViewController: UIViewController {
+class EmailVerificationErrorViewController: UIViewController {
     
     let errorView = ErrorView().then {
         $0.configure(
             icon: "trashicon",
-            fisrtLabel: "비밀번호 재설정을 그만할까요?",
-            secondLabel: "해당 화면을 나가면 이메일 인증을 다시 진행합니다\n그래도 화면을 나갈까요?",
+            fisrtLabel: "회원가입을 그만할까요?",
+            secondLabel: "해당 화면을 나가면 처음부터 다시 진행합니다\n그래도 화면을 나갈까요?",
             firstColor: .gray900,
-            secondColor: .gray600,
+            secondColor: .gray700,
             title1: "나가기",
             title1Color1: .gray400,
             title1Background: .gray100,
@@ -26,8 +26,6 @@ class ChangePasswordErrorViewController: UIViewController {
             viewColor: .white
         )
     }
-
-    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,10 +56,10 @@ class ChangePasswordErrorViewController: UIViewController {
         if let navigationController = self.presentingViewController as? UINavigationController {
             dismiss(animated: true) {
                 // LoginViewController로 이동
-                let loginVC = LoginViewController()
-                navigationController.setViewControllers([loginVC], animated: true)
+                let emailLoginVC = EmailLoginViewController()
+                let loginVC = MainLoginViewController()
+                navigationController.setViewControllers([loginVC, emailLoginVC], animated: false)
             }
         }
     }
-    
 }
