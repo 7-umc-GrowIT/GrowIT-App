@@ -16,7 +16,7 @@ struct EmailLoginResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: EmailResult
+    let result: EmailResult?
 }
 
 // 이메일 회원가입
