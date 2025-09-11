@@ -55,6 +55,7 @@ class ChangePasswordView: UIView {
     public lazy var codeTextField = CustomTextField(frame: .zero, isPasswordField: false).then {
         $0.setTitleLabel("인증번호")
         $0.setPlaceholder("인증번호를 입력해 주세요")
+        $0.setTextFieldInteraction(enabled: false)
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -111,7 +112,7 @@ class ChangePasswordView: UIView {
     
     private func constraints() {
         emailTextField.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(148)
+            $0.top.equalTo(safeAreaLayoutGuide).inset(32)
             $0.leading.equalToSuperview().offset(24)
             $0.height.equalTo(78)
         }
@@ -122,7 +123,7 @@ class ChangePasswordView: UIView {
         }
         
         sendCodeButton.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(178)
+            $0.top.equalTo(safeAreaLayoutGuide).inset(62)
             $0.leading.equalTo(emailTextField.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().offset(-24)
             $0.width.equalTo(108)

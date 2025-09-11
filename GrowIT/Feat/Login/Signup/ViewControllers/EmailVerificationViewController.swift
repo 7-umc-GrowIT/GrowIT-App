@@ -27,6 +27,8 @@ class EmailVerificationViewController: UIViewController {
         //  Textfields
         $0.emailTextField.textField.addTarget(self, action: #selector(updateSendCodeButtonState), for: .editingChanged)
         $0.codeTextField.textField.addTarget(self, action: #selector(updateCertificationButtonState), for: .editingChanged)
+        
+        $0.nextButton.addTarget(self, action: #selector(nextButtonTap), for: .touchUpInside)
     }
 
     // MARK: - init
@@ -61,9 +63,6 @@ class EmailVerificationViewController: UIViewController {
             target: self,
             action: #selector(prevVC)
         )
-        
-        emailVerificationView.nextButton.addTarget(self, action: #selector(
-            nextButtonTap), for: .touchUpInside)
     }
     
     // MARK: - Setup Actions
