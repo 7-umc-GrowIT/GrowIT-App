@@ -59,7 +59,7 @@ class ChangePasswordErrorViewController: UIViewController {
             dismiss(animated: true) {
                 // LoginViewController로 이동
                 let loginVC = MainLoginViewController()
-                navigationController.setViewControllers([loginVC], animated: true)
+                navigationController.setViewControllers([loginVC], animated: false)
             }
         }
     }

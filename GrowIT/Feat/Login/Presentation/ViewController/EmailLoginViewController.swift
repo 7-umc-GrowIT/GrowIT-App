@@ -80,6 +80,7 @@ class EmailLoginViewController: UIViewController {
        
        let isFormValid = isEmailValid && isPasswordValid
        
+       emailLoginView.loginButton.isEnabled = isFormValid
        emailLoginView.loginButton.setButtonState(
            isEnabled: isFormValid,
            enabledColor: .black, // 활성화 상태에서 검정색 배경

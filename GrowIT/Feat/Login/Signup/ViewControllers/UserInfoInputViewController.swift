@@ -93,6 +93,7 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         // 비밀번호가 일치하고 둘 다 비어 있지 않으며 길이도 유효할 경우 버튼 활성화
         let isPasswordsMatch = isLengthValid && !password.isEmpty && password == confirmPassword
         
+        userInfoView.nextButton.isEnabled = isPasswordsMatch
         userInfoView.nextButton.setButtonState(
             isEnabled: isPasswordsMatch,
             enabledColor: .black,
