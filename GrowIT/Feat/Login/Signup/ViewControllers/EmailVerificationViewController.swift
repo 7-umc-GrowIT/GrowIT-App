@@ -15,8 +15,7 @@ class EmailVerificationViewController: UIViewController {
     
     var agreeTerms: [UserTermDTO] = []
     private var isEmailFieldDisabled = false
-    private var isCodeFieldDisabled = false
-    
+    // 인증번호 비교용 이메일
     private var email: String = ""
     
     // MARK: - View
@@ -26,9 +25,8 @@ class EmailVerificationViewController: UIViewController {
         $0.certificationButton.addTarget(self, action: #selector(certificationButtonTapped), for: .touchUpInside)
         
         //  Textfields
-        $0.emailTextField.textField.addTarget(self, action: #selector(textFieldsDidChange), for: .editingChanged)
-        $0.codeTextField.textField.addTarget(self, action: #selector(textFieldsDidChange), for: .editingChanged)
-        
+        $0.emailTextField.textField.addTarget(self, action: #selector(updateSendCodeButtonState), for: .editingChanged)
+        $0.codeTextField.textField.addTarget(self, action: #selector(updateCertificationButtonState), for: .editingChanged)
     }
 
     // MARK: - init
@@ -74,114 +72,32 @@ class EmailVerificationViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
-    // MARK: - TextField Change Handler
-    @objc
-    private func textFieldsDidChange() {
-        updateSendCodeButtonState()
-        updateCertificationButtonState()
-    }
-    
-    // 인증번호 전송 버튼
-    private func updateSendCodeButtonState() {
-        guard let emailText = emailVerificationView.emailTextField.textField.text else { return }
+    // MARK: - NetWork
+    func callPostVerification(codeText: String) {
+        let request = EmailVerifyRequest(email: email, authCode: codeText)
         
-        // 이메일 필드와 인증번호 필드 모두 활성화 상태 유지
-        emailVerificationView.emailTextField.setTextFieldInteraction(enabled: true)
-        emailVerificationView.codeTextField.setTextFieldInteraction(enabled: true)
-        
-        
-        if emailText.isEmpty {
-            emailVerificationView.emailTextField.clearError()
-        } else if isValidEmail(emailText) {
-            emailVerificationView.emailTextField.clearError()
-        } else {
-            emailVerificationView.emailTextField.setError(message: "올바르지 않은 이메일 형식입니다.")
+        authService.verification(data: request) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("인증번호 확인 성공 메시지: \(response.message)")
+                    
+                    // 인증 성공 UI 업데이트
+                    self.handleVerificationSuccess()
+                
+                case .failure(let error):
+                    print("인증번호 확인 실패: \(error)")
+                  
+                    // 서버 응답에서 인증 실패 메시지를 확인하고 필드 업데이트
+                    self.emailVerificationView.codeTextField.setError(message: "인증번호가 올바르지 않습니다.")
+                }
+            }
         }
-        
-        let isEmailValid = isValidEmail(emailText)
-        emailVerificationView.sendCodeButton.isEnabled = isEmailValid
-        emailVerificationView.sendCodeButton.setButtonState(
-            isEnabled: isEmailValid,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray400
-        )
     }
     
-    // 코드인증 버튼
-    private func updateCertificationButtonState() {
-        guard let codeText = emailVerificationView.codeTextField.textField.text else { return }
-        
-        if isCodeFieldDisabled {
-            setCodeFieldDisabledUI()
-            return
-        }
-        
-        if codeText.isEmpty {
-            emailVerificationView.codeTextField.clearError()
-        } else {
-            emailVerificationView.codeTextField.clearError()
-        }
-        
-        
-        let isCodeValid = !codeText.isEmpty
-        emailVerificationView.certificationButton.isEnabled = isCodeValid
-        emailVerificationView.certificationButton.setButtonState(
-            isEnabled: isCodeValid,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray400
-        )
-    }
-    
-    // MARK: - Helper
-    private func isValidEmail(_ email: String) -> Bool {
-        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
-        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
-    }
-    
-    private func setCodeFieldDisabledUI() {
-        emailVerificationView.codeTextField.setTextFieldInteraction(enabled: false)
-        emailVerificationView.codeTextField.titleLabel.textColor = .gray300
-        emailVerificationView.codeTextField.textField.textColor = .gray300
-        emailVerificationView.codeTextField.textField.backgroundColor = .gray100
-        
-    }
-    
-    // MARK: - Actions
-    @objc
-    private func prevVC() {
-        let emailErrorVC = EmailVerificationErrorViewController()
-        let navController = UINavigationController(rootViewController: emailErrorVC)
-        navController.modalPresentationStyle = .pageSheet
-        presentSheet(navController, heightRatio: 314/932)
-    }
-    
-    @objc
-    private func sendCodeButtonTapped() {
-        view.endEditing(true)
-        
-        guard let emailText = emailVerificationView.emailTextField.textField.text,
-              !emailText.isEmpty else {
-            print("이메일 입력 필요")
-            return
-        }
-        
-        email = emailText
-        let request = SendEmailVerifyRequest(email: emailText)
-        
-        // 👉 버튼 누르자마자 비활성화
-        emailVerificationView.certificationButton.isEnabled = false
-        emailVerificationView.sendCodeButton.setButtonState(
-            isEnabled: false,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray400
-        )
-        
+    func callPostSendCode(email: String) {
+        let request = SendEmailVerifyRequest(email: email)
+        self.email = email
         authService.email(type: "SIGNUP", data: request) { result in
             DispatchQueue.main.async {
                 switch result {
@@ -190,7 +106,6 @@ class EmailVerificationViewController: UIViewController {
                     print("응답 메시지: \(response.message)")
                     
                     self.isEmailFieldDisabled = true
-                    self.emailVerificationView.emailTextField.setTextFieldInteraction(enabled: false)
                     
                     ToastSecond.show(
                         image: UIImage(named: "Style=Mail") ?? UIImage(),
@@ -212,39 +127,55 @@ class EmailVerificationViewController: UIViewController {
         }
     }
     
+    // MARK: - TextField Change Handler
+    // 인증번호 전송 버튼
     @objc
-    private func certificationButtonTapped() {
-        guard let codeText = emailVerificationView.codeTextField.textField.text, !codeText.isEmpty else {return}
-        callPostVerification(codeText: codeText)
-    }
-    
-    // MARK: - NetWork
-    func callPostVerification(codeText: String) {
-        let request = EmailVerifyRequest(email: email, authCode: codeText)
-
-        authService.verification(data: request) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let response):
-                    print("인증번호 확인 성공 메시지: \(response.message)")
-                    
-                    // 인증 성공 UI 업데이트
-                    self.handleVerificationSuccess()
-                
-                case .failure(let error):
-                    print("인증번호 확인 실패: \(error)")
-                    
-                    // 서버 응답에서 인증 실패 메시지를 확인하고 필드 업데이트
-                    self.emailVerificationView.codeTextField.setError(message: "인증번호가 올바르지 않습니다.")
-                }
-            }
+    private func updateSendCodeButtonState() {
+        
+        // 이메일 유효성 검사
+        guard let emailText = emailVerificationView.emailTextField.textField.text else { return }
+        let isEmailValid = isValidEmail(emailText)
+        
+        if emailText.isEmpty || isEmailValid {
+            emailVerificationView.emailTextField.clearError()
+        } else {
+            emailVerificationView.emailTextField.setError(message: "올바르지 않은 이메일 형식입니다.")
         }
+        
+        // 버튼 활성화 상태 관리
+        isEnableButtons(emailVerificationView.sendCodeButton, isEmailValid)
     }
     
+    // 코드인증 버튼
+    @objc
+    private func updateCertificationButtonState() {
+        guard let codeText = emailVerificationView.codeTextField.textField.text else { return }
+        emailVerificationView.codeTextField.clearError() // ???????
+        
+        let isCodeValid = !codeText.isEmpty
+ 
+        // 버튼 활성화 상태 관리
+        isEnableButtons(emailVerificationView.certificationButton, isCodeValid)
+    }
+    
+    // MARK: - Helper
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
+    }
+    
+    // 인증 성공 후 아예 비활성화
+    private func setCodeFieldDisabledUI() {
+        emailVerificationView.codeTextField.setTextFieldInteraction(enabled: false)
+        emailVerificationView.codeTextField.titleLabel.textColor = .gray300
+        emailVerificationView.codeTextField.textField.textColor = .gray300
+        emailVerificationView.codeTextField.textField.backgroundColor = .gray100
+    }
+    
+    // 인증 성공 시 처리
     private func handleVerificationSuccess() {
         // 인증번호 필드 비활성화
-        self.isCodeFieldDisabled = true
-        self.setCodeFieldDisabledUI()
+        setCodeFieldDisabledUI()
         
         // 이메일 필드 Success 상태로 변경
         self.emailVerificationView.emailTextField.setTextFieldInteraction(enabled: false)
@@ -256,38 +187,54 @@ class EmailVerificationViewController: UIViewController {
         self.emailVerificationView.emailTextField.errorLabel.isHidden = false
         self.emailVerificationView.emailTextField.errorLabelTopConstraint?.update(offset: 4)
         
-        // 인증하기 버튼 비활성화
-        emailVerificationView.certificationButton.isEnabled = false
-        self.emailVerificationView.certificationButton.setButtonState(
-            isEnabled: false,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray400
-        )
-        
-        emailVerificationView.sendCodeButton.isEnabled = false
-        self.emailVerificationView.sendCodeButton.setButtonState(
-            isEnabled: false,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray400
-        )
-        
         ToastSecond.show(image: UIImage(named: "Style=check") ?? UIImage(), message: "인증번호 인증을 완료했어요", font: .heading3SemiBold(), in: self.view)
         
         // 버튼 상태 업데이트
-        emailVerificationView.nextButton.isEnabled = true
-        self.emailVerificationView.nextButton.setButtonState(
-            isEnabled: true,
+        isEnableButtons(emailVerificationView.certificationButton, false)
+        isEnableButtons(emailVerificationView.sendCodeButton, false)
+        isEnableButtons(emailVerificationView.nextButton, true)
+    }
+    
+    private func isEnableButtons(_ buttons: AppButton, _ isEnabled: Bool) {
+        buttons.setButtonState(
+            isEnabled: isEnabled,
             enabledColor: .black,
             disabledColor: .gray100,
             enabledTitleColor: .white,
             disabledTitleColor: .gray400
         )
     }
-
+    
+    // MARK: - Actions
+    // 중간에 나갈 경우 모달
+    @objc
+    private func prevVC() {
+        let emailErrorVC = EmailVerificationErrorViewController()
+        let navController = UINavigationController(rootViewController: emailErrorVC)
+        navController.modalPresentationStyle = .pageSheet
+        presentSheet(navController, heightRatio: 314/932)
+    }
+    
+    @objc
+    private func sendCodeButtonTapped() {
+        guard let emailText = emailVerificationView.emailTextField.textField.text,
+              !emailText.isEmpty else {
+            print("이메일 입력 필요")
+            return
+        }
+        callPostSendCode(email: emailText)
+        
+        //  버튼 누르자마자 비활성화
+        view.endEditing(true)
+        self.emailVerificationView.emailTextField.clearButton.isHidden = true
+        isEnableButtons(emailVerificationView.sendCodeButton, false)
+    }
+    
+    @objc
+    private func certificationButtonTapped() {
+        guard let codeText = emailVerificationView.codeTextField.textField.text, !codeText.isEmpty else { return }
+        callPostVerification(codeText: codeText)
+    }
     
     @objc
     func nextButtonTap() {
@@ -307,5 +254,4 @@ class EmailVerificationViewController: UIViewController {
     private func dismissKeyboard() {
         view.endEditing(true)
     }
-    
 }
