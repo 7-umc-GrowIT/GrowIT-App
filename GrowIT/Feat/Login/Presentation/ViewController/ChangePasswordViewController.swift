@@ -10,42 +10,49 @@ import Foundation
 import SnapKit
 
 class ChangePasswordViewController: UIViewController {
-    
     // MARK: - Properties
-    private let changePasswordView = ChangePasswordView()
     private let navigationBarManager = NavigationManager()
-    private var isEmailFieldDisabled = false
-    private var isCodeFieldDisabled = false
     var shouldShowExitModal: Bool = true /// 뒤로가기 시 에러 모달을 띄울지 여부
     
-    private var userService: UserService {
-        return UserService()
-    }
-    
-    private var authService: AuthService {
-        return AuthService()
-    }
+    let userService = UserService()
+    let authService = AuthService()
     
     private var email: String = ""
     
-    // MARK: - Lifecycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupView()
-        setupActions()
-        updateSendCodeButtonState()
-        updateCertificationButtonState()
-        updatePasswordMatchState()
-        updatePwdChangeBtnState()
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        view.addGestureRecognizer(tapGesture)
+    // MARK: - view
+    private lazy var changePasswordView = ChangePasswordView().then {
+        // Buttons
+        $0.sendCodeButton.addTarget(self, action: #selector(sendCodeButtonTapped), for: .touchUpInside)
+        $0.certificationButton.addTarget(self, action: #selector(certificationButtonTapped), for: .touchUpInside)
+        $0.changePwdButton.addTarget(self, action: #selector(changePwdButtonTapped), for: .touchUpInside)
+        
+        //  Textfields
+        $0.emailTextField.textField.addTarget(self, action: #selector(emailTextFieldsDidChange), for: .editingChanged)
+        $0.codeTextField.textField.addTarget(self, action: #selector(codeTextFieldsDidChange), for: .editingChanged)
+        $0.newPwdTextField.textField.isSecureTextEntry = true
+        $0.newPwdTextField.textField.addTarget(self, action: #selector(changePasswordTextFieldsDidChange), for: .editingChanged)
+        $0.pwdCheckTextField.textField.isSecureTextEntry = true
+        $0.pwdCheckTextField.textField.addTarget(self, action: #selector(changePasswordTextFieldsDidChange), for: .editingChanged)
     }
     
-    // MARK: - Setup View
-    private func setupView() {
+    // MARK: - init
+    override func viewDidLoad() {
+        super.viewDidLoad()
         self.view = changePasswordView
-        self.navigationController?.isNavigationBarHidden = false
-        
+
+        setupNavigationBar()
+        setupActions()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        emailTextFieldsDidChange()
+        codeTextFieldsDidChange()
+    }
+    
+    // MARK: - Setup NavigationBar
+    private func setupNavigationBar() {
         navigationBarManager.setTitle(
             to: self.navigationItem,
             title: "비밀번호 변경",
@@ -62,154 +69,14 @@ class ChangePasswordViewController: UIViewController {
     
     // MARK: - Setup Actions
     private func setupActions() {
-        // TextField 이벤트 설정
-        changePasswordView.emailTextField.textField.addTarget(
-            self, action: #selector(textFieldsDidChange), for: .editingChanged
-        )
-        changePasswordView.codeTextField.textField.addTarget(
-            self, action: #selector(textFieldsDidChange), for: .editingChanged
-        )
-        changePasswordView.newPwdTextField.textField.isSecureTextEntry = true
-        changePasswordView.newPwdTextField.textField.addTarget(
-            self, action: #selector(textFieldsDidChange), for: .editingChanged
-        )
-        changePasswordView.pwdCheckTextField.textField.isSecureTextEntry = true
-        changePasswordView.pwdCheckTextField.textField.addTarget(
-            self, action: #selector(textFieldsDidChange), for: .editingChanged
-        )
-        
-        // 버튼 이벤트 설정
-        changePasswordView.sendCodeButton.addTarget(
-            self, action: #selector(sendCodeButtonTapped), for: .touchUpInside
-        )
-        changePasswordView.certificationButton.addTarget(
-            self, action: #selector(certificationButtonTapped), for: .touchUpInside
-        )
-        changePasswordView.changePwdButton.addTarget(
-            self, action: #selector(changePwdButtonTapped), for: .touchUpInside
-        )
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
     }
     
-    // MARK: - TextField Change Handler
-    @objc private func textFieldsDidChange() {
-        updateSendCodeButtonState()
-        updateCertificationButtonState()
-        updatePasswordMatchState()
-        updatePwdChangeBtnState()
-    }
-    
-    // MARK: - Update Button States
-    private func updateSendCodeButtonState() {
-        guard let emailText = changePasswordView.emailTextField.textField.text else { return }
-        
-        if isEmailFieldDisabled {
-            setEmailFieldDisabledUI()
-            return
-        }
-        
-        if emailText.isEmpty {
-            changePasswordView.emailTextField.clearError()
-            changePasswordView.emailLabel.isHidden = false  // 기본 라벨 표시
-        } else if isValidEmail(emailText) {
-            changePasswordView.emailTextField.clearError()
-            changePasswordView.emailLabel.isHidden = false  // 기본 라벨 표시
-        } else {
-            changePasswordView.emailTextField.setError(message: "올바르지 않은 이메일 형식입니다.")
-            changePasswordView.emailLabel.isHidden = true   // 오류 메시지가 표시될 때는 기본 라벨 숨김
-        }
-        
-        let isEmailValid = isValidEmail(emailText)
-        changePasswordView.sendCodeButton.setButtonState(
-            isEnabled: isEmailValid,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray400
-        )
-    }
-    
-    private func updateCertificationButtonState() {
-        guard let codeText = changePasswordView.codeTextField.textField.text else { return }
-
-        if isCodeFieldDisabled {
-            setCodeFieldDisabledUI()
-            return
-        }
-
-        // 인증번호 유효성 검사: 8자리 (영문 + 숫자)
-        let isValidCode = isValidVerificationCode(codeText)
-
-        if codeText.isEmpty {
-            changePasswordView.codeTextField.clearError()
-        } else if !isValidCode {
-            changePasswordView.codeTextField.setError(message: "올바른 인증번호를 입력하세요.")
-        } else {
-            changePasswordView.codeTextField.clearError()
-        }
-
-        // 인증번호가 8자리일 때 버튼 활성화
-        changePasswordView.certificationButton.setButtonState(
-            isEnabled: isValidCode,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray400
-        )
-    }
-
-    // 인증번호 형식 검증 함수 추가
-    private func isValidVerificationCode(_ code: String) -> Bool {
-        let codeRegex = "^[A-Za-z0-9]{8}$" // 영문+숫자로 8자리
-        return NSPredicate(format: "SELF MATCHES %@", codeRegex).evaluate(with: code)
-    }
-
-    
-    private func updatePwdChangeBtnState() {
-        guard let newPassword = changePasswordView.newPwdTextField.textField.text,
-              let confirmPassword = changePasswordView.pwdCheckTextField.textField.text else { return }
-        
-        //  길이 조건 추가
-        let isLengthValid = newPassword.count >= 8 && newPassword.count <= 30
-        let isPasswordsMatch = isLengthValid && !newPassword.isEmpty && newPassword == confirmPassword
-        
-        changePasswordView.changePwdButton.isEnabled = isPasswordsMatch
-        changePasswordView.changePwdButton.setButtonState(
-            isEnabled: isPasswordsMatch,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray400
-        )
-    }
-    
-    // MARK: - Helper
-    private func isValidEmail(_ email: String) -> Bool {
-        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
-        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
-    }
-    
-    private func setEmailFieldDisabledUI() {
-        changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
-        changePasswordView.emailTextField.textField.isUserInteractionEnabled = false
-        changePasswordView.emailTextField.titleLabel.textColor = .gray300
-        changePasswordView.emailTextField.textField.textColor = .gray300
-        changePasswordView.emailTextField.textField.backgroundColor = .gray100
-    }
-    
-    private func setCodeFieldDisabledUI() {
-        changePasswordView.codeTextField.setTextFieldInteraction(enabled: false)
-        changePasswordView.codeTextField.titleLabel.textColor = .gray300
-        changePasswordView.codeTextField.textField.textColor = .gray300
-        changePasswordView.codeTextField.textField.backgroundColor = .gray100
-    }
-    
-    // MARK: - API
-    private func handlePasswordChange() {
-        guard let email = changePasswordView.emailTextField.textField.text,
-              let newPassword = changePasswordView.newPwdTextField.textField.text,
-              let passwordCheck = changePasswordView.pwdCheckTextField.textField.text else {
-            return
-        }
+    // MARK: - NetWork
+    private func callPatchUserPassword(_ email: String,
+                                       _ newPassword: String,
+                                       _ passwordCheck: String) {
         
         let request = UserPatchRequestDTO(
             isVerified: true,
@@ -242,27 +109,154 @@ class ChangePasswordViewController: UIViewController {
             }
         }
     }
-
     
-    // MARK: - Actions
-    @objc private func prevVC() {
-        if shouldShowExitModal {
-            let changePwdErrorVC = ChangePasswordErrorViewController()
-            let navController = UINavigationController(rootViewController: changePwdErrorVC)
-            navController.modalPresentationStyle = .pageSheet
-            presentSheet(navController, heightRatio: 0.37)
-        }
-        else {
-            // 그냥 pop 또는 dismiss
-            if let nav = navigationController {
-                nav.popViewController(animated: true)
-            } else {
-                dismiss(animated: true, completion: nil)
+    private func callPostSendCode(email: String) {
+        let request = SendEmailVerifyRequest(email: email)
+        
+        authService.email(type: "PASSWORD_RESET", data: request) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("인증 메일 전송 성공 이메일: \(response.email)")
+                    print("응답 메시지: \(response.message)")
+
+                    self.changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
+                    self.changePasswordView.codeTextField.setTextFieldInteraction(enabled: true)
+                    
+                    let toastImage = UIImage(named: "Style=Mail") ?? UIImage()
+                    CustomToast(containerWidth: 225).show(
+                        image: toastImage,
+                        message: "인증번호를 발송했어요",
+                        font: UIFont.heading3SemiBold()
+                    )
+                    
+                    self.isEnableButtons(self.changePasswordView.sendCodeButton, false)
+
+                case .failure(let error):
+                    print("인증 메일 전송 실패: \(error)")
+                    self.changePasswordView.emailLabel.isHidden = true  // 기본 라벨 숨기기
+                    self.changePasswordView.emailTextField.setError(message: "가입 되지 않은 이메일입니다")
+                }
             }
         }
     }
     
-    private func updatePasswordMatchState() {
+    func callPostVerification(email: String, codeText: String) {
+        let request = EmailVerifyRequest(email: email, authCode: codeText)
+
+        authService.verification(data: request) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("인증번호 확인 성공 메시지: \(response.message)")
+
+                    // 인증 성공 시 UI 업데이트 로직 추가
+                    self?.handleVerificationSuccess()
+
+                case .failure(let error):
+                    print("인증번호 확인 실패: \(error)")
+                    self?.changePasswordView.codeTextField.setError(message: "인증번호가 올바르지 않습니다.")
+                }
+            }
+        }
+    }
+    
+    // MARK: - Validation Regex
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
+    }
+    
+    // 비밀번호 정규식 검증
+    private func isValidPassword(_ password: String) -> Bool {
+        let passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,30}$"
+        return NSPredicate(format: "SELF MATCHES %@", passwordRegex).evaluate(with: password)
+    }
+    
+    //MARK: - Functional
+    private func isEnableButtons(_ buttons: AppButton, _ isEnabled: Bool) {
+        buttons.setButtonState(
+            isEnabled: isEnabled,
+            enabledColor: .black,
+            disabledColor: .gray100,
+            enabledTitleColor: .white,
+            disabledTitleColor: .gray400
+        )
+    }
+    
+    private func setEmailFieldDisabledUI() {
+        changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
+        changePasswordView.emailTextField.titleLabel.textColor = .gray300
+        changePasswordView.emailTextField.textField.textColor = .gray300
+        changePasswordView.emailTextField.textField.backgroundColor = .gray100
+        changePasswordView.emailTextField.textField.layer.borderColor = UIColor.gray100.cgColor
+        changePasswordView.emailTextField.errorLabel.isHidden = true
+    }
+    
+    private func setCodeFieldDisabledUI() {
+        changePasswordView.codeTextField.setTextFieldInteraction(enabled: false)
+        changePasswordView.codeTextField.titleLabel.textColor = .gray300
+        changePasswordView.codeTextField.textField.textColor = .gray300
+        changePasswordView.codeTextField.textField.backgroundColor = .gray100
+        changePasswordView.codeTextField.textField.layer.borderColor = UIColor.gray100.cgColor
+        changePasswordView.codeTextField.errorLabel.isHidden = true
+    }
+    
+    private func handlePasswordChange() {
+        guard let email = changePasswordView.emailTextField.textField.text,
+              let newPassword = changePasswordView.newPwdTextField.textField.text,
+              let passwordCheck = changePasswordView.pwdCheckTextField.textField.text else {
+            return
+        }
+        
+        callPatchUserPassword(email, newPassword, passwordCheck)
+    }
+
+    // MARK: TextField
+    @objc
+    private func emailTextFieldsDidChange() {
+        // 이메일 유효성 검사
+        guard let emailText = changePasswordView.emailTextField.textField.text else { return }
+        
+        if emailText.isEmpty || isValidEmail(emailText) {
+            changePasswordView.emailTextField.clearError()
+            changePasswordView.emailLabel.isHidden = false  // 기본 라벨 표시
+        } else {
+            changePasswordView.emailTextField.setError(message: "올바르지 않은 이메일 형식입니다.")
+            changePasswordView.emailLabel.isHidden = true   // 오류 메시지가 표시될 때는 기본 라벨 숨김
+        }
+        
+        let isEmailValid = isValidEmail(emailText)
+        isEnableButtons(changePasswordView.sendCodeButton, isEmailValid)
+    }
+    
+    @objc
+    private func codeTextFieldsDidChange() {
+        guard let codeText = changePasswordView.codeTextField.textField.text else { return }
+
+        if codeText.isEmpty {
+            changePasswordView.codeTextField.clearError()
+        }
+
+        let isCodeValid = !codeText.isEmpty
+        isEnableButtons(changePasswordView.certificationButton, isCodeValid)
+    }
+    
+    @objc
+    private func changePasswordTextFieldsDidChange() {
+        updatePwdChangeBtnState()
+        guard let newPassword = changePasswordView.newPwdTextField.textField.text,
+              let confirmPassword = changePasswordView.pwdCheckTextField.textField.text else { return }
+        
+        //  길이 조건 추가
+        let isPasswordValid = isValidPassword(newPassword)
+        let isPasswordsMatch = isPasswordValid && newPassword == confirmPassword
+        
+        isEnableButtons(changePasswordView.changePwdButton, isPasswordsMatch)
+        print(isPasswordsMatch)
+    }
+    
+    private func updatePwdChangeBtnState() {
         guard let newPassword = changePasswordView.newPwdTextField.textField.text,
               let confirmPassword = changePasswordView.pwdCheckTextField.textField.text else { return }
         
@@ -273,10 +267,10 @@ class ChangePasswordViewController: UIViewController {
             return
         }
         
-        //  길이 검사
-        if !newPassword.isEmpty {
-            if newPassword.count < 8 || newPassword.count > 30 {
-                changePasswordView.newPwdTextField.setError(message: "비밀번호는 8~30자 이내로 입력해주세요")
+        // 비밀번호 정규식 검사
+           if !newPassword.isEmpty {
+               if !isValidPassword(newPassword) {
+                changePasswordView.newPwdTextField.setError(message: "영문, 숫자, 특수문자를 포함한 8~30자로 입력해주세요")
                 changePasswordView.newPwdTextField.titleLabel.textColor = .negative400
                 changePasswordView.newPwdTextField.textField.textColor = .negative400
                 return
@@ -311,107 +305,51 @@ class ChangePasswordViewController: UIViewController {
         }
     }
     
-    @objc private func sendCodeButtonTapped() {
-        guard let emailText = changePasswordView.emailTextField.textField.text,
-              !emailText.isEmpty else {
-            return
+    // MARK: - Event
+    @objc
+    private func prevVC() {
+        if shouldShowExitModal {
+            let changePwdErrorVC = ChangePasswordErrorViewController()
+            let navController = UINavigationController(rootViewController: changePwdErrorVC)
+            navController.modalPresentationStyle = .pageSheet
+            presentSheet(navController, heightRatio: 0.37)
         }
-        
-        email = emailText
-        let request = SendEmailVerifyRequest(email: emailText)
-        
-        authService.email(type: "PASSWORD_RESET", data: request) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let response):
-                    print("인증 메일 전송 성공 이메일: \(response.email)")
-                    print("응답 메시지: \(response.message)")
-
-                    self.isEmailFieldDisabled = true
-                    self.changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
-                    
-                    let toastImage = UIImage(named: "Style=Mail") ?? UIImage()
-                    CustomToast(containerWidth: 225).show(
-                        image: toastImage,
-                        message: "인증번호를 발송했어요",
-                        font: UIFont.heading3SemiBold()
-                    )
-                    
-                    self.changePasswordView.sendCodeButton.setButtonState(
-                        isEnabled: false,
-                        enabledColor: .black,
-                        disabledColor: .gray100,
-                        enabledTitleColor: .white,
-                        disabledTitleColor: .gray400
-                    )
-
-                case .failure(let error):
-                    print("인증 메일 전송 실패: \(error)")
-                    self.changePasswordView.emailLabel.isHidden = true  // 기본 라벨 숨기기
-                    self.changePasswordView.emailTextField.setError(message: "이메일 전송에 실패했습니다.")
-                }
+        else {
+            // 그냥 pop 또는 dismiss
+            if let nav = navigationController {
+                nav.popViewController(animated: true)
+            } else {
+                dismiss(animated: true, completion: nil)
             }
         }
     }
     
-    @objc private func certificationButtonTapped() {
+    
+    
+    @objc
+    private func sendCodeButtonTapped() {
+        guard let emailText = changePasswordView.emailTextField.textField.text,
+              !emailText.isEmpty else { return }
+        callPostSendCode(email: emailText)
+    }
+    
+    @objc
+    private func certificationButtonTapped() {
         guard let emailText = changePasswordView.emailTextField.textField.text,
               let codeText = changePasswordView.codeTextField.textField.text,
-              !codeText.isEmpty else {
-            print("인증번호 입력하세요")
-            return
-        }
-
-        let request = EmailVerifyRequest(email: emailText, authCode: codeText)
-
-        authService.verification(data: request) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let response):
-                    print("인증번호 확인 성공 메시지: \(response.message)")
-
-                    // 인증 성공 시 UI 업데이트 로직 추가
-                    self?.handleVerificationSuccess()
-
-                case .failure(let error):
-                    print("인증번호 확인 실패: \(error)")
-                    self?.changePasswordView.codeTextField.setError(message: "인증번호가 올바르지 않습니다.")
-                }
-            }
-        }
+              !codeText.isEmpty else { return }
+        callPostVerification(email: emailText, codeText: codeText)
     }
     
     private func handleVerificationSuccess() {
         // 인증 성공 시, 인증번호 입력 필드를 비활성화
-        self.isCodeFieldDisabled = true
         self.setCodeFieldDisabledUI()
-
-        // 이메일 입력 필드 비활성화
-        self.changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
-        
-        // 기본 UI 설정
-        self.changePasswordView.emailTextField.textField.layer.borderColor = UIColor.gray100.cgColor
-        self.changePasswordView.emailTextField.textField.backgroundColor = .gray100
-        self.changePasswordView.emailTextField.textField.textColor = .gray300
-        self.changePasswordView.emailTextField.titleLabel.textColor = .gray300
+        self.setEmailFieldDisabledUI()
 
         // 인증 완료 후 버튼 비활성화
-        self.changePasswordView.certificationButton.setButtonState(
-            isEnabled: false,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray300
-        )
-
-        self.changePasswordView.sendCodeButton.setButtonState(
-            isEnabled: false,
-            enabledColor: .black,
-            disabledColor: .gray100,
-            enabledTitleColor: .white,
-            disabledTitleColor: .gray300
-        )
-
+        isEnableButtons(changePasswordView.certificationButton, false)
+        isEnableButtons(changePasswordView.sendCodeButton, false)
+        
         // 인증 성공 시 토스트 메시지 표시
         let toastImage = UIImage(named: "Style=check") ?? UIImage()
         CustomToast(containerWidth: 258).show(
@@ -421,11 +359,14 @@ class ChangePasswordViewController: UIViewController {
         )
     }
     
-    @objc private func changePwdButtonTapped() {
+    @objc
+    private func changePwdButtonTapped() {
         handlePasswordChange()
     }
     
-    @objc private func dismissKeyboard() {
+    @objc
+    private func dismissKeyboard() {
         view.endEditing(true)
     }
+    
 }
