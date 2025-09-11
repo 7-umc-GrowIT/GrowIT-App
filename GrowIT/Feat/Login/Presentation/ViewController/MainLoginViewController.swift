@@ -225,14 +225,13 @@ class MainLoginViewController: UIViewController {
     }
     
     private func navigateToMainScreen() {
-        let tabBar = CustomTabBarController(initialIndex: 1)
-        let nav = UINavigationController(rootViewController: tabBar)
-        if let window = UIApplication.shared.windows.first {
+        let homeVC = CustomTabBarController(initialIndex: 1)
+        let nav = UINavigationController(rootViewController: homeVC)
+        
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
             window.rootViewController = nav
             window.makeKeyAndVisible()
-        } else {
-            // 폴백: 현재 내비 스택 교체
-            navigationController?.setViewControllers([tabBar], animated: true)
         }
     }
     
