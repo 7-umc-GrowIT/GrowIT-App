@@ -164,10 +164,13 @@ final class AuthService: NetworkManager {
                     let decodedResponse = try JSONDecoder().decode(EmailSignUpResponse.self, from: response.data)
                     print("회원가입 성공! 액세스 토큰")
                     
-                    let accessToken = decodedResponse.result.tokens.accessToken
-                    let refreshToken = decodedResponse.result.tokens.refreshToken
-                    TokenManager.shared.saveTokens(accessToken: accessToken, refreshToken: refreshToken)
-                    print("회원가입 후 토큰 저장 완료")
+                    if let tokens = decodedResponse.result?.tokens {
+                        TokenManager.shared.saveTokens(
+                            accessToken: tokens.accessToken,
+                            refreshToken: tokens.refreshToken
+                        )
+                        print("회원가입 후 토큰 저장 완료")
+                    }
                     
                     completion(.success(decodedResponse))
                     
