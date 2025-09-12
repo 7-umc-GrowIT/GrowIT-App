@@ -19,6 +19,7 @@ class ChangePasswordViewController: UIViewController {
     
     private var email: String = ""
     private var isMypage: Bool = false
+    private var meEmail: String = ""
 
     // MARK: - view
     private lazy var changePasswordView = ChangePasswordView().then {
@@ -85,6 +86,7 @@ class ChangePasswordViewController: UIViewController {
     }
     
     // MARK: - NetWork
+    // 비밀번호 변경 API
     private func callPatchUserPassword(_ email: String,
                                        _ newPassword: String,
                                        _ passwordCheck: String) {
@@ -121,6 +123,7 @@ class ChangePasswordViewController: UIViewController {
         }
     }
     
+    // 인증번호 발송 API
     private func callPostSendCode(email: String) {
         let request = SendEmailVerifyRequest(email: email)
         
@@ -152,6 +155,7 @@ class ChangePasswordViewController: UIViewController {
         }
     }
     
+    // 인증번호 확인 API
     func callPostVerification(email: String, codeText: String) {
         let request = EmailVerifyRequest(email: email, authCode: codeText)
 
@@ -170,6 +174,19 @@ class ChangePasswordViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    func callGetMeEmail() {
+        userService.getMeEmail(completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                changePasswordView.emailTextField.textField.text = data.email
+                self.emailTextFieldsDidChange()
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
     }
     
     // MARK: - Validation Regex
@@ -197,14 +214,13 @@ class ChangePasswordViewController: UIViewController {
     
     private func setMypageUI() {
         if isMypage {
+            callGetMeEmail()
             changePasswordView.codeTextField.setTextFieldInteraction(enabled: true)
             changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
             changePasswordView.emailTextField.textField.textColor = .gray300
             changePasswordView.emailTextField.textField.backgroundColor = .gray100
             changePasswordView.emailTextField.textField.layer.borderColor = UIColor.gray100.cgColor
             changePasswordView.emailTextField.setHint(message: "가입 시 사용했던 이메일입니다")
-            
-            changePasswordView.emailTextField.textField.text = "ㄴ"
         }
     }
     
