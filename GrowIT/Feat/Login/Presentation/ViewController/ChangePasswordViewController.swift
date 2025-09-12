@@ -197,7 +197,7 @@ class ChangePasswordViewController: UIViewController {
     
     // 비밀번호 정규식 검증
     private func isValidPassword(_ password: String) -> Bool {
-        let passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,30}$"
+        let passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,30}$"
         return NSPredicate(format: "SELF MATCHES %@", passwordRegex).evaluate(with: password)
     }
     
