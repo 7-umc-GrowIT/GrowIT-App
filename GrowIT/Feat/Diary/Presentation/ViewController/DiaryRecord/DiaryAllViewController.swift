@@ -23,7 +23,7 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
         
         setupUI()
         setupDelegate()
-        //setupCustomTitle()
+        setupNotifications()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -48,6 +48,19 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
             title: "나의 일기 기록",
             textColor: .black
         )
+    }
+    
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(reloadDiaries),
+            name: .diaryReloadNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func reloadDiaries() {
+        callGetAllDiaries()
     }
     
     private func setupCustomTitle() {
