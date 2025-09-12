@@ -127,7 +127,7 @@ class MyAccountViewController: UIViewController {
     
     @objc
     func changePwdBtnTap() {
-        let changePwdVC = ChangePasswordViewController()
+        let changePwdVC = ChangePasswordViewController(isMypage: true)
         changePwdVC.shouldShowExitModal = false
         navigationController?.pushViewController(changePwdVC, animated: true)
     }

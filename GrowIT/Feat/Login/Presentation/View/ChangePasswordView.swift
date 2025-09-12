@@ -27,6 +27,7 @@ class ChangePasswordView: UIView {
     public lazy var emailTextField = CustomTextField(frame: .zero, isPasswordField: false).then {
         $0.setTitleLabel("이메일")
         $0.setPlaceholder("이메일을 입력해 주세요")
+        $0.setHint(message: "가입 시 사용했던 이메일을 입력해 주세요")
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -104,7 +105,7 @@ class ChangePasswordView: UIView {
     // MARK: - add Function & Constraints
     
     private func addComponents() {
-        [emailTextField, emailLabel, sendCodeButton,
+        [emailTextField, sendCodeButton,
          codeTextField, certificationButton, newPwdTextField,
          pwdCheckTextField, changePwdButton]
             .forEach(self.addSubview)
@@ -117,11 +118,6 @@ class ChangePasswordView: UIView {
             $0.height.equalTo(78)
         }
         
-        emailLabel.snp.makeConstraints {
-            $0.top.equalTo(emailTextField.snp.bottom).offset(4)
-            $0.leading.equalTo(emailTextField)
-        }
-        
         sendCodeButton.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(62)
             $0.leading.equalTo(emailTextField.snp.trailing).offset(8)
@@ -131,7 +127,7 @@ class ChangePasswordView: UIView {
         }
         
         codeTextField.snp.makeConstraints {
-            $0.top.equalTo(emailTextField.snp.bottom).offset(45)
+            $0.top.equalTo(emailTextField.snp.bottom).offset(40)
             $0.leading.equalTo(emailTextField)
             $0.height.equalTo(78)
         }

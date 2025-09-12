@@ -18,7 +18,8 @@ class ChangePasswordViewController: UIViewController {
     let authService = AuthService()
     
     private var email: String = ""
-    
+    private var isMypage: Bool = false
+
     // MARK: - view
     private lazy var changePasswordView = ChangePasswordView().then {
         // Buttons
@@ -42,6 +43,7 @@ class ChangePasswordViewController: UIViewController {
 
         setupNavigationBar()
         setupActions()
+        setMypageUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -49,6 +51,15 @@ class ChangePasswordViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
         emailTextFieldsDidChange()
         codeTextFieldsDidChange()
+    }
+    
+    init(isMypage: Bool) {
+        super.init(nibName: nil, bundle: nil)
+        self.isMypage = isMypage
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Setup NavigationBar
@@ -184,6 +195,19 @@ class ChangePasswordViewController: UIViewController {
         )
     }
     
+    private func setMypageUI() {
+        if isMypage {
+            changePasswordView.codeTextField.setTextFieldInteraction(enabled: true)
+            changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
+            changePasswordView.emailTextField.textField.textColor = .gray300
+            changePasswordView.emailTextField.textField.backgroundColor = .gray100
+            changePasswordView.emailTextField.textField.layer.borderColor = UIColor.gray100.cgColor
+            changePasswordView.emailTextField.setHint(message: "가입 시 사용했던 이메일입니다")
+            
+            changePasswordView.emailTextField.textField.text = "ㄴ"
+        }
+    }
+    
     private func setEmailFieldDisabledUI() {
         changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
         changePasswordView.emailTextField.titleLabel.textColor = .gray300
@@ -218,14 +242,16 @@ class ChangePasswordViewController: UIViewController {
         // 이메일 유효성 검사
         guard let emailText = changePasswordView.emailTextField.textField.text else { return }
         
-        if emailText.isEmpty || isValidEmail(emailText) {
-            changePasswordView.emailTextField.clearError()
-            changePasswordView.emailLabel.isHidden = false  // 기본 라벨 표시
-        } else {
-            changePasswordView.emailTextField.setError(message: "올바르지 않은 이메일 형식입니다.")
-            changePasswordView.emailLabel.isHidden = true   // 오류 메시지가 표시될 때는 기본 라벨 숨김
+        if !isMypage {
+            if emailText.isEmpty || isValidEmail(emailText) {
+                changePasswordView.emailTextField.clearError()
+                changePasswordView.emailLabel.isHidden = false  // 기본 라벨 표시
+            } else {
+                changePasswordView.emailTextField.setError(message: "올바르지 않은 이메일 형식입니다.")
+                changePasswordView.emailLabel.isHidden = true   // 오류 메시지가 표시될 때는 기본 라벨 숨김
+            }
         }
-        
+       
         let isEmailValid = isValidEmail(emailText)
         isEnableButtons(changePasswordView.sendCodeButton, isEmailValid)
     }
