@@ -15,7 +15,6 @@ class TextDiaryView: UIView, UITextViewDelegate {
         super.init(frame: frame)
         diaryTextField.delegate = self
         setupUI()
-        // setTodayDate()
     }
     
     required init?(coder: NSCoder) {
@@ -75,7 +74,6 @@ class TextDiaryView: UIView, UITextViewDelegate {
     
     let saveButton = AppButton(title: "내가 입력한 일기 저장하기").then {
         $0.setButtonState(isEnabled: false, enabledColor: .black, disabledColor: .gray100, enabledTitleColor: .white, disabledTitleColor: .gray400)
-        $0.isUserInteractionEnabled = false
     }
     
     // MARK: - Setup TextView
@@ -100,7 +98,7 @@ class TextDiaryView: UIView, UITextViewDelegate {
     private func checkButtonState() {
         let isDateSelected = dateLabel.text != "날짜를 선택해 주세요"
         let trimmedText = diaryTextField.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        let isTextValid = !trimmedText.isEmpty && trimmedText != placeholder && trimmedText.count > 100
+        let isTextValid = !trimmedText.isEmpty && trimmedText != placeholder && trimmedText.count >= 100
         
         saveButton.setButtonState(
             isEnabled: isDateSelected && isTextValid,
@@ -110,11 +108,11 @@ class TextDiaryView: UIView, UITextViewDelegate {
             disabledTitleColor: .gray400
         )
         
-        if isDateSelected && isTextValid {
-            saveButton.isUserInteractionEnabled = true
-        } else {
-            saveButton.isUserInteractionEnabled = false
-        }
+//        if isDateSelected && isTextValid {
+//            saveButton.isUserInteractionEnabled = true
+//        } else {
+//            saveButton.isUserInteractionEnabled = false
+//        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -144,8 +142,6 @@ class TextDiaryView: UIView, UITextViewDelegate {
             $0.left.equalTo(dayLabel.snp.left)
         }
         
-        //dateView.addSubview(dateLabel)
-        
         addSubview(diaryTextField)
         diaryTextField.snp.makeConstraints { make in
             make.top.equalTo(dropDownStack.snp.bottom).offset(24)
@@ -167,14 +163,6 @@ class TextDiaryView: UIView, UITextViewDelegate {
             make.bottom.equalToSuperview().offset(-40)
         }
     }
-    
-//    private func setTodayDate() {
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "yyyy년 M월 d일"
-//        formatter.locale = Locale(identifier: "ko_KR")
-//        
-//        dateLabel.text = formatter.string(from: Date())
-//    }
     
     func updateDateLabel(_ date: String) {
         dateLabel.text = date.formattedDate()

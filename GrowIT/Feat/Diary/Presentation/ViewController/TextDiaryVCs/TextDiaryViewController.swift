@@ -15,7 +15,6 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     let navigationBarManager = NavigationManager()
     let textDiaryView = TextDiaryView()
     let diaryService = DiaryService()
-    
     let calVC = DiaryCalendarController(isDropDown: true)
     
     override func viewDidLoad() {
@@ -54,7 +53,7 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     //MARK: - Setup Button actions
     private func setupActions() {
         textDiaryView.saveButton.addTarget(self, action: #selector(nextVC), for: .touchUpInside)
-        textDiaryView.dropDownStack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(calenderVC))
+        textDiaryView.dropDownStack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(popUp))
         )
     }
     
@@ -64,7 +63,10 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     }
     
     @objc func nextVC() {
-        if textDiaryView.saveButton.isEnabled == false {
+        print(textDiaryView.saveButton.backgroundColor == .black)
+        if (textDiaryView.dateLabel.text == "날짜를 선택해주세요") {
+            popUpCalendar()
+        } else if(textDiaryView.saveButton.backgroundColor != .black) {
             CustomToast(containerWidth: 232).show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "일기를 더 작성해 주세요", font: .heading3SemiBold())
         } else {
             let userDiary = textDiaryView.diaryTextField.text ?? ""
@@ -78,7 +80,11 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
         }
     }
     
-    @objc func calenderVC(_ sender: UIButton) {
+    @objc func popUp(_ sender: UIButton) {
+        popUpCalendar()
+    }
+    
+    private func popUpCalendar() {
         let calVC = DiaryCalendarController(isDropDown: true)
         calVC.configureTheme(isDarkMode: false)
         calVC.delegate = self

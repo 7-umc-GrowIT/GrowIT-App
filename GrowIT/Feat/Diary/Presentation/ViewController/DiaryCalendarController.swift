@@ -300,7 +300,6 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
         let availableWidth = collectionView.frame.width
         let widthPerItem = availableWidth / 7
         cellWidth = widthPerItem
-        print(cellWidth)
     
         return CGSize(width: widthPerItem, height: widthPerItem) // 셀의 너비와 높이를 동일하게 설정
     }
