@@ -16,6 +16,7 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     let textDiaryView = TextDiaryView()
     let diaryService = DiaryService()
     let calVC = DiaryCalendarController(isDropDown: true)
+    var isSaving: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -119,6 +120,8 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     
     // MARK: Setup APIs
     func callPostTextDiary(userDiary: String, date: String, completion: @escaping (Int) -> Void) {
+        guard !isSaving else { return }
+        isSaving = true
         let convertedDate = convertDateFormat(from: date)
         UserDefaults.standard.set(convertedDate, forKey: "TextDate")
         diaryService.postTextDiary(
@@ -126,6 +129,7 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
                 content: userDiary,
                 date: convertedDate ?? "")
         ){ result in
+            self.isSaving = false
             switch result {
             case .success(let data):
                 completion(data.diaryId)

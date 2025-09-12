@@ -16,6 +16,7 @@ class DiaryPostFixViewController: UIViewController {
     let diaryPostFixView = DiaryPostFixView()
     private let diaryService = DiaryService()
     var onDismiss: (() -> Void)?
+    var isFixing: Bool = false
     
     init(text: String, date: String, diaryId: Int) {
         self.text = text
@@ -93,11 +94,14 @@ class DiaryPostFixViewController: UIViewController {
     
     
     private func callPatchFixDiary() {
+        guard !isFixing else { return }
+        isFixing = true
         diaryService.patchFixDiary(
             diaryId: diaryId,
             data: getUserContent(),
             completion: { [weak self] result in
                 guard let self = self else { return }
+                self.isFixing = false
                 switch result {
                 case .success(let data):
                     print("Success: \(data)")

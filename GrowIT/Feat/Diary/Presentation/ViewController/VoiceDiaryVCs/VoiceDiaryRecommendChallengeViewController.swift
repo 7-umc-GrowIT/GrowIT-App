@@ -26,6 +26,8 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         return voiceDiaryRecommendChallengeView.challengeStackView.challengeViews
     }
     
+    var isSaving: Bool = false
+    
     override func viewDidLoad() {
         navigationController?.navigationBar.isHidden = false
         super.viewDidLoad()
@@ -96,8 +98,11 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
             return
         }
         
+        guard !isSaving else { return }
+        isSaving = true
         challengeService.postSelectedChallenge(data: selectedChallenges) { [weak self] result in
             guard let self = self else { return }
+            self.isSaving = false
             switch result {
             case .success(let response):
                 print("챌린지 선택 성공: \(response)")
