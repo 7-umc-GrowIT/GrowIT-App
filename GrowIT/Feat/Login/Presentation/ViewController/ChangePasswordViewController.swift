@@ -18,7 +18,9 @@ class ChangePasswordViewController: UIViewController {
     let authService = AuthService()
     
     private var email: String = ""
-    
+    private var isMypage: Bool = false
+    private var meEmail: String = ""
+
     // MARK: - view
     private lazy var changePasswordView = ChangePasswordView().then {
         // Buttons
@@ -42,6 +44,7 @@ class ChangePasswordViewController: UIViewController {
 
         setupNavigationBar()
         setupActions()
+        setMypageUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -49,6 +52,15 @@ class ChangePasswordViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
         emailTextFieldsDidChange()
         codeTextFieldsDidChange()
+    }
+    
+    init(isMypage: Bool) {
+        super.init(nibName: nil, bundle: nil)
+        self.isMypage = isMypage
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Setup NavigationBar
@@ -74,6 +86,7 @@ class ChangePasswordViewController: UIViewController {
     }
     
     // MARK: - NetWork
+    // 비밀번호 변경 API
     private func callPatchUserPassword(_ email: String,
                                        _ newPassword: String,
                                        _ passwordCheck: String) {
@@ -110,6 +123,7 @@ class ChangePasswordViewController: UIViewController {
         }
     }
     
+    // 인증번호 발송 API
     private func callPostSendCode(email: String) {
         let request = SendEmailVerifyRequest(email: email)
         
@@ -141,6 +155,7 @@ class ChangePasswordViewController: UIViewController {
         }
     }
     
+    // 인증번호 확인 API
     func callPostVerification(email: String, codeText: String) {
         let request = EmailVerifyRequest(email: email, authCode: codeText)
 
@@ -159,6 +174,19 @@ class ChangePasswordViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    func callGetMeEmail() {
+        userService.getMeEmail(completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                changePasswordView.emailTextField.textField.text = data.email
+                self.emailTextFieldsDidChange()
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        })
     }
     
     // MARK: - Validation Regex
@@ -182,6 +210,18 @@ class ChangePasswordViewController: UIViewController {
             enabledTitleColor: .white,
             disabledTitleColor: .gray400
         )
+    }
+    
+    private func setMypageUI() {
+        if isMypage {
+            callGetMeEmail()
+            changePasswordView.codeTextField.setTextFieldInteraction(enabled: true)
+            changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
+            changePasswordView.emailTextField.textField.textColor = .gray300
+            changePasswordView.emailTextField.textField.backgroundColor = .gray100
+            changePasswordView.emailTextField.textField.layer.borderColor = UIColor.gray100.cgColor
+            changePasswordView.emailTextField.setHint(message: "가입 시 사용했던 이메일입니다")
+        }
     }
     
     private func setEmailFieldDisabledUI() {
@@ -218,14 +258,16 @@ class ChangePasswordViewController: UIViewController {
         // 이메일 유효성 검사
         guard let emailText = changePasswordView.emailTextField.textField.text else { return }
         
-        if emailText.isEmpty || isValidEmail(emailText) {
-            changePasswordView.emailTextField.clearError()
-            changePasswordView.emailLabel.isHidden = false  // 기본 라벨 표시
-        } else {
-            changePasswordView.emailTextField.setError(message: "올바르지 않은 이메일 형식입니다.")
-            changePasswordView.emailLabel.isHidden = true   // 오류 메시지가 표시될 때는 기본 라벨 숨김
+        if !isMypage {
+            if emailText.isEmpty || isValidEmail(emailText) {
+                changePasswordView.emailTextField.clearError()
+                changePasswordView.emailLabel.isHidden = false  // 기본 라벨 표시
+            } else {
+                changePasswordView.emailTextField.setError(message: "올바르지 않은 이메일 형식입니다.")
+                changePasswordView.emailLabel.isHidden = true   // 오류 메시지가 표시될 때는 기본 라벨 숨김
+            }
         }
-        
+       
         let isEmailValid = isValidEmail(emailText)
         isEnableButtons(changePasswordView.sendCodeButton, isEmailValid)
     }

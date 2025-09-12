@@ -83,6 +83,15 @@ final class UserService: NetworkManager {
         )
     }
     
+    // 로그인한 이메일 조회 API
+    func getMeEmail(completion: @escaping(Result<UserGetMeEmailResponseDTO, NetworkError>) -> Void) {
+        request(
+            target: .getMeEmail,
+            decodingType: UserGetMeEmailResponseDTO.self,
+            completion: completion
+        )
+    }
+    
     // 회원 탈퇴 API
     func deleteUser(data: UserDeleteRequestDTO, completion: @escaping(Result<EmptyResult, NetworkError>) -> Void) {
         request(
