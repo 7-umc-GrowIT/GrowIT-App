@@ -41,7 +41,7 @@ class JDiaryCell: UICollectionViewCell{
     
     private func constraints(){
         dateCell.snp.makeConstraints{
-            $0.top.equalToSuperview()
+            $0.top.equalToSuperview().offset(4)
             $0.centerX.equalToSuperview()
         }
         
