@@ -183,7 +183,7 @@ class EmailLoginViewController: UIViewController {
     // 찾기, 변경, 회원가입 버튼 액션
     @objc
     func didTapChangePassword() {
-        let changePwdVC = ChangePasswordViewController()
+        let changePwdVC = ChangePasswordViewController(isMypage: false)
         self.navigationController?.pushViewController(changePwdVC, animated: true)
     }
     
