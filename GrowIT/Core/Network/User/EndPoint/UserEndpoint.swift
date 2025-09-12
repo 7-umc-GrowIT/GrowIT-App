@@ -13,6 +13,7 @@ enum UserEndpoint {
     case getCredits
     case getTotalCredits
     case getMypage
+    case getMeEmail
     
     // Post
     case postPaymentCredits(data: UserPostRequestDTO)
@@ -40,6 +41,8 @@ extension UserEndpoint: TargetType {
             return "/credits/total"
         case .getMypage:
             return "/mypage"
+        case .getMeEmail:
+            return "/me/email"
         case .postPaymentCredits:
             return "/credits/payment"
         case .patchPassword:
@@ -64,7 +67,7 @@ extension UserEndpoint: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .getCredits, .getTotalCredits, .getMypage:
+        case .getCredits, .getTotalCredits, .getMypage, .getMeEmail:
             return .requestPlain
         case .postPaymentCredits(let data):
             return .requestJSONEncodable(data)

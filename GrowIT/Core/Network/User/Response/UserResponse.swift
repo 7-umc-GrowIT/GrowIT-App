@@ -40,4 +40,8 @@ struct UserGetMypageResponseDTO: Decodable {
     let name: String
 }
 
+struct UserGetMeEmailResponseDTO: Decodable {
+    let email: String?
+}
+
 struct UserDeleteResponseDTO: Decodable { }
