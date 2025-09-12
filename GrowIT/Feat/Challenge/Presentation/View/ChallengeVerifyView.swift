@@ -29,7 +29,9 @@ class ChallengeVerifyView: UIView {
         $0.contentMode = .scaleAspectFit
     }
     
-    private lazy var challengeName = makeLabel(title: "", color: .black, font: .heading1Bold())
+    private lazy var challengeName = makeLabel(title: "", color: .gray900, font: .heading1Bold())
+    
+    private lazy var challengeContent = makeLabel(title: "", color: .gray900, font: .heading3Bold())
     
     private lazy var subTitle = makeLabel(title: "챌린지를 인증하고 크레딧을 얻어 보세요!", color: .gray500, font: .body2Medium())
     
@@ -87,6 +89,7 @@ class ChallengeVerifyView: UIView {
         label.textColor = color
         label.font = font
         label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 0
         return label
     }
     
