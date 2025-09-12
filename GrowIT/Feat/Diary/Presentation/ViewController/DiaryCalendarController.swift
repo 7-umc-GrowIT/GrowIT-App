@@ -364,11 +364,19 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
 
         if let date = Calendar.current.date(from: dateComponents) {
             let formattedDate = dateFormatter.string(from: date)
+            let today = Calendar.current.startOfDay(for: Date())
+            let selectedDay = Calendar.current.startOfDay(for: date)
+            
+            if(selectedDay > today) {
+                CustomToast(containerWidth: 277).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 작성이 불가능해요", font: .heading3SemiBold())
+                return
+            }
             
             if let result = callendarDiaries.first(where: {$0.date == formattedDate}){
                 if(self.isDropDown){
                     CustomToast(containerWidth: 310).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 이미 일기를 작성했어요", font: .heading3SemiBold())
-                }else{
+                    return
+                } else{
                     diaryService.fetchDiary(diaryId: result.diaryId, completion: { [weak self] result in
                         guard let self = self else {return}
                         switch result{
@@ -380,12 +388,10 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
                             print("Error: \(error)")
                         }
                     })
-                    
+                    return
                 }
             }
-            if(!callendarDiaries.contains(where: {$0.date == formattedDate})){
-                delegate?.didSelectDate(formattedDate)
-            }
+            delegate?.didSelectDate(formattedDate)
         }
     }
     
