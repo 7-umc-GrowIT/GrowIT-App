@@ -11,6 +11,8 @@ import SnapKit
 
 protocol DiaryCalendarControllerDelegate: AnyObject {
     func didSelectDate(_ date: String)
+    
+    func diaryCalendar(_ controller: DiaryCalendarController, didChangeWeekCount count: Int, _ cellWidth: Double)
 }
 
 class DiaryCalendarController: UIViewController {
@@ -32,6 +34,7 @@ class DiaryCalendarController: UIViewController {
     var daysPerMonth: [Int] {
         return [31, isLeapYear() ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] // 윤년 고려
     }
+    let today = Calendar.current.startOfDay(for: Date())
     var currentDate = Date()
     var currentCalendar: Calendar {
         var calendar = Calendar.current
@@ -140,6 +143,7 @@ class DiaryCalendarController: UIViewController {
 
         // 캘린더를 업데이트하여 변경된 날짜를 반영
         updateCalendar()
+        getDiaryDates()
     }
     
     @objc private func backMonthTapped() {
@@ -154,6 +158,15 @@ class DiaryCalendarController: UIViewController {
     }
     
     @objc private func nextMonthTapped() {
+        let todayYear = currentCalendar.component(.year, from: today)
+        let todayMonth = currentCalendar.component(.month, from: today)
+        
+        // 오늘 연도/월을 넘으면 return
+        if (currentYear! > todayYear) ||
+           (currentYear! == todayYear && currentMonthIndex! + 1 >= todayMonth) {
+            return
+        }
+
         if currentMonthIndex == 11 {
             currentMonthIndex = 0 // 1월로 설정
             currentYear! += 1 // 연도 증가
@@ -167,9 +180,20 @@ class DiaryCalendarController: UIViewController {
     private func updateCalendar() {
         diaryCalendar.yearMonthLabel.text = "\(currentYear!)년 \(currentMonthIndex! + 1)월"
         calculateWeeksInMonth()
+        delegate?.diaryCalendar(self, didChangeWeekCount: numberOfWeeksInMonth, cellWidth)
         adjustCalendarHeightBasedOnWeeks()
         diaryCalendar.calendarCollectionView.reloadData()
         self.view.layoutIfNeeded()
+        
+        // ✅ 이번 달이면 next 버튼 숨기기
+        let todayYear = currentCalendar.component(.year, from: today)
+        let todayMonth = currentCalendar.component(.month, from: today)
+        
+        if currentYear == todayYear, currentMonthIndex! + 1 == todayMonth {
+            diaryCalendar.nextMonthBtn.isHidden = true
+        } else {
+            diaryCalendar.nextMonthBtn.isHidden = false
+        }
     }
     
     func isLeapYear() -> Bool { //윤달 계산
@@ -185,7 +209,7 @@ class DiaryCalendarController: UIViewController {
     }
 
     private func adjustCalendarHeightBasedOnWeeks() {
-        let totalHeight = CGFloat(numberOfWeeksInMonth) * cellWidth + 88
+        let totalHeight = CGFloat(numberOfWeeksInMonth) * cellWidth + 92
         diaryCalendar.calendarBg.snp.updateConstraints { make in
             make.height.equalTo(totalHeight)
         }
@@ -198,7 +222,6 @@ class DiaryCalendarController: UIViewController {
 extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int{
         let firstDayOfMonth = firstWeekdayOfMonth // 현재월의 시작
-        let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12]  // 이전 달의 날짜 수
         let daysToShowFromPrevMonth = (firstDayOfMonth - currentCalendar.firstWeekday + 7) % 7
         
         let daysInMonth = numberOfDaysInMonth
@@ -214,7 +237,6 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
         let day = indexPath.item - firstDayIndex + 1
         
         let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12] // 이전 달의 날짜 수
-        let daysToShowFromPreviousMonth = firstWeekdayOfMonth - currentCalendar.firstWeekday
         let previousMonthDay = daysInPreviousMonth + day
         
         let previousMonth = currentMonthIndex! == 0 ? 12 : currentMonthIndex!
@@ -225,6 +247,7 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
         var dateComponents = DateComponents()
         dateComponents.year = currentYear
         dateComponents.month = currentMonthIndex! + 1
+        dateComponents.day = day
 
         // Adjust day number based on the first day of the month
         if day < 1 {
@@ -277,6 +300,7 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
         let availableWidth = collectionView.frame.width
         let widthPerItem = availableWidth / 7
         cellWidth = widthPerItem
+        print(cellWidth)
     
         return CGSize(width: widthPerItem, height: widthPerItem) // 셀의 너비와 높이를 동일하게 설정
     }

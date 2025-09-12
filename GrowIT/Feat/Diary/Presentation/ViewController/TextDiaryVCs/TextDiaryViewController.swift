@@ -10,6 +10,7 @@ import EzPopup
 
 class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate {
     
+    
     //MARK: - Properties
     let navigationBarManager = NavigationManager()
     let textDiaryView = TextDiaryView()
@@ -82,6 +83,7 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
         calVC.configureTheme(isDarkMode: false)
         calVC.delegate = self
         calVC.view.backgroundColor = .clear
+        let totalHeight = calVC.view.bounds.height
         let popupVC = PopupViewController(contentController: calVC, popupWidth: 382, popupHeight: 370)
         present(popupVC, animated: true)
     }
@@ -91,6 +93,21 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
         
         if let presentedVC = self.presentedViewController {
             presentedVC.dismiss(animated: true)
+        }
+    }
+    
+    func diaryCalendar(_ controller: DiaryCalendarController, didChangeWeekCount count: Int, _ cellWidth: Double) {
+        let baseHeightPerWeek: CGFloat = 52 // 주당 높이 설정 예시
+        let extraHeight: CGFloat = 92       // 기존에 더한 높이
+        print(cellWidth)
+        let totalHeight = CGFloat(count) * cellWidth + extraHeight
+
+        calVC.view.snp.updateConstraints { make in
+            make.height.equalTo(totalHeight)
+        }
+
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
         }
     }
     
