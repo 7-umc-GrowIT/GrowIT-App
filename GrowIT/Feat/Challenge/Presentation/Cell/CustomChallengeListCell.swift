@@ -32,7 +32,7 @@ class CustomChallengeListCell: UICollectionViewCell{
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 20
         $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        $0.layer.borderColor = UIColor.border.cgColor
         $0.layer.masksToBounds = true
         
     }
