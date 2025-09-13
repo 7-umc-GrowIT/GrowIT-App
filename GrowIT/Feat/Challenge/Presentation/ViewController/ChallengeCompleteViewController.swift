@@ -200,12 +200,17 @@ class ChallengeCompleteViewController: UIViewController {
 extension ChallengeCompleteViewController: UITextViewDelegate{
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        // "Done" 버튼을 눌렀을 때 키보드 내리기
+        // "Done" (엔터) 입력 시 키보드 내리기
         if text == "\n" {
-            textView.resignFirstResponder()
-            return false
+            //textView.resignFirstResponder()
+            return true
         }
-        return true
+        
+        // 현재 텍스트와 입력할 텍스트의 합으로 새 길이 계산
+        let currentText = textView.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
+        return updatedText.count <= 100 // 100자 제한
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {

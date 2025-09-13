@@ -271,7 +271,7 @@ class ChallengeCompleteView: UIView {
         $0.layer.borderWidth = 1
         $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
         $0.textContainerInset = .init(top: 12, left: 12, bottom: 12, right: 12)
-        $0.returnKeyType = .done
+        $0.returnKeyType = .default
         $0.setLineSpacing(spacing: 8, font: .body1Medium(), color: .gray900)
     }
     
