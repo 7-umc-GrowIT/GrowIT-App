@@ -54,6 +54,7 @@ class VoiceDiaryEntryView: UIView {
     
     private let tooltipView = ToolTipView().then {
         $0.configure(text: "처음이라면 크레딧 5 증정!")
+        $0.isHidden = true
     }
     
     let helpLabel = UILabel().then {
@@ -106,5 +107,8 @@ class VoiceDiaryEntryView: UIView {
         }
     }
     
+    public func showEventMessage(_ hasBefore: Bool) {
+        tooltipView.isHidden = hasBefore
+    }
     
 }

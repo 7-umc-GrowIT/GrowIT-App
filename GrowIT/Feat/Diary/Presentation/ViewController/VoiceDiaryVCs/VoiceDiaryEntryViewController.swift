@@ -22,6 +22,8 @@ class VoiceDiaryEntryViewController: UIViewController {
         setupNavigationBar()
         setupActions()
         navigationController?.navigationBar.isHidden = false
+        
+        checkHasVoiceDiary()
     }
     
     // MARK: Setup Navigation Bar
@@ -73,5 +75,17 @@ class VoiceDiaryEntryViewController: UIViewController {
         nextVC.modalPresentationStyle = .pageSheet
         
         presentSheet(nextVC, heightRatio: 0.336)
+    }
+    
+    private func checkHasVoiceDiary() {
+        diaryService.fetchHasVoiceDiary() { result in
+            switch result {
+            case .success(let data):
+                print(data)
+                self.voiceDiaryEntryView.showEventMessage(data)
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
 }
