@@ -12,6 +12,7 @@ struct ChallengeStatusResponseDTO: Decodable {
     let content: [UserChallengeDto]
     let currentPage: Int
     let totalPages: Int
+    let totalElements: Int
     let first: Bool
     let last: Bool
 }

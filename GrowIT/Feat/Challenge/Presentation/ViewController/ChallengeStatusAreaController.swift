@@ -35,7 +35,7 @@ final class ChallengeStatusAreaController: UIViewController {
         setupCollectionView()
         setupNotifications()
         bindViewModel()
-        viewModel.moveToPage(1) // 진입 시 1페이지 조회
+        viewModel.fetchChallengesForStatus(index: 0, page: 1)// 진입 시 1페이지 조회
     }
     
     // MARK: - Setup
@@ -69,7 +69,6 @@ final class ChallengeStatusAreaController: UIViewController {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.challengeStatusArea.challengeAllList.reloadData()
-                self?.challengeStatusArea.challengeStatusNum.text = "\(self?.viewModel.challenges.count ?? 0)"
                 self?.scrollToTop()
             }
             .store(in: &cancellables)
@@ -94,6 +93,13 @@ final class ChallengeStatusAreaController: UIViewController {
             .receive(on: RunLoop.main)
             .sink { [weak self] totalPages in
                 self?.challengeStatusArea.totalPage = totalPages
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$totalElements
+            .receive(on: RunLoop.main)
+            .sink { [weak self] totalElements in
+                self?.challengeStatusArea.challengeStatusNum.text = (totalElements > 0) ? "\(totalElements)" : ""
             }
             .store(in: &cancellables)
     }
