@@ -23,6 +23,17 @@ class ChallengeVerifyView: UIView {
     }
     
     // MARK: - Property
+    public lazy var scrollView = UIScrollView(frame: self.bounds).then{
+        $0.isScrollEnabled = true
+        $0.showsVerticalScrollIndicator = false
+        $0.showsHorizontalScrollIndicator = false
+        $0.contentOffset = CGPoint(x: 0, y: 0)
+        $0.contentSize = contentView.bounds.size
+    }
+    
+    public lazy var contentView = UIView().then{
+        $0.backgroundColor = .clear
+    }
     
     private lazy var challengeIcon = UIImageView().then{
         $0.image = UIImage(named: "challengeListIcon")
@@ -141,24 +152,41 @@ class ChallengeVerifyView: UIView {
     
     // MARK: - addFunc & Constraints
     private func addComponents(){
-        [challengeIcon, titleStack, imageStack, reviewStack, reviewHintText, challengeVerifyButton].forEach(self.addSubview)
-        [challengeName, subTitle].forEach(titleStack.addArrangedSubview)
+        self.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
         [imageUploadLabel, imageContainer].forEach(imageStack.addArrangedSubview)
         [oneLineReviewLabel, reviewTextView].forEach(reviewStack.addArrangedSubview)
         imageContainer.addSubview(imageUploadStack)
         [imageUploadIcon, imageUploadText].forEach(imageUploadStack.addArrangedSubview)
+        
+        [challengeIcon, challengeName, subTitle, imageStack, reviewStack, reviewHintText, challengeVerifyButton].forEach(contentView.addSubview)
     }
     
     private func constraints(){
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalTo(scrollView)
+        }
+        
         challengeIcon.snp.makeConstraints{
-            $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(32)
+            $0.top.equalTo(contentView.snp.top).offset(32)
             $0.left.equalToSuperview().offset(24)
             $0.width.height.equalTo(40)
         }
         
-        titleStack.snp.makeConstraints{
+        challengeName.snp.makeConstraints {
             $0.top.equalTo(challengeIcon.snp.bottom).offset(8)
-            $0.left.equalToSuperview().offset(24)
+            $0.horizontalEdges.equalToSuperview().inset(24)
+        }
+        
+        subTitle.snp.makeConstraints {
+            $0.top.equalTo(challengeName.snp.bottom).offset(4)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         imageContainer.snp.makeConstraints{
@@ -173,14 +201,16 @@ class ChallengeVerifyView: UIView {
             $0.center.equalToSuperview()
         }
         
+        
         imageStack.snp.makeConstraints{
-            $0.top.equalTo(titleStack.snp.bottom).offset(20)
+            $0.top.equalTo(subTitle.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         reviewTextView.snp.makeConstraints{
             $0.height.equalTo(140)
         }
+        
         reviewStack.snp.makeConstraints {
             $0.top.equalTo(imageStack.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(24)
@@ -192,9 +222,9 @@ class ChallengeVerifyView: UIView {
         }
         
         challengeVerifyButton.snp.makeConstraints {
-            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom).inset(20)
+            $0.top.equalTo(reviewHintText.snp.bottom).offset(200)
             $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.bottom.equalTo(contentView.snp.bottom).offset(-20)
         }
     }
-    
 }

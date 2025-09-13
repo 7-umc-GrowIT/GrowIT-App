@@ -41,7 +41,13 @@ class ChallengeVerifyViewController: UIViewController {
         setupInitialTextViewState()
         
         challengeVerifyView.setChallengeName(name: challenge?.title ?? "")
-        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("스크롤뷰 높이는 \(challengeVerifyView.scrollView.contentSize.height)")
+        print("컨텐트뷰 높이는 \(challengeVerifyView.contentView.frame.height)")
+        print("화면 전체 높이는 \(UIScreen.main.bounds.height)")
     }
     
     init(challenge: UserChallenge?){
@@ -133,20 +139,28 @@ class ChallengeVerifyViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
-    /// 키보드가 나타나면 키보드 높이만큼 화면 올리기
-    @objc private func keyboardWillShow(notification: NSNotification) {
-        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
-        if self.view.frame.origin.y == 0 {
-            self.view.frame.origin.y -= keyboardSize.height
+    @objc func keyboardWillShow(_ sender: Notification) {
+        guard let keyboardFrame = sender.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue,
+              let currentResponder = UIResponder.currentResponder as? UIView else { return }
+
+        let keyboardTopY = keyboardFrame.cgRectValue.origin.y
+        let convertedFrame = challengeVerifyView.scrollView.convert(currentResponder.frame, from: currentResponder.superview)
+        let responderBottomY = convertedFrame.maxY
+
+        // 스크롤뷰 내에서 현재 응답자가 가려지는지 확인
+        if responderBottomY > keyboardTopY {
+            let shift = responderBottomY - keyboardTopY + 16
+
+            // scrollView의 contentOffset을 변경하여 텍스트뷰가 보이도록 이동
+            challengeVerifyView.scrollView.setContentOffset(CGPoint(x: 0, y: shift), animated: true)
         }
     }
-    
-    /// 키보드 내려가면 원래대로 복구
-    @objc private func keyboardWillHide(notification: NSNotification) {
-        if self.view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
-        }
+
+    @objc func keyboardWillHide(_ sender: Notification) {
+        // 스크롤뷰의 contentOffset을 0,0으로 되돌립니다.
+        challengeVerifyView.scrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
     }
+
     /// 인증하기 버튼 터치 이벤트
     @objc private func challengeVerifyButtonTapped() {
         
@@ -285,4 +299,21 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
     }
     
     
+}
+
+extension UIResponder {
+    
+    private struct Static {
+        static weak var responder: UIResponder?
+    }
+    
+    static var currentResponder: UIResponder? {
+        Static.responder = nil
+        UIApplication.shared.sendAction(#selector(UIResponder._trap), to: nil, from: nil, for: nil)
+        return Static.responder
+    }
+    
+    @objc private func _trap() {
+        Static.responder = self
+    }
 }
