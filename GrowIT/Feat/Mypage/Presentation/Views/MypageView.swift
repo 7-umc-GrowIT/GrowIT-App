@@ -45,7 +45,7 @@ class MypageView: UIView {
     }
     
     public lazy var nicknameLabel = AppLabel(text: "",
-                                         font: .subHeading2(),
+                                         font: .heading2Bold(),
                                          textColor: .gray900)
     
     public lazy var editProfileButton = SmallTextButton(title: "프로필 수정하기",
