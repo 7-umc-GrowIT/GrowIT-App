@@ -111,7 +111,7 @@ class ChallengeStatusArea: UIView {
         button.titleLabel?.numberOfLines = 1
         button.layer.cornerRadius = 6
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        button.layer.borderColor = UIColor.border.cgColor
         
         return button
     }

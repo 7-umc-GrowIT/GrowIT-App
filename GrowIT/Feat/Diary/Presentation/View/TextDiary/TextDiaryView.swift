@@ -62,7 +62,7 @@ class TextDiaryView: UIView, UITextViewDelegate {
         $0.text = "일기 내용을 입력하세요"
         $0.layer.cornerRadius = 8
         $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        $0.layer.borderColor = UIColor.border.cgColor
         $0.setLineSpacing(spacing: 8, font: .body1Medium(), color: .gray300)
     }
     

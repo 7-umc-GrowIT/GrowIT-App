@@ -57,6 +57,7 @@ extension UIColor{
 
     ///Stroke Colors
     static let stroke2 = UIColor(named: "border-2")
+    static let borderColor = UIColor(named: "border")
     
     /// HEX 문자열을 UIColor로 변환하는 초기화 메서드
     convenience init?(hex: String) {
