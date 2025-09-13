@@ -216,7 +216,7 @@ extension ChallengeCompleteViewController: UITextViewDelegate{
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        let textLength = textView.text.count
+        let textLength = textView.text.trimmingCharacters(in: .whitespacesAndNewlines).count
         
         if(textLength == 0){
             challengeCompleteView.validateTextView(errorMessage: "챌린지 한줄소감은 필수로 입력해야 합니다", textColor: .negative400, bgColor: .negative50, borderColor: .negative400, hintColor: .negative400)
@@ -239,7 +239,7 @@ extension ChallengeCompleteViewController: UITextViewDelegate{
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        let textLength = textView.text.count
+        let textLength = textView.text.trimmingCharacters(in: .whitespacesAndNewlines).count
         
         if(textLength == 0){
             challengeCompleteView.reviewContainer.text = "챌린지 소감을 간단하게 입력해 주세요"

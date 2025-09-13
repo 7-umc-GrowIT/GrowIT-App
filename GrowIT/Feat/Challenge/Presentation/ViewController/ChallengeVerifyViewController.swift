@@ -249,7 +249,7 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
         }
     
     func textViewDidChange(_ textView: UITextView) {
-        reviewLength = textView.text?.count ?? 0
+        reviewLength = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines).count ?? 0
         
         if(reviewLength < 50 || reviewLength > 100){
            isReviewValidate = false
@@ -265,7 +265,7 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        reviewLength = textView.text?.count ?? 0
+        reviewLength = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines).count ?? 0
         
         if(reviewLength == 0){
             isReviewValidate = false
