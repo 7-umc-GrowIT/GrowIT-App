@@ -37,6 +37,8 @@ class TermsDetailViewController: UIViewController, UITextViewDelegate {
     }
     
     private func setupUI() {
+        termsDetailView.agreeButton.isEnabled = false
+
         view.addSubview(termsDetailView)
         termsDetailView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
