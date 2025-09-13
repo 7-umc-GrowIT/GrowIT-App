@@ -39,7 +39,7 @@ class TermsDetailView: UIView {
         contentTextView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(32)
             make.leading.trailing.equalToSuperview().inset(20)
-            make.bottom.equalToSuperview().offset(-80)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-90)
         }
 
         
