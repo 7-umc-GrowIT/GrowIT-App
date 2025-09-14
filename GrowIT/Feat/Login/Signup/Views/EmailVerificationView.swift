@@ -46,7 +46,9 @@ class EmailVerificationView: UIView {
         textfieldTitle: "인증번호",
         placeholder: "인증번호를 입력해 주세요",
         buttonTitle: "인증하기"
-    )
+    ).then {
+        $0.setTextFieldInteraction(enabled: false)
+    }
     
     public lazy var nextButton = AppButton(
         title: "다음으로",
