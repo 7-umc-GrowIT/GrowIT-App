@@ -70,9 +70,9 @@ class AppTextField: UIView {
     }
     
     // MARK: - Init
-    init(frame: CGRect, isPasswordField: Bool = false) {
+    init(isPasswordField: Bool = false) {
         self.isPassword = isPasswordField
-        super.init(frame: frame)
+        super.init(frame: .zero)
         addViews()
         setupConstraints()
         addTargets()
@@ -172,8 +172,11 @@ class AppTextField: UIView {
     }
     
     private func applySuccessStyle() {
+        titleLabel.textColor = .gray900
+        textField.textColor = .positive400
         textField.layer.borderColor = UIColor.positive400.cgColor
         textField.backgroundColor = .positive50
+        clearButton.setImage(UIImage(named: "State=Default"), for: .normal)
         if isPassword {
             eyeButton.tintColor = .positive100
         }
