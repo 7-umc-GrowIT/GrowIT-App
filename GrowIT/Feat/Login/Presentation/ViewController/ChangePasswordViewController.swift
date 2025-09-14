@@ -226,26 +226,27 @@ class ChangePasswordViewController: UIViewController {
         guard let newPassword = changePasswordView.newPwdTextField.textField.text,
               let confirmPassword = changePasswordView.pwdCheckTextField.textField.text else { return }
         
-        if newPassword.isEmpty && confirmPassword.isEmpty {
+        // 둘 다 비어있는 경우
+        if newPassword.isEmpty || confirmPassword.isEmpty {
             changePasswordView.newPwdTextField.setState(.none)
             changePasswordView.pwdCheckTextField.setState(.none)
             return
         }
         
-        if !isValidPassword(newPassword) {
-            changePasswordView.newPwdTextField.setState(.error("영문, 숫자, 특수문자를 포함한 8~30자로 입력해주세요"))
-            return
-        }
+        // 새로운 비밀번호가 유효성에 맞지 않는 경우
+        isValidPassword(newPassword) ? changePasswordView.newPwdTextField.setState(.none) : changePasswordView.newPwdTextField.setState(.error("영문, 숫자, 특수문자를 포함한 8~30자로 입력해주세요"))
         
+        // 비밀번호 확인
         if !confirmPassword.isEmpty {
             if newPassword == confirmPassword {
-                changePasswordView.newPwdTextField.setState(.success("사용 가능한 비밀번호입니다"))
+                changePasswordView.newPwdTextField.setState(.success(""))
                 changePasswordView.pwdCheckTextField.setState(.success("비밀번호가 일치합니다"))
             } else {
                 changePasswordView.pwdCheckTextField.setState(.error("비밀번호가 일치하지 않습니다"))
             }
         }
         
+        // 두 비밀번호가 맞고 새로운 비밀번호가 유효성에 맞는 경우
         let isPasswordsMatch = isValidPassword(newPassword) && newPassword == confirmPassword
         changePasswordView.changePwdButton.setButtonState(
             isEnabled: isPasswordsMatch,
@@ -288,6 +289,8 @@ class ChangePasswordViewController: UIViewController {
     private func handleVerificationSuccess() {
         changePasswordView.codeField.setTextFieldInteraction(enabled: false)
         changePasswordView.emailField.setTextFieldInteraction(enabled: false)
+        changePasswordView.newPwdTextField.setTextFieldInteraction(enabled: true)
+        changePasswordView.pwdCheckTextField.setTextFieldInteraction(enabled: true)
         
         changePasswordView.codeField.setButtonState(isEnabled: false)
         changePasswordView.emailField.setButtonState(isEnabled: false)

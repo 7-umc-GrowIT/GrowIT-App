@@ -34,17 +34,21 @@ class ChangePasswordView: UIView {
         textfieldTitle: "인증번호",
         placeholder: "인증번호를 입력해 주세요",
         buttonTitle: "인증하기"
-    )
+    ).then {
+        $0.setTextFieldInteraction(enabled: false)
+    }
     
     public lazy var newPwdTextField = AppTextField(isPasswordField: true).then {
         $0.setTitleLabel("새로운 비밀번호")
         $0.setPlaceholder("새로운 비밀번호를 입력해 주세요")
+        $0.setTextFieldInteraction(enabled: false)
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
     public lazy var pwdCheckTextField = AppTextField(isPasswordField: true).then {
         $0.setTitleLabel("비밀번호 확인")
         $0.setPlaceholder("비밀번호를 한 번 더 입력해 주세요")
+        $0.setTextFieldInteraction(enabled: false)
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -84,13 +88,11 @@ class ChangePasswordView: UIView {
         newPwdTextField.snp.makeConstraints {
             $0.top.equalTo(codeField.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.height.equalTo(78)
         }
         
         pwdCheckTextField.snp.makeConstraints {
             $0.top.equalTo(newPwdTextField.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.height.equalTo(78)
         }
         
         changePwdButton.snp.makeConstraints {
