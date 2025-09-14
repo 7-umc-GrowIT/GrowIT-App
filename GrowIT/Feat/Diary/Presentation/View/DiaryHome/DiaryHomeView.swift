@@ -65,7 +65,6 @@ class DiaryHomeView: UIView {
         [diaryHomeNavbar, diaryHomeScrollView].forEach(self.addSubview)
         diaryHomeScrollView.addSubview(contentView)
         contentView.addSubviews([diaryHomeBanner, diaryHomeCalendarHeader])
-        //[diaryHomeBanner, diaryHomeCalendarHeader].forEach(diaryHomeStack.addArrangedSubview)
     }
     
     private func constraints(){
@@ -79,9 +78,6 @@ class DiaryHomeView: UIView {
         diaryHomeScrollView.snp.makeConstraints{
             $0.top.equalTo(diaryHomeNavbar.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            // 높이의 17% 값을 계산하여 bottom inset으로 사용
-//            let bottomInset = self.frame.size.height * 0.17
-//            $0.bottom.equalToSuperview().inset(bottomInset)
             $0.bottom.equalToSuperview()
         }
         

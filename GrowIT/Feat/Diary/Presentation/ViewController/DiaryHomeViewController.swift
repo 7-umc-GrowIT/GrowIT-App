@@ -24,7 +24,7 @@ class DiaryHomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view = diaryHomeView
-        view.backgroundColor = .white
+        view.backgroundColor = .gray50
         navigationController?.navigationBar.isHidden = true
         setupCalendarView()
         setupActions()
