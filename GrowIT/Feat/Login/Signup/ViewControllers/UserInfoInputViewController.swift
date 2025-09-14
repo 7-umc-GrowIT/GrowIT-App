@@ -188,7 +188,7 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
             return
         }
         
-        let request = EmailSignUpRequest(
+        let request = AuthSignUpRequestDTO(
             isVerified: isVerified,
             email: email,
             name: name,
@@ -202,7 +202,7 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         print("- 이름: \(request.name)")
         print("- 약관 동의 상태: \(request.userTerms)")
         
-        authService.signUp(type: "email", data: request) { result in
+        authService.postAuthSignUp(type: "email", data: request) { result in
             switch result {
             case .success(let response):
                 print("✅ 회원가입 성공: \(response.message)")

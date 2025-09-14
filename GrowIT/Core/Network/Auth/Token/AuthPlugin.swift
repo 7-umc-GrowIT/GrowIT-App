@@ -25,8 +25,8 @@ final class AuthPlugin: PluginType {
         var request = request
         if let authTarget = target as? AuthorizationEndpoints {
             switch authTarget {
-            case .postEmailLogin, .postEmailSignUp, .postKakaoLogin,
-                .postAppleLogin, .postSendEmailVerification, .postReissueToken:
+            case .postLogin, .postSignUp, .postLoginKakao,
+                    .postLoginApple, .postEmailSend, .postReissueToken:
                 return request
             default: break
             }
@@ -79,7 +79,7 @@ final class AuthPlugin: PluginType {
     // MARK: - 토큰 갱신
     private func performTokenRefresh(refreshToken: String) {
         let provider = MoyaProvider<AuthorizationEndpoints>()
-        let request = ReissueTokenRequest(refreshToken: refreshToken)
+        let request = AuthReissueRequestDTO(refreshToken: refreshToken)
         provider.request(.postReissueToken(data: request)) { [weak self] result in
             guard let self = self else { return }
             self.lock.lock()
@@ -91,7 +91,7 @@ final class AuthPlugin: PluginType {
             switch result {
             case .success(let response):
                 do {
-                    let decoded = try JSONDecoder().decode(ReissueResponse.self, from: response.data)
+                    let decoded = try JSONDecoder().decode(AuthReissueResponseDTO.self, from: response.data)
                     if decoded.isSuccess {
                         TokenManager.shared.saveAccessToken(decoded.result.accessToken)
                         queued.forEach { target, callback in

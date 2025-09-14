@@ -103,7 +103,7 @@ class EmailLoginViewController: UIViewController {
             return
         }
         
-        let loginRequest = EmailLoginRequest(email: email, password: password)
+        let loginRequest = AuthLoginRequestDTO(email: email, password: password)
         
         authService.loginEmail(data: loginRequest) { [weak self] result in
             guard let self = self else { return }

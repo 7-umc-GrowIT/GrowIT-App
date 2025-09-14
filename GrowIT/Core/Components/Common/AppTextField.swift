@@ -33,7 +33,7 @@ class AppTextField: UIView {
         $0.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 12.0, height: 0.0))
         $0.leftViewMode = .always
         $0.rightView = buttonStackView
-        $0.rightViewMode = .always
+        $0.rightViewMode = .whileEditing
     }
     
     lazy var eyeButton = UIButton().then {
@@ -253,7 +253,7 @@ class AppTextField: UIView {
     
     // MARK: - Setup UI
     private func addViews() {
-        self.addSubviews([buttonStackView, allStackView])
+        self.addSubview(allStackView)
         
         buttonStackView.addArrangedSubViews([eyeButton, clearButton, spacer])
         allStackView.addArrangedSubViews([titleLabel, textField, bottomLabel])
@@ -277,11 +277,6 @@ class AppTextField: UIView {
         
         bottomLabel.snp.makeConstraints {
             $0.leading.equalToSuperview()
-        }
-        
-        buttonStackView.snp.makeConstraints {
-            $0.centerY.equalTo(textField)
-            $0.trailing.equalTo(textField.snp.trailing).inset(12)
         }
         
         eyeButton.snp.makeConstraints {

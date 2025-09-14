@@ -161,31 +161,35 @@ fileprivate func handleResponse<T: Decodable>(
     _ response: Response,
     decodingType: T.Type
 ) -> Result<T, NetworkError> {
-        do {
-            print("🔍 handleResponse 호출됨 - Status: \(response.statusCode)")
-            
-            // 200-299 성공 응답만 처리
-            // 401 에러가 여기까지 왔다는 것은 AuthPlugin에서 처리하지 못했거나
-            // 토큰 갱신에 실패했다는 뜻
-            guard (200...299).contains(response.statusCode) else {
-                let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
-                let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
-                return .failure(.serverError(statusCode: response.statusCode, message: message))
-            }
-            
-            let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
-            
-            if let result = apiResponse.result {
-                return .success(result)
-            } else if T.self == EmptyResult.self {
-                return .success(EmptyResult() as! T)
-            } else {
-                return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
-            }
-        } catch {
-            return .failure(.decodingError)
+    do {
+        print("🔍 handleResponse 호출됨 - Status: \(response.statusCode)")
+        
+        guard (200...299).contains(response.statusCode) else {
+            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
+            let message = errorResponse?.message ?? "HTTP \(response.statusCode)"
+            return .failure(.serverError(statusCode: response.statusCode, message: message))
         }
+        
+        // 🔑 result 없는 경우 VerifyResponse 직접 디코딩 허용
+        if T.self == AuthEmailVerifyResponseDTO.self {
+            let decoded = try JSONDecoder().decode(AuthEmailVerifyResponseDTO.self, from: response.data)
+            return .success(decoded as! T)
+        }
+        
+        let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
+        
+        if let result = apiResponse.result {
+            return .success(result)
+        } else if T.self == EmptyResponse.self {
+            print("📩 서버 메시지: \(apiResponse.message)")
+            return .success(EmptyResponse() as! T)
+        } else {
+            return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
+        }
+    } catch {
+        return .failure(.decodingError)
     }
+}
 
 
 fileprivate func handleResponseOptional<T: Decodable>(
