@@ -36,7 +36,7 @@ class DiaryHomeCalendarHeader: UIView {
     let allViewText = UILabel().then {
         $0.text = "한 번에 모아보기"
         $0.font = .detail1Medium()
-        $0.textColor = .gray500
+        $0.textColor = .gray400
         $0.adjustsFontSizeToFitWidth = true
     }
     
