@@ -113,12 +113,22 @@ class AppTextField: UIView {
         allStackView.setCustomSpacing(CGFloat(spacing), after: titleLabel)
     }
     
+    func setTitleLabeloffset(_ offset: Int) {
+        textField.snp.updateConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(offset)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(48)
+        }
+    }
+    
     // MARK: - 상태관리
     enum BottomLabelState {
         case none
         case hint(String)
         case error(String)
         case success(String)
+        case errorNotLabel
+        case successNotLabel
     }
     
     func setState(_ state: BottomLabelState) {
@@ -139,6 +149,14 @@ class AppTextField: UIView {
         case .success(let message):
             applySuccessStyle()
             showBottomLabel(message: message, color: .positive400)
+            
+        case .errorNotLabel:
+            applyErrorStyle()
+            hideBottomLabel()
+            
+        case .successNotLabel:
+            applySuccessStyle()
+            hideBottomLabel()
         }
     }
     
@@ -198,6 +216,8 @@ class AppTextField: UIView {
     private func handleEditingDidBegin() {
         if case .error = currentState { return }
         if case .success = currentState { return }
+        if case .errorNotLabel = currentState { return }
+        if case .successNotLabel = currentState { return }
         
         textField.layer.borderColor = UIColor.primary500.cgColor
     }

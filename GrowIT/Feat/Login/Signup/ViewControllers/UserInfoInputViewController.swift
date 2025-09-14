@@ -139,9 +139,10 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         // 비밀번호 확인 검사
         if !confirmPassword.isEmpty {
             if isValidPassword(password) && password == confirmPassword {
-                userInfoView.passwordTextField.setState(.success(""))
+                userInfoView.passwordTextField.setState(.successNotLabel)
                 userInfoView.passwordCheckTextField.setState(.success("비밀번호가 일치합니다"))
             } else if password != confirmPassword {
+                userInfoView.passwordTextField.setState(.errorNotLabel)
                 userInfoView.passwordCheckTextField.setState(.error("비밀번호가 일치하지 않습니다"))
             }
         }
