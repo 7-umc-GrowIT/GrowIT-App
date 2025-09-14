@@ -71,7 +71,10 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         userInfoView.passwordTextField.textField.returnKeyType = .next
         userInfoView.passwordCheckTextField.textField.returnKeyType = .done
         
-        // 비밀번호 변경 이벤트 감지
+        // 이름 이벤트 감지
+        userInfoView.nameTextField.textField.addTarget(self, action: #selector(nameFieldDidChange), for: .editingChanged)
+        
+        // 비밀번호 이벤트 감지
         [userInfoView.passwordTextField.textField,
          userInfoView.passwordCheckTextField.textField].forEach {
             $0.addTarget(self, action: #selector(passwordFieldsDidChange), for: .editingChanged)
@@ -87,17 +90,24 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         return NSPredicate(format: "SELF MATCHES %@", passwordRegex).evaluate(with: password)
     }
     
+    private func isValidName(_ name: String) -> Bool {
+        return name.count >= 1 && name.count <= 20
+    }
+    
     // MARK: - Update Button States
     private func nextButtonState() {
-        guard let password = userInfoView.passwordTextField.textField.text,
+        guard let name = userInfoView.nameTextField.textField.text,
+              let password = userInfoView.passwordTextField.textField.text,
               let confirmPassword = userInfoView.passwordCheckTextField.textField.text
         else { return }
         
+        let isNameValid = isValidName(name)
         let isPasswordsMatch = isValidPassword(password) && password == confirmPassword
+        let isFormValid = isNameValid && isPasswordsMatch
         
-        userInfoView.nextButton.isEnabled = isPasswordsMatch
+        userInfoView.nextButton.isEnabled = isFormValid
         userInfoView.nextButton.setButtonState(
-            isEnabled: isPasswordsMatch,
+            isEnabled: isFormValid,
             enabledColor: .black,
             disabledColor: .gray100,
             enabledTitleColor: .white,
@@ -111,6 +121,20 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         let navController = UINavigationController(rootViewController: emailErrorVC)
         navController.modalPresentationStyle = .pageSheet
         presentSheet(navController, heightRatio: 314/932)
+    }
+    
+    @objc private func nameFieldDidChange() {
+        guard let name = userInfoView.nameTextField.textField.text else { return }
+        
+        if name.isEmpty {
+            userInfoView.nameTextField.setState(.none)
+        } else if !isValidName(name) {
+            userInfoView.nameTextField.setState(.error("이름은 1~20자 이내로 입력해 주세요"))
+        } else {
+            userInfoView.nameTextField.setState(.none)
+        }
+        
+        nextButtonState()
     }
     
     @objc private func passwordFieldsDidChange() {
