@@ -145,7 +145,7 @@ class EmailLoginViewController: UIViewController {
                     } else {
                         switch response.message {
                         case "이메일 또는 비밀번호가 일치하지 않습니다.":
-                            self.emailLoginView.emailTextField.setState(.error(""))
+                            self.emailLoginView.emailTextField.setState(.errorNotLabel)
                             self.emailLoginView.pwdTextField.setState(.error("입력한 이메일 또는 비밀번호가 일치하지 않습니다"))
                         case "사용자를 찾을 수 없습니다.":
                             self.emailLoginView.emailTextField.setState(.error("가입되지 않은 이메일입니다"))

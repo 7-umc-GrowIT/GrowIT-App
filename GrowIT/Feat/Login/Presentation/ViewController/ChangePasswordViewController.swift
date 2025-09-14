@@ -239,9 +239,10 @@ class ChangePasswordViewController: UIViewController {
         // 비밀번호 확인
         if !confirmPassword.isEmpty {
             if newPassword == confirmPassword {
-                changePasswordView.newPwdTextField.setState(.success(""))
+                changePasswordView.newPwdTextField.setState(.successNotLabel)
                 changePasswordView.pwdCheckTextField.setState(.success("비밀번호가 일치합니다"))
             } else {
+                changePasswordView.pwdCheckTextField.setState(.errorNotLabel)
                 changePasswordView.pwdCheckTextField.setState(.error("비밀번호가 일치하지 않습니다"))
             }
         }
