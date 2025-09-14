@@ -383,7 +383,7 @@ class ChallengeCompleteView: UIView {
         [imageLabel, imageContainer].forEach(imageStack.addArrangedSubview)
         [reviewLabel, reviewContainer].forEach(reviewStack.addArrangedSubview)
         [challengeExitButton, challengeUpdateButton].forEach(buttonStack.addArrangedSubview)
-//        [titleIcon, title, challengeStack, imageStack, reviewStack, reviewHintText, buttonStack].forEach(challengeCompleteStack.addArrangedSubview)
+
     }
     
     private func addComponents(){

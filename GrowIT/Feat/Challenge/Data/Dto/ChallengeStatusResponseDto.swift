@@ -20,6 +20,7 @@ struct ChallengeStatusResponseDTO: Decodable {
 struct UserChallengeDto: Decodable {
     let id: Int
     let title: String
+    let content: String
     let challengeType: String
     let time: Int
     let completed: Bool

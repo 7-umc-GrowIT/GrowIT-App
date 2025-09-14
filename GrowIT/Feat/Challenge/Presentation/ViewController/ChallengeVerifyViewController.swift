@@ -41,13 +41,7 @@ class ChallengeVerifyViewController: UIViewController {
         setupInitialTextViewState()
         
         challengeVerifyView.setChallengeName(name: challenge?.title ?? "")
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        print("스크롤뷰 높이는 \(challengeVerifyView.scrollView.contentSize.height)")
-        print("컨텐트뷰 높이는 \(challengeVerifyView.contentView.frame.height)")
-        print("화면 전체 높이는 \(UIScreen.main.bounds.height)")
+        challengeVerifyView.setContent(name: challenge?.content ?? "")
     }
     
     init(challenge: UserChallenge?){
