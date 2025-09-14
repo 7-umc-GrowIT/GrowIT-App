@@ -232,7 +232,7 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JDiaryCell.identifier, for: indexPath) as? JDiaryCell else { return UICollectionViewCell()}
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiaryCell.identifier, for: indexPath) as? DiaryCell else { return UICollectionViewCell()}
         let firstDayIndex = firstWeekdayOfMonth - 1  // 0-based index
         let day = indexPath.item - firstDayIndex + 1
         
@@ -333,67 +333,70 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
     
     /// 셀 선택 시 실행되는 메소드
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let firstDayIndex = firstWeekdayOfMonth - 1  // 월의 첫 요일 인덱스 계산
+        let firstDayIndex = firstWeekdayOfMonth - 1
         let day = indexPath.item - firstDayIndex + 1
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd" // 날짜 형식 지정
+        dateFormatter.dateFormat = "yyyy-MM-dd"
         
         var dateComponents = DateComponents()
         dateComponents.year = currentYear
         
-        // 달력에서 셀의 날짜 계산
+        // 날짜 계산 (이전 달, 다음 달, 현재 달)
         if day < 1 {
-            // 이전 달
             dateComponents.month = currentMonthIndex == 0 ? 12 : currentMonthIndex
             let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12]
             dateComponents.day = daysInPreviousMonth + day
             dateComponents.year! -= currentMonthIndex == 0 ? 1 : 0
         } else if day > numberOfDaysInMonth {
-            // 다음 달
             dateComponents.month = currentMonthIndex == 11 ? 1 : currentMonthIndex! + 2
             dateComponents.day = day - numberOfDaysInMonth
             dateComponents.year! += currentMonthIndex == 11 ? 1 : 0
         } else {
-            // 현재 달
             dateComponents.month = currentMonthIndex! + 1
             dateComponents.day = day
         }
         
-
-        if let date = Calendar.current.date(from: dateComponents) {
-            let formattedDate = dateFormatter.string(from: date)
-            let today = Calendar.current.startOfDay(for: Date())
-            let selectedDay = Calendar.current.startOfDay(for: date)
-            
-            if(selectedDay > today) {
+        guard let date = Calendar.current.date(from: dateComponents) else { return }
+        let formattedDate = dateFormatter.string(from: date)
+        let today = Calendar.current.startOfDay(for: Date())
+        let selectedDay = Calendar.current.startOfDay(for: date)
+        
+        print("날짜 눌림: \(formattedDate)")
+        print(callendarDiaries)
+        print(formattedDate)
+        if self.isDropDown {
+            print("팝업이 열림")
+            if selectedDay > today {
                 CustomToast(containerWidth: 277).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 작성이 불가능해요", font: .heading3SemiBold())
                 return
             }
             
-            if let result = callendarDiaries.first(where: {$0.date == formattedDate}){
-                if(self.isDropDown){
-                    CustomToast(containerWidth: 310).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 이미 일기를 작성했어요", font: .heading3SemiBold())
-                    return
-                } else{
-                    diaryService.fetchDiary(diaryId: result.diaryId, completion: { [weak self] result in
-                        guard let self = self else {return}
-                        switch result{
-                        case.success(let data):
-                            print("받은 일기 데이터는 \(data)")
-                            let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
-                            presentSheet(diaryPostFixVC, heightRatio: 0.6)
-                        case.failure(let error):
-                            print("Error: \(error)")
-                        }
-                    })
-                    return
-                }
+            if (callendarDiaries.contains(where: {$0.date == formattedDate})){
+                CustomToast(containerWidth: 310).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 이미 일기를 작성했어요", font: .heading3SemiBold())
+                return
+            }else{
+                delegate?.didSelectDate(formattedDate)
             }
-            delegate?.didSelectDate(formattedDate)
+        } else {
+            print("팝업이 안 열림")
+            if let result = callendarDiaries.first(where: { $0.date == formattedDate }) {
+                print("여기까지 들어옴")
+                diaryService.fetchDiary(diaryId: result.diaryId) { [weak self] result in
+                    guard let self = self else { return }
+                    switch result {
+                    case .success(let data):
+                        print("받은 일기 데이터는 \(data)")
+                        let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
+                        self.presentSheet(diaryPostFixVC, heightRatio: 0.6)
+                    case .failure(let error):
+                        print("Error: \(error)")
+                    }
+                }
+                return
+            }
         }
     }
-    
 }
 
 extension Notification.Name {
