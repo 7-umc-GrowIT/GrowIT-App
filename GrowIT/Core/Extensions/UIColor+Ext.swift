@@ -43,6 +43,7 @@ extension UIColor{
     static let negativeColor100 = UIColor(named: "Negative-100")
     static let negativeColor400 = UIColor(named: "Negative-400")
     static let negativeColor400w = UIColor(named: "Negative-400w")
+    static let negativeColorFD90B5 = UIColor(named: "FD90B5")
     
     ///Positive Colors
     static let positiveColor50 = UIColor(named: "Positive-50")

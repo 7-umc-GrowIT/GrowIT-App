@@ -64,7 +64,7 @@ class DiaryCalendar: UIView {
         $0.isScrollEnabled = false
         $0.showsHorizontalScrollIndicator = false
         $0.showsVerticalScrollIndicator = false
-        $0.register(JDiaryCell.self, forCellWithReuseIdentifier: JDiaryCell.identifier)
+        $0.register(DiaryCell.self, forCellWithReuseIdentifier: DiaryCell.identifier)
         $0.register(WeekDayHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: WeekDayHeaderView.reuseIdentifier)
         $0.translatesAutoresizingMaskIntoConstraints = false
     }

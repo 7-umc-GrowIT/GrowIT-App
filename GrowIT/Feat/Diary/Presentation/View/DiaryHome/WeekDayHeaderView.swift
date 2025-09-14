@@ -53,7 +53,7 @@ class WeekDayHeaderView: UICollectionReusableView {
     func configureTheme(isDarkMode: Bool) {
         dayLabels.enumerated().forEach { index, label in
             if isDarkMode {
-                label.textColor = index == 0 ? .negative400 : .gray300
+                label.textColor = index == 0 ? .negative400W : .gray300
             } else {
                 label.textColor = index == 0 ? .negative400 : .gray600
             }

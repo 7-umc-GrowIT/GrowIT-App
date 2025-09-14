@@ -9,7 +9,7 @@ import UIKit
 import Then
 import SnapKit
 
-class JDiaryCell: UICollectionViewCell{
+class DiaryCell: UICollectionViewCell{
     
     static let identifier:String = "JDiaryCell"
     
@@ -55,7 +55,7 @@ class JDiaryCell: UICollectionViewCell{
     public func figure(day:Int, isSunday:Bool, isFromCurrentMonth: Bool, isDark: Bool){
         dateCell.text = "\(day)"
         if(isSunday){
-            dateCell.textColor = .negative400
+            dateCell.textColor = !isDark ? .negative400 : .negative400W
         }else if(!isFromCurrentMonth){
             dateCell.textColor = .gray300
         }else{
@@ -63,7 +63,7 @@ class JDiaryCell: UICollectionViewCell{
         }
         
         if(isDark){
-            dateImage.image = UIImage(named: "diaryIcondark")
+            dateImage.image = UIImage(named: "diaryIconDark")
         }else{
             dateImage.image = UIImage(named: "diaryIcon")
         }
