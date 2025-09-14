@@ -200,7 +200,7 @@ extension ChallengeStatusAreaController: UITableViewDelegate, UITableViewDataSou
         label.font = .heading3Bold()
         label.numberOfLines = 0
         label.text = challenge.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        let availableWidth = tableView.frame.width * 0.5 // name label 제약과 동일
+        let availableWidth = tableView.frame.width * 0.45 // name label 제약과 동일
         let size = label.sizeThatFits(CGSize(width: availableWidth, height: .greatestFiniteMagnitude))
         
         let titleHeight = size.height
