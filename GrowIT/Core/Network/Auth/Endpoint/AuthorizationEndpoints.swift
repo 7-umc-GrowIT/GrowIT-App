@@ -10,19 +10,15 @@ import Moya
 
 enum AuthorizationEndpoints {
     // Post
-    case postVerification(data: EmailVerifyRequest) // 이메일 인증번호 확인 api
-    case postEmailSignUp(data: EmailSignUpRequest) // 이메일 회원가입 api
-    case postSocialSignUp(data: SocialSignUpRequest) // 소셜 간편 가입 api
-    case postReissueToken(data: ReissueTokenRequest) // 토큰 재발급 api
-    case postKakaoLogin(data: SocialLoginRequest)
-    case postAppleLogin(data: SocialLoginRequest)
-    case postEmailLogin(data: EmailLoginRequest)
-    case postSendEmailVerification(type: String, data: SendEmailVerifyRequest) // 인증 메일 전송 api
+    case postSignUp(data: AuthSignUpRequestDTO)
+    case postSignUpSocial(data: AuthSignUpSocialRequestDTO)
+    case postReissueToken(data: AuthReissueRequestDTO)
     case postLogout
-   
-    // Patch
-    case patchSignOut
-    case fetchSignUpTerms
+    case postLogin(data: AuthLoginRequestDTO)
+    case postLoginKakao(data: AuthLoginSocialRequestDTO)
+    case postLoginApple(data: AuthLoginSocialRequestDTO)
+    case postEmailVerify(data: AuthEmailVerifyRequestDTO)
+    case postEmailSend(type: String, data: AuthEmailSendReqeustDTO)
 }
 
 extension AuthorizationEndpoints: TargetType {
@@ -35,37 +31,29 @@ extension AuthorizationEndpoints: TargetType {
     
     var path: String {
         switch self {
-        case .postVerification:
-            return "/verification"
-        case .postEmailSignUp:
+        case .postSignUp:
             return "/signup"
-        case .postSocialSignUp:
+        case .postSignUpSocial:
             return "/signup/social"
         case .postReissueToken:
             return "/reissue"
-        case .postKakaoLogin:
-            return "/login/kakao"
-        case .postAppleLogin:
-            return "/login/apple"
-        case .postEmailLogin:
+        case .postLogin:
             return "/login"
-        case .postSendEmailVerification:
-            return "/email"
         case .postLogout:
             return "/logout"
-        case .patchSignOut:
-            return "/signout"
-        case .fetchSignUpTerms:
-            return "/auth/terms"
+        case .postLoginKakao:
+            return "/login/kakao"
+        case .postLoginApple:
+            return "/login/apple"
+        case .postEmailVerify:
+            return "/email/verify"
+        case .postEmailSend:
+            return "/email/send"
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .fetchSignUpTerms:
-            return .get
-        case .patchSignOut:
-            return .patch
         default:
             return .post
         }
@@ -73,32 +61,28 @@ extension AuthorizationEndpoints: TargetType {
     
     var task: Task {
         switch self {
-        case .postVerification(let data):
+        case .postSignUp(let data):
             return .requestJSONEncodable(data)
-        case .postEmailSignUp(let data):
+        case .postSignUpSocial(let data):
             return .requestJSONEncodable(data)
         case .postReissueToken(let data):
             return .requestJSONEncodable(data)
-        case .postKakaoLogin(let data):
+        case .postLogin(let data):
             return .requestJSONEncodable(data)
-        case .postAppleLogin(let data) :
+        case .postLogout:
+            return .requestPlain
+        case .postLoginKakao(let data):
             return .requestJSONEncodable(data)
-        case .postEmailLogin(let data):
+        case .postLoginApple(let data):
             return .requestJSONEncodable(data)
-        case .postSendEmailVerification(let type, let data):
+        case .postEmailVerify(let data):
+            return .requestJSONEncodable(data)
+        case .postEmailSend(let type, let data):
             return .requestCompositeParameters(
                 bodyParameters: ["email": data.email], // JSON 바디
                 bodyEncoding: JSONEncoding.default,
                 urlParameters: ["type": type] // 쿼리 스트링
             )
-        case .patchSignOut:
-            return .requestPlain
-        case .fetchSignUpTerms:
-            return .requestPlain
-        case .postSocialSignUp(data: let data):
-            return .requestJSONEncodable(data)
-        case .postLogout:
-            return .requestPlain
         }
     }
     
@@ -120,5 +104,5 @@ extension AuthorizationEndpoints: TargetType {
         }
         return headers
     }
-
+    
 }

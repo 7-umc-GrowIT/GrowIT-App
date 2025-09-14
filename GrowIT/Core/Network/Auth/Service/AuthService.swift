@@ -26,14 +26,56 @@ final class AuthService: NetworkManager {
     }
     
     // MARK: - API funcs
-    
-    /// 이메일 인증 확인
-    func verification(data: EmailVerifyRequest, completion: @escaping (Result<VerifyResponse, NetworkError>) -> Void) {
-        request(target: .postVerification(data: data), decodingType: VerifyResponse.self, completion: completion)
+    // 이메일 회원가입 API
+    func postAuthSignUp(type: String, data: AuthSignUpRequestDTO, completion: @escaping (Result<AuthSignUpResponseDTO, NetworkError>) -> Void) {
+        provider.request(.postSignUp(data: data)) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    // 서버에서 받은 JSON 데이터 출력
+                    let jsonString = String(data: response.data, encoding: .utf8)
+                    print("서버 응답 JSON: \(jsonString ?? "데이터 없음")")
+                    
+                    // JSON 디코딩 시 오류 확인
+                    let decodedResponse = try JSONDecoder().decode(AuthSignUpResponseDTO.self, from: response.data)
+                    print("회원가입 성공! 액세스 토큰")
+                    
+                    if let tokens = decodedResponse.result?.tokens {
+                        TokenManager.shared.saveTokens(
+                            accessToken: tokens.accessToken,
+                            refreshToken: tokens.refreshToken
+                        )
+                        print("회원가입 후 토큰 저장 완료")
+                    }
+                    
+                    completion(.success(decodedResponse))
+                    
+                } catch {
+                    // 디코딩 오류 발생 시 상세 원인 출력
+                    print("회원가입 응답 디코딩 실패: \(error)")
+                    if let decodingError = error as? DecodingError {
+                        switch decodingError {
+                        case .keyNotFound(let key, _):
+                            print("키 없음: \(key.stringValue)")
+                        case .typeMismatch(let type, let context):
+                            print("타입 불일치: \(type), \(context.debugDescription)")
+                        case .valueNotFound(let type, let context):
+                            print("값 없음: \(type), \(context.debugDescription)")
+                        default:
+                            print("기타 디코딩 오류: \(error.localizedDescription)")
+                        }
+                    }
+                    completion(.failure(.decodingError))
+                }
+                
+            case .failure(let error):
+                print("네트워크 요청 실패: \(error.localizedDescription)")
+            }
+        }
     }
     
-    // 소셜 간편 가입
-    func signupWithKakao(oauthUserInfo: OauthUserInfo, userTerms: [UserTermDTO], completion: @escaping (Result<SocialSignUpResponse, Error>) -> Void) {
+    // 소셜 간편 가입 API
+    func postAuthSocialSignUp(oauthUserInfo: OauthUserInfo, userTerms: [UserTermDTO], completion: @escaping (Result<AuthSignUpSocialResponseDTO, Error>) -> Void) {
         let url = URL(string: "\(Constants.API.authURL)/signup/social")!
         
         var request = URLRequest(url: url)
@@ -72,7 +114,7 @@ final class AuthService: NetworkManager {
             
             if httpResponse.statusCode == 200 {
                 do {
-                    let signupResponse = try JSONDecoder().decode(SocialSignUpResponse.self, from: data)
+                    let signupResponse = try JSONDecoder().decode(AuthSignUpSocialResponseDTO.self, from: data)
                     completion(.success(signupResponse))
                 } catch {
                     completion(.failure(error))
@@ -86,129 +128,16 @@ final class AuthService: NetworkManager {
         task.resume()
     }
     
-    
-    // 카카오 소셜 로그인 API
-    func postLoginKakao(data: SocialLoginRequest, completion: @escaping (Result<SocialLoginResponse, NetworkError>) -> Void) {
-        provider.request(.postKakaoLogin(data: data)) { result in
-            switch result {
-            case .success(let response):
-                do {
-                    let decoded = try JSONDecoder().decode(SocialLoginResponse.self, from: response.data)
-                    completion(.success(decoded))
-                } catch {
-                    completion(.failure(.decodingError))
-                }
-            case .failure(let error):
-                completion(.failure(.networkError(message: error.localizedDescription)))
-            }
-        }
-    }
-    
-    // 애플 소셜 로그인 API
-    func postLoginApple(data: SocialLoginRequest, completion: @escaping (Result<SocialLoginResponse, NetworkError>) -> Void) {
-        provider.request(.postAppleLogin(data: data)) { result in
-            switch result {
-            case .success(let response):
-                do {
-                    let decoded = try JSONDecoder().decode(SocialLoginResponse.self, from: response.data)
-                    completion(.success(decoded))
-                } catch {
-                    completion(.failure(.decodingError))
-                }
-            case .failure(let error):
-                completion(.failure(.networkError(message: error.localizedDescription)))
-            }
-        }
-    }
-    
-    /// 이메일 로그인
-    func loginEmail(data: EmailLoginRequest, completion: @escaping (Result<EmailLoginResponse, NetworkError>) -> Void) {
-        provider.request(.postEmailLogin(data: data)) { result in
-            switch result {
-            case .success(let response):
-                do {
-                    let decodedResponse = try JSONDecoder().decode(EmailLoginResponse.self, from: response.data)
-                    print("로그인 응답: \(decodedResponse)")
-                    
-                    completion(.success(decodedResponse))
-                    
-                } catch {
-                    print("로그인 응답 디코딩 실패: \(error)")
-                    completion(.failure(.decodingError))
-                }
-                
-            case .failure(let error):
-                print("네트워크 요청 실패: \(error.localizedDescription)")
-                completion(.failure(.networkError(message: error.localizedDescription)))
-            }
-        }
-    }
-    
-    
-    /// 이메일 인증 요청
-    func email(type: String, data: SendEmailVerifyRequest, completion: @escaping (Result<EmailVerifyResponse, NetworkError>) -> Void) {
-        request(target: .postSendEmailVerification(type: type, data: data), decodingType: EmailVerifyResponse.self, completion: completion)
-    }
-    
-    /// 회원가입 요청 (디코딩 오류 출력 추가)
-    func signUp(type: String, data: EmailSignUpRequest, completion: @escaping (Result<EmailSignUpResponse, NetworkError>) -> Void) {
-        provider.request(.postEmailSignUp(data: data)) { result in
-            switch result {
-            case .success(let response):
-                do {
-                    // 서버에서 받은 JSON 데이터 출력
-                    let jsonString = String(data: response.data, encoding: .utf8)
-                    print("서버 응답 JSON: \(jsonString ?? "데이터 없음")")
-                    
-                    // JSON 디코딩 시 오류 확인
-                    let decodedResponse = try JSONDecoder().decode(EmailSignUpResponse.self, from: response.data)
-                    print("회원가입 성공! 액세스 토큰")
-                    
-                    if let tokens = decodedResponse.result?.tokens {
-                        TokenManager.shared.saveTokens(
-                            accessToken: tokens.accessToken,
-                            refreshToken: tokens.refreshToken
-                        )
-                        print("회원가입 후 토큰 저장 완료")
-                    }
-                    
-                    completion(.success(decodedResponse))
-                    
-                } catch {
-                    // 디코딩 오류 발생 시 상세 원인 출력
-                    print("회원가입 응답 디코딩 실패: \(error)")
-                    if let decodingError = error as? DecodingError {
-                        switch decodingError {
-                        case .keyNotFound(let key, _):
-                            print("키 없음: \(key.stringValue)")
-                        case .typeMismatch(let type, let context):
-                            print("타입 불일치: \(type), \(context.debugDescription)")
-                        case .valueNotFound(let type, let context):
-                            print("값 없음: \(type), \(context.debugDescription)")
-                        default:
-                            print("기타 디코딩 오류: \(error.localizedDescription)")
-                        }
-                    }
-                    completion(.failure(.decodingError))
-                }
-                
-            case .failure(let error):
-                print("네트워크 요청 실패: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    
-    /// 토큰 재발급 요청 메서드
-    func reissueToken(refreshToken: String, completion: @escaping (Result<ReissueResponse, NetworkError>) -> Void) {
+    // 토큰 재발급 API
+    func postAuthReissueToken(refreshToken: String, completion: @escaping (Result<AuthReissueResponseDTO, NetworkError>) -> Void) {
         print("토큰 재발급 요청 시작 RefreshToken: \(refreshToken)")
         
-        let request = ReissueTokenRequest(refreshToken: refreshToken)
+        let request = AuthReissueRequestDTO(refreshToken: refreshToken)
         provider.request(.postReissueToken(data: request)) { result in
             switch result {
             case .success(let response):
                 do {
-                    let decodedResponse = try JSONDecoder().decode(ReissueResponse.self, from: response.data)
+                    let decodedResponse = try JSONDecoder().decode(AuthReissueResponseDTO.self, from: response.data)
                     print("토큰 재발급 서버 응답 데이터: \(decodedResponse)")
                     
                     if decodedResponse.isSuccess {
@@ -237,7 +166,88 @@ final class AuthService: NetworkManager {
         }
     }
     
-    /// 로그아웃
+    // 이메일 로그인 API
+    func loginEmail(data: AuthLoginRequestDTO, completion: @escaping (Result<AuthLoginResponseDTO, NetworkError>) -> Void) {
+        provider.request(.postLogin(data: data)) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    let decodedResponse = try JSONDecoder().decode(AuthLoginResponseDTO.self, from: response.data)
+                    print("로그인 응답: \(decodedResponse)")
+                    
+                    completion(.success(decodedResponse))
+                    
+                } catch {
+                    print("로그인 응답 디코딩 실패: \(error)")
+                    completion(.failure(.decodingError))
+                }
+                
+            case .failure(let error):
+                print("네트워크 요청 실패: \(error.localizedDescription)")
+                completion(.failure(.networkError(message: error.localizedDescription)))
+            }
+        }
+    }
+    
+    // 카카오 로그인 API
+    func postLoginKakao(data: AuthLoginSocialRequestDTO, completion: @escaping (Result<AuthLoginSocialResponsetDTO, NetworkError>) -> Void) {
+        provider.request(.postLoginKakao(data: data)) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    let decoded = try JSONDecoder().decode(AuthLoginSocialResponsetDTO.self, from: response.data)
+                    completion(.success(decoded))
+                } catch {
+                    completion(.failure(.decodingError))
+                }
+            case .failure(let error):
+                completion(.failure(.networkError(message: error.localizedDescription)))
+            }
+        }
+    }
+    
+    // 애플 로그인 API
+    func postLoginApple(data: AuthLoginSocialRequestDTO, completion: @escaping (Result<AuthLoginSocialResponsetDTO, NetworkError>) -> Void) {
+        provider.request(.postLoginApple(data: data)) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    let decoded = try JSONDecoder().decode(AuthLoginSocialResponsetDTO.self, from: response.data)
+                    completion(.success(decoded))
+                } catch {
+                    completion(.failure(.decodingError))
+                }
+            case .failure(let error):
+                completion(.failure(.networkError(message: error.localizedDescription)))
+            }
+        }
+    }
+    
+    // 인증번호 검증 API
+    func verification(
+        data: AuthEmailVerifyRequestDTO,
+        completion: @escaping (Result<AuthEmailVerifyResponseDTO, NetworkError>) -> Void
+    ) {
+        request(
+            target: .postEmailVerify(data: data),
+            decodingType: AuthEmailVerifyResponseDTO.self,
+            completion: completion
+        )
+    }
+    
+    // 인증 이메일 발송 API
+    func email(
+        type: String,
+        data: AuthEmailSendReqeustDTO,
+        completion: @escaping (Result<AuthEmailSendResponseDTO, NetworkError>) -> Void) {
+            request(
+                target: .postEmailSend(type: type, data: data),
+                decodingType: AuthEmailSendResponseDTO.self,
+                completion: completion
+            )
+        }
+    
+    // 로그아웃 API
     func postAuthLogout(completion: @escaping (Result<postLogoutResponseDTO, NetworkError>) -> Void) {
         request(
             target: .postLogout,
@@ -246,4 +256,3 @@ final class AuthService: NetworkManager {
         )
     }
 }
-

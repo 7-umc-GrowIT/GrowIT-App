@@ -106,7 +106,7 @@ class MainLoginViewController: UIViewController {
     // MARK: - 서버 요청 로직
     // 인가 코드를 서버에 전달하여 로그인 요청
     private func loginWithServer(code: String, name: String, socialType: String) {
-        let request = SocialLoginRequest(code: code, name: name)
+        let request = AuthLoginSocialRequestDTO(code: code, name: name)
         
         if socialType == "KAKAO"{
             authService.postLoginKakao(data: request) { [weak self] result in
@@ -145,7 +145,7 @@ class MainLoginViewController: UIViewController {
     /// 로그인 응답 처리
     /// - 회원가입이 필요한 경우: 약관 동의 화면으로 이동
     /// - 회원가입 불필요: 토큰 저장 후 메인 화면 이동
-    private func handleLoginResponse(_ loginResponse: SocialLoginResponse) {
+    private func handleLoginResponse(_ loginResponse: AuthLoginSocialResponsetDTO) {
         if loginResponse.result.signupRequired {
             // 회원가입 필요 (true)
             showTermsAgree(oauthUserInfo: loginResponse.result.oauthUserInfo)
@@ -180,7 +180,7 @@ class MainLoginViewController: UIViewController {
 
     /// 회원가입 요청
     private func signupWithKakao(oauthUserInfo: OauthUserInfo, userTerms: [UserTermDTO]) {
-        authService.signupWithKakao(oauthUserInfo: oauthUserInfo, userTerms: userTerms) { [weak self] signupResponse in
+        authService.postAuthSocialSignUp(oauthUserInfo: oauthUserInfo, userTerms: userTerms) { [weak self] signupResponse in
             guard let self = self else { return }
             print("😎 oauthUserInfo : \(oauthUserInfo)\n userTerms: \(userTerms) ")
             DispatchQueue.main.async {

@@ -8,13 +8,8 @@
 import Foundation
 import Moya
 
-// 인증번호 확인 API
-struct EmailVerifyRequest: Codable {
-    let email: String // 이메일 주소
-    let authCode: String // 인증번호
-}
-
-struct EmailSignUpRequest: Codable {
+// 이메일 회원가입 API
+struct AuthSignUpRequestDTO: Codable {
     let isVerified: Bool        // 이메일 인증 여부
     let email: String           // 사용자 이메일
     let name: String            // 사용자 이름
@@ -22,13 +17,8 @@ struct EmailSignUpRequest: Codable {
     let userTerms: [UserTermDTO] // 약관 동의 리스트
 }
 
-// 카카오 또는 애플 로그인 요청
-struct SocialLoginRequest: Codable {
-    let code: String
-    let name: String
-}
-
-struct SocialSignUpRequest: Codable {
+// 소셜 간편 가입 API
+struct AuthSignUpSocialRequestDTO: Codable {
     let userTerms: [UserTermDTO]
 }
 
@@ -42,16 +32,30 @@ struct UserTermDTO: Codable {
     }
 }
 
-struct ReissueTokenRequest: Codable {
-    let refreshToken: String 
+// 토큰 재발급 API
+struct AuthReissueRequestDTO: Codable {
+    let refreshToken: String
 }
 
-struct EmailLoginRequest: Codable {
+// 이메일 로그인 API
+struct AuthLoginRequestDTO: Codable {
     let email: String
     let password: String
 }
 
-struct SendEmailVerifyRequest: Codable {
-    let email: String
+// 소셜 로그인 API
+struct AuthLoginSocialRequestDTO: Codable {
+    let code: String
+    let name: String
 }
 
+// 인증번호 검증 API
+struct AuthEmailVerifyRequestDTO: Codable {
+    let email: String // 이메일 주소
+    let authCode: String // 인증번호
+}
+
+// 인증 이메일 발송 API
+struct AuthEmailSendReqeustDTO: Codable {
+    let email: String
+}

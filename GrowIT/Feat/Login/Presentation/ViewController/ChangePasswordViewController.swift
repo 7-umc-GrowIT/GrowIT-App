@@ -125,14 +125,12 @@ class ChangePasswordViewController: UIViewController {
     
     // 인증번호 발송 API
     private func callPostSendCode(email: String) {
-        let request = SendEmailVerifyRequest(email: email)
+        let request = AuthEmailSendReqeustDTO(email: email)
         
         authService.email(type: "PASSWORD_RESET", data: request) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let response):
-                    print("인증 메일 전송 성공 이메일: \(response.email)")
-                    print("응답 메시지: \(response.message)")
 
                     self.changePasswordView.emailTextField.setTextFieldInteraction(enabled: false)
                     self.changePasswordView.codeTextField.setTextFieldInteraction(enabled: true)
@@ -157,14 +155,14 @@ class ChangePasswordViewController: UIViewController {
     
     // 인증번호 확인 API
     func callPostVerification(email: String, codeText: String) {
-        let request = EmailVerifyRequest(email: email, authCode: codeText)
+        let request = AuthEmailVerifyRequestDTO(email: email, authCode: codeText)
 
         authService.verification(data: request) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let response):
-                    print("인증번호 확인 성공 메시지: \(response.message)")
-
+                case .success:
+                  
+                    print("tjdrhdsfdsfsdfdsfsfs")
                     // 인증 성공 시 UI 업데이트 로직 추가
                     self?.handleVerificationSuccess()
 

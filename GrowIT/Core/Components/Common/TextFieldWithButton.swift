@@ -28,7 +28,7 @@ class TextFieldWithButton: UIView {
         $0.setTitleColor(titleColor, for: .normal)
         $0.backgroundColor = backgroundColor
         $0.titleLabel?.font = UIFont.body1Medium()
-        $0.layer.cornerRadius = 10
+        $0.layer.cornerRadius = 8
         $0.layer.borderWidth = 1
         $0.layer.borderColor = UIColor.border.cgColor
     }
@@ -51,6 +51,11 @@ class TextFieldWithButton: UIView {
     // MARK: - Public Interface (VC에서 쓰기 쉽게 추가)
     var text: String? {
         return textField.textField.text
+    }
+    
+    var textColor: UIColor? {
+        get { return textField.textField.textColor }
+        set { textField.textField.textColor = newValue }
     }
     
     func setState(_ state: AppTextField.BottomLabelState) {
