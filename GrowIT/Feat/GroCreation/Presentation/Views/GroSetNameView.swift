@@ -31,7 +31,7 @@ class GroSetNameView: UIView {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    var nickNameTextField = CustomTextField(frame: .zero, isPasswordField: false).then {
+    var nickNameTextField = AppTextField(isPasswordField: false).then {
         $0.setTitleLabel("닉네임")
         $0.setPlaceholder("닉네임을 입력해주세요")
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -116,7 +116,6 @@ class GroSetNameView: UIView {
         
         nickNameTextField.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(32)
-            $0.height.equalTo(80)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
         

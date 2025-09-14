@@ -277,6 +277,7 @@ class AppTextField: UIView {
         
         bottomLabel.snp.makeConstraints {
             $0.leading.equalToSuperview()
+            $0.height.greaterThanOrEqualTo(16)
         }
         
         eyeButton.snp.makeConstraints {

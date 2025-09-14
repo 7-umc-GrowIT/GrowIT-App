@@ -14,12 +14,12 @@ class EditNameModalView: UIView {
         $0.contentMode = .scaleAspectFit
     }
     
-    public lazy var nickNameTextField = CustomTextField(frame: .zero, isPasswordField: false).then {
+    public lazy var nickNameTextField = AppTextField(isPasswordField: false).then {
         $0.setTitleLabel("변경할 닉네임을 입력해 주세요")
         $0.setPlaceholder("닉네임을 입력해 주세요")
         $0.setTitleFont(UIFont.heading2Bold())
-        $0.setTitleLabeloffset(16)
-        $0.setHint(message: "2~8자 이내의 닉네임을 작성해 주세요")
+//        $0.setTitleLabeloffset(16)
+        $0.setState(.hint("2~8자 이내의 닉네임을 작성해 주세요"))
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
