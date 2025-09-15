@@ -11,19 +11,19 @@ class ItemCollectionViewCell: UICollectionViewCell {
     static let identifier = "ItemCollectionViewCell"
     
     // 아이템 이미지
-    var itemImageView = UIImageView().then {
+    public lazy var itemImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
     // 아이템 배경(색상)
-    var itemBackGroundView = UIView().then {
+    public lazy var itemBackGroundView = UIView().then {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 12
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    private lazy var creditStackView = UIStackView().then {
+    public lazy var creditStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.alignment = .center
         $0.spacing = 8
@@ -36,13 +36,20 @@ class ItemCollectionViewCell: UICollectionViewCell {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    var creditLabel = UILabel().then {
+    public lazy var creditLabel = UILabel().then {
         $0.textColor = .black
         $0.font = UIFont.body2SemiBold()
         $0.textAlignment = .center
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
+    public lazy var isOwnedLabel = UILabel().then {
+        $0.textColor = .grayColor500
+        $0.font = UIFont.body2Medium()
+        $0.textAlignment = .center
+        $0.isHidden = true  // 기본은 숨김
+    }
+
     //MARK: - init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -77,7 +84,7 @@ class ItemCollectionViewCell: UICollectionViewCell {
     private func setView() {
         itemBackGroundView.addSubview(itemImageView)
         creditStackView.addArrangedSubViews([creditIcon, creditLabel])
-        self.addSubviews([itemBackGroundView, creditStackView])
+        self.addSubviews([itemBackGroundView, creditStackView, isOwnedLabel])
     }
     
     //MARK: - 레이아웃 설정
@@ -101,6 +108,11 @@ class ItemCollectionViewCell: UICollectionViewCell {
         creditIcon.snp.makeConstraints {
             $0.width.equalTo(15)
             $0.height.equalTo(17)
+        }
+        
+        isOwnedLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(15)
         }
     }
     
