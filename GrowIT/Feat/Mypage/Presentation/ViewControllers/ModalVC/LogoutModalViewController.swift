@@ -50,6 +50,7 @@ class LogoutModalViewController: UIViewController {
 
         // 토큰 삭제
         TokenManager.shared.clearTokens()
+        UserDefaults.standard.removeObject(forKey: "loginMethod")
         GroImageCacheManager.shared.clearAll()
         ImageCache.default.clearMemoryCache()
         ImageCache.default.clearDiskCache {

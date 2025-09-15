@@ -30,7 +30,7 @@ class ChallengeStatusBtnGroupCell: UICollectionViewCell {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 6
         $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        $0.layer.borderColor = UIColor.border.cgColor
     }
     
     private lazy var title = UILabel().then{
@@ -74,7 +74,7 @@ class ChallengeStatusBtnGroupCell: UICollectionViewCell {
         }else{
             self.title.textColor = .gray300
             self.button.backgroundColor = .white
-            self.button.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+            self.button.layer.borderColor = UIColor.border.cgColor
         }
     }
     

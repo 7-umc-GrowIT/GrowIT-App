@@ -41,19 +41,19 @@ class UserInfoInputView: UIView {
         $0.font = UIFont.subHeading1()
     }
     
-    public lazy var nameTextField = CustomTextField(frame: .zero, isPasswordField: false).then {
+    public lazy var nameTextField = AppTextField(isPasswordField: false).then {
         $0.setTitleLabel("이름")
         $0.setPlaceholder("이름을 입력해 주세요")
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    public lazy var passwordTextField = CustomTextField(frame: .zero, isPasswordField: true).then {
+    public lazy var passwordTextField = AppTextField(isPasswordField: true).then {
         $0.setTitleLabel("비밀번호")
         $0.setPlaceholder("비밀번호를 입력해 주세요")
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    public lazy var passwordCheckTextField = CustomTextField(frame: .zero, isPasswordField: true).then {
+    public lazy var passwordCheckTextField = AppTextField(isPasswordField: true).then {
         $0.setTitleLabel("비밀번호 확인")
         $0.setPlaceholder("비밀번호를 한 번 더 입력해 주세요")
     }
@@ -99,26 +99,22 @@ class UserInfoInputView: UIView {
         
         nameTextField.snp.makeConstraints {
             $0.top.equalTo(mainLabel.snp.bottom).offset(28)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(78)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         passwordTextField.snp.makeConstraints {
             $0.top.equalTo(nameTextField.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(78)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         passwordCheckTextField.snp.makeConstraints {
             $0.top.equalTo(passwordTextField.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(78)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         nextButton.snp.makeConstraints {
-            $0.bottom.equalToSuperview().offset(-40)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(60)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
+            $0.horizontalEdges.equalToSuperview().inset(24) 
         }
     }
 }

@@ -58,7 +58,7 @@ class ChallengeVerifyView: UIView {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 8
         $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        $0.layer.borderColor = UIColor.border.cgColor
         $0.textContainerInset = .init(top: 12, left: 12, bottom: 12, right: 12)
         $0.returnKeyType = .done
         $0.textColor = UIColor.gray300 // 플레이스홀더 색상처럼 보이게
@@ -102,7 +102,7 @@ class ChallengeVerifyView: UIView {
         view.backgroundColor = .white
         view.layer.cornerRadius = 8
         view.clipsToBounds = true
-        view.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        view.layer.borderColor = UIColor.border.cgColor
         view.layer.borderWidth = 1
         return view
     }

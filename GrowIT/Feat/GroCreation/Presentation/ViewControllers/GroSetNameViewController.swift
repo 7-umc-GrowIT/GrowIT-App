@@ -64,7 +64,7 @@ class GroSetNameViewController: UIViewController {
                 switch error {
                 case .serverError(_, let message):
                     if message == "이미 사용 중인 닉네임입니다." {
-                        groSetNameView.nickNameTextField.setError(message: "다른 닉네임과 중복되는 닉네임입니다")
+                        groSetNameView.nickNameTextField.setState(.error("다른 닉네임과 중복되는 닉네임입니다"))
                     }
                 default:
                     break
@@ -116,9 +116,9 @@ class GroSetNameViewController: UIViewController {
         isValidName = groName!.count >= 2 && groName!.count <= 8
         
         if !isValidName {
-            groSetNameView.nickNameTextField.setError(message: "닉네임은 2~8자 이내로 작성해야 합니다")
+            groSetNameView.nickNameTextField.setState(.error("닉네임은 2~8자 이내로 작성해야 합니다"))
         } else {
-            groSetNameView.nickNameTextField.clearError()
+            groSetNameView.nickNameTextField.setState(.none)
         }
         updateNextButtonState()
     }

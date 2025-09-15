@@ -32,35 +32,37 @@ class EditNameModalViewController: UIViewController {
     
     // MARK: - NetWork
     func callPatchGroChangeNickname() {
-        groService.patchGroChangeNickname(data: GroChangeNicknameRequestDTO(name: groName), completion: { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case.success:
-                self.onNicknameChanged?(self.groName) // 계정뷰 이름 변경
-                NotificationCenter.default.post(name: .nicknameChanged, object: nil) // 토스트
-                DispatchQueue.main.async {
-                    self.dismiss(animated: true, completion: nil) }
+        groService.patchGroChangeNickname(
+            data: GroChangeNicknameRequestDTO(name: groName),
+            completion: { [weak self] result in
+                guard let self = self else { return }
                 
-            case.failure(let error):
-                print("Error: \(error)")
-                if case .serverError(let statusCode, let message) = error {
-                    switch statusCode {
-                    case 400:
-                        self.editnameModalView.nickNameTextField.setError(message: "작성한 닉네임에 변경사항이 없습니다")
-                    case 409:
-                        self.editnameModalView.nickNameTextField.setError(message: "다른 닉네임과 중복되는 닉네임입니다")
+                switch result {
+                case .success:
+                    self.onNicknameChanged?(self.groName)
+                    NotificationCenter.default.post(name: .nicknameChanged, object: nil)
+                    DispatchQueue.main.async {
+                        self.dismiss(animated: true, completion: nil)
+                    }
                     
-                    default:
-                        self.editnameModalView.nickNameTextField.setError(message: message)
+                case .failure(let error):
+                    print("Error: \(error)")
+                    if case .serverError(let statusCode, let message) = error {
+                        switch statusCode {
+                        case 400:
+                            self.editnameModalView.nickNameTextField.setState(.error("작성한 닉네임에 변경사항이 없습니다"))
+                        case 409:
+                            self.editnameModalView.nickNameTextField.setState(.error("다른 닉네임과 중복되는 닉네임입니다"))
+                        default:
+                            self.editnameModalView.nickNameTextField.setState(.error(message))
+                        }
                     }
                 }
             }
-        })
+        )
     }
     
-    //MARK: - Functional
-    //MARK: Event
+    //MARK: - Event
     @objc
     func didTapChangeButton() {
         callPatchGroChangeNickname()
@@ -72,21 +74,21 @@ class EditNameModalViewController: UIViewController {
         isValidName = groName.count >= 2 && groName.count <= 8
         
         if !isValidName {
-            editnameModalView.nickNameTextField.setError(message: "닉네임은 2~8자 이내로 작성해야 합니다")
+            editnameModalView.nickNameTextField.setState(.error("닉네임은 2~8자 이내로 작성해야 합니다"))
         } else {
-            editnameModalView.nickNameTextField.clearError()
+            editnameModalView.nickNameTextField.setState(.success("사용 가능한 닉네임입니다"))
         }
         updateNextButtonState()
     }
     
     private func updateNextButtonState() {
         editnameModalView.changeButton.isEnabled = isValidName
-        
         editnameModalView.changeButton.setButtonState(
             isEnabled: isValidName,
             enabledColor: .black,
             disabledColor: .gray100,
             enabledTitleColor: .white,
-            disabledTitleColor: .gray400)
+            disabledTitleColor: .gray400
+        )
     }
 }

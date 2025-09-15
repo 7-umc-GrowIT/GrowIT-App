@@ -14,7 +14,7 @@ class EmailLoginViewController: UIViewController {
     //MARK: - Properties
     let navigationBarManager = NavigationManager()
     let authService = AuthService()
-
+    
     //MARK: - View
     private lazy var emailLoginView = EmailLoginView().then {
         // Buttons
@@ -25,7 +25,7 @@ class EmailLoginViewController: UIViewController {
         $0.emailSaveButton.addTarget(self, action: #selector(didTapSaveEmail), for: .touchUpInside)
         
         // Textfields
-        $0.emailTextField.textField.addTarget(self, action: #selector(textFieldsDidChange), for: .editingChanged)
+        $0.emailTextField.textField.addTarget(self, action: #selector(emailFieldDidChange), for: .editingChanged)
         $0.pwdTextField.textField.addTarget(self, action: #selector(textFieldsDidChange), for: .editingChanged)
     }
     
@@ -47,7 +47,6 @@ class EmailLoginViewController: UIViewController {
     
     //MARK: - Setup UI
     private func setupNavigationBar() {
-        // 네비게이션 타이틀 설정
         navigationBarManager.setTitle(
             to: self.navigationItem,
             title: "이메일로 로그인",
@@ -62,38 +61,52 @@ class EmailLoginViewController: UIViewController {
         )
     }
     
-    // MARK: - Setup Actions
     private func setupActions() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
     }
-
+    
+    // MARK: - Validation
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
+    }
     
     //MARK: - TextFields Handler
-   @objc private func textFieldsDidChange() {
-       updateLoginButtonState()
-   }
-   
-   private func updateLoginButtonState() {
-       let isEmailValid = emailLoginView.emailTextField.validationRule?(emailLoginView.emailTextField.textField.text ?? "") ?? false
-       let isPasswordValid = !(emailLoginView.pwdTextField.textField.text ?? "").isEmpty
-       
-       let isFormValid = isEmailValid && isPasswordValid
-       
-       emailLoginView.loginButton.isEnabled = isFormValid
-       emailLoginView.loginButton.setButtonState(
-           isEnabled: isFormValid,
-           enabledColor: .black, // 활성화 상태에서 검정색 배경
-           disabledColor: .gray100, // 비활성화 상태의 배경색
-           enabledTitleColor: .black,
-           disabledTitleColor: .gray100
-           
-       )
-
-       // 버튼 텍스트 색상 업데이트
-       let textColor: UIColor = isFormValid ? .white : .gray400
-       emailLoginView.loginButton.setTitleColor(textColor, for: .normal)
-   }
+    @objc private func emailFieldDidChange() {
+        guard let email = emailLoginView.emailTextField.textField.text else { return }
+        let isEmailValid = isValidEmail(email)
+        
+        if email.isEmpty || isEmailValid {
+            emailLoginView.emailTextField.setState(.none)
+        } else {
+            emailLoginView.emailTextField.setState(.error("올바르지 않은 이메일 형식입니다."))
+        }
+        updateLoginButtonState()
+    }
+    
+    @objc private func textFieldsDidChange() {
+        updateLoginButtonState()
+    }
+    
+    private func updateLoginButtonState() {
+        let email = emailLoginView.emailTextField.textField.text ?? ""
+        let password = emailLoginView.pwdTextField.textField.text ?? ""
+        
+        let isEmailValid = isValidEmail(email)
+        let isPasswordValid = !password.isEmpty
+        
+        let isFormValid = isEmailValid && isPasswordValid
+        
+        emailLoginView.loginButton.isEnabled = isFormValid
+        emailLoginView.loginButton.setButtonState(
+            isEnabled: isFormValid,
+            enabledColor: .black,
+            disabledColor: .gray100,
+            enabledTitleColor: .white,
+            disabledTitleColor: .gray400
+        )
+    }
     
     // MARK: - Network
     private func callPostEmailLogin() {
@@ -103,16 +116,15 @@ class EmailLoginViewController: UIViewController {
             return
         }
         
-        let loginRequest = EmailLoginRequest(email: email, password: password)
+        let loginRequest = AuthLoginRequestDTO(email: email, password: password)
         
         authService.loginEmail(data: loginRequest) { [weak self] result in
             guard let self = self else { return }
-
+            
             DispatchQueue.main.async {
                 switch result {
                 case .success(let response):
                     if response.isSuccess {
-                        // 토큰 저장
                         guard let tokenData = response.result else { return }
                         let accessToken = tokenData.tokens.accessToken
                         let refreshToken = tokenData.tokens.refreshToken
@@ -120,11 +132,9 @@ class EmailLoginViewController: UIViewController {
                             accessToken: accessToken,
                             refreshToken: refreshToken
                         )
-
-                        // loginMethod 저장 (Social or Local)
+                        
                         UserDefaults.standard.set(tokenData.loginMethod, forKey: "loginMethod")
-
-                        // 이메일 저장
+                        
                         if self.emailLoginView.emailSaveButton.isSelected {
                             UserDefaults.standard.set(email, forKey: "savedEmail")
                         } else {
@@ -135,15 +145,15 @@ class EmailLoginViewController: UIViewController {
                     } else {
                         switch response.message {
                         case "이메일 또는 비밀번호가 일치하지 않습니다.":
-                            self.emailLoginView.emailTextField.setError(message: "")
-                            self.emailLoginView.pwdTextField.setError(message: "입력한 이메일 또는 비밀번호가 일치하지 않습니다")
+                            self.emailLoginView.emailTextField.setState(.errorNotLabel)
+                            self.emailLoginView.pwdTextField.setState(.error("입력한 이메일 또는 비밀번호가 일치하지 않습니다"))
                         case "사용자를 찾을 수 없습니다.":
-                            self.emailLoginView.emailTextField.setError(message: "가입되지 않은 이메일입니다")
+                            self.emailLoginView.emailTextField.setState(.error("가입되지 않은 이메일입니다"))
                         default:
                             break
                         }
                     }
-
+                    
                 case .failure(let error):
                     print("로그인 요청 실패: \(error.localizedDescription)")
                 }
@@ -152,7 +162,6 @@ class EmailLoginViewController: UIViewController {
     }
     
     // MARK: - Functional
-    // 로그인 성공 후 다음 화면으로 이동
     private func navigateToMainScreen() {
         let homeVC = CustomTabBarController(initialIndex: 1)
         let nav = UINavigationController(rootViewController: homeVC)
@@ -165,43 +174,36 @@ class EmailLoginViewController: UIViewController {
     }
     
     //MARK: Event
-    @objc
-    private func prevVC() {
+    @objc private func prevVC() {
         navigationController?.popViewController(animated: true)
     }
     
-    @objc
-    private func didTapLoginButton() {
+    @objc private func didTapLoginButton() {
         callPostEmailLogin()
     }
     
-    @objc
-    private func dismissKeyboard() {
+    @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
     
     // 찾기, 변경, 회원가입 버튼 액션
-    @objc
-    func didTapChangePassword() {
+    @objc func didTapChangePassword() {
         let changePwdVC = ChangePasswordViewController(isMypage: false)
         self.navigationController?.pushViewController(changePwdVC, animated: true)
     }
     
-    @objc
-    func didTapSignUp() {
+    @objc func didTapSignUp() {
         let termsAgreeVC = TermsAgreeViewController()
         self.navigationController?.pushViewController(termsAgreeVC, animated: true)
     }
     
-    @objc
-    func didTapFindEmail() {
+    @objc func didTapFindEmail() {
         let accountInquiryVC = AccountInquiryViewController()
         presentSheet(accountInquiryVC, heightRatio: 0.336)
     }
     
     // 이메일 저장
-    @objc
-    private func didTapSaveEmail() {
+    @objc private func didTapSaveEmail() {
         let isChecked = !emailLoginView.emailSaveButton.isSelected
         emailLoginView.emailSaveButton.isSelected = isChecked
         UserDefaults.standard.set(isChecked, forKey: "isCheckBoxChecked")
@@ -217,4 +219,3 @@ class EmailLoginViewController: UIViewController {
         }
     }
 }
-
