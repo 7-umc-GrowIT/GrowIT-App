@@ -122,8 +122,22 @@ class ItemListModalViewController: UIViewController {
                     }
                 }
             } else {
+                // 아이템샵 모드에서도 착용 중인 아이템 선택
+                print("🔍 아이템샵 모드 - categoryToEquippedId: \(self.itemDelegate?.categoryToEquippedId ?? [:])")
+                print("🔍 shopItems count: \(self.shopItems.count)")
+                
+                // 먼저 모든 선택 해제
                 for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
                     self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
+                }
+                
+                // 착용 중인 아이템 선택
+                for (index, item) in self.shopItems.enumerated() {
+                    if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category], equippedItemId == item.id {
+                        print("✅ 착용 중 아이템 발견: \(item.name) (ID: \(item.id), Category: \(item.category))")
+                        let indexPath = IndexPath(item: index, section: 0)
+                        self.itemListModalView.itemCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                    }
                 }
             }
         }
@@ -166,16 +180,25 @@ class ItemListModalViewController: UIViewController {
         callGetItems { [weak self] in
             guard let self = self else { return }
             
-            // 마이 아이템 모드일 때만 착용 중 아이템 선택
-            if self.isMyItems {
-                DispatchQueue.main.async {
-                    // 먼저 모든 선택 해제
-                    for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
-                        self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
-                    }
-                    
-                    // 착용 중인 아이템 선택
+            DispatchQueue.main.async {
+                // 먼저 모든 선택 해제
+                for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
+                    self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
+                }
+                
+                // 현재 모드에 따라 착용 중인 아이템 선택
+                if self.isMyItems {
+                    // 마이 아이템 모드
                     for (index, item) in self.myItems.enumerated() {
+                        if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category],
+                           equippedItemId == item.id {
+                            let indexPath = IndexPath(item: index, section: 0)
+                            self.itemListModalView.itemCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                        }
+                    }
+                } else {
+                    // 아이템샵 모드
+                    for (index, item) in self.shopItems.enumerated() {
                         if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category],
                            equippedItemId == item.id {
                             let indexPath = IndexPath(item: index, section: 0)
@@ -245,7 +268,6 @@ extension ItemListModalViewController: UICollectionViewDataSource {
             // 마이 아이템 셀 설정
             let item = myItems[indexPath.row]
             cell.isOwnedLabel.text = "보유 중"
-//            cell.itemBackGroundView.backgroundColor = colorMapping[item.shopBackgroundColor] ?? .itemYellow
             cell.itemImageView.kf.setImage(with: URL(string: item.imageUrl), options: [.transition(.fade(0.1)), .cacheOriginalImage])
             cell.updateSelectionState()
             
@@ -257,10 +279,20 @@ extension ItemListModalViewController: UICollectionViewDataSource {
             
             // 아이템샵 셀 설정
             let item = shopItems[indexPath.row]
-            cell.creditLabel.text = String(item.price)
-//            cell.itemBackGroundView.backgroundColor = colorMapping[item.shopBackgroundColor] ?? .itemYellow
-            cell.itemImageView.kf.setImage(with: URL(string: item.imageUrl), options: [.transition(.fade(0.1)), .cacheOriginalImage])
-            
+            if item.purchased {
+                cell.creditStackView.isHidden = true
+                cell.isOwnedLabel.isHidden = false
+                cell.isOwnedLabel.text = "보유 중"
+            } else {
+                cell.creditStackView.isHidden = false
+                cell.isOwnedLabel.isHidden = true
+                cell.creditLabel.text = String(item.price)
+            }
+            cell.itemImageView.kf.setImage(
+                with: URL(string: item.imageUrl),
+                options: [.transition(.fade(0.1)), .cacheOriginalImage]
+            )
+
             return cell
         }
     }
