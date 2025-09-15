@@ -172,6 +172,7 @@ final class AuthPlugin: PluginType {
         AppLaunchState.isFirstLaunch = true // 홈화면 첫 진입여부 초기화
         TokenManager.shared.clearTokens()
         GroImageCacheManager.shared.clearAll()
+        UserDefaults.standard.removeObject(forKey: "loginMethod")
         ImageCache.default.clearMemoryCache()
         ImageCache.default.clearDiskCache {
             print("🗑️ Kingfisher 디스크 캐시 초기화 완료")

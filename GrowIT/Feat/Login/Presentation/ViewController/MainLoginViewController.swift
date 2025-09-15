@@ -191,6 +191,10 @@ class MainLoginViewController: UIViewController {
                         accessToken: signupResult.result.tokens.accessToken,
                         refreshToken: signupResult.result.tokens.refreshToken
                     )
+                    
+                    // 소셜 회원가입 시 loginMethod 저장
+                    UserDefaults.standard.set(signupResult.result.loginMethod, forKey: "loginMethod")
+                    
                     // 그로 생성 화면으로 이동
                     self.navigateToGroCreation()
                 case .failure(let error):

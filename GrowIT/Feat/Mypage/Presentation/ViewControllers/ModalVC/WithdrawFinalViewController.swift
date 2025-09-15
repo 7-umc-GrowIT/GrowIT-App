@@ -49,7 +49,7 @@ class WithdrawFinalViewController: UIViewController {
             guard let self = self else { return }
             
             switch result {
-            case .success(let data):
+            case .success:
                 finishDeleteUser()
                 print("탈퇴 성공, 이유번호 : \(reasonId)")
             case .failure(let error):
@@ -62,6 +62,7 @@ class WithdrawFinalViewController: UIViewController {
     private func finishDeleteUser() {
         // 토큰 삭제
         TokenManager.shared.clearTokens()
+        UserDefaults.standard.removeObject(forKey: "loginMethod")
         GroImageCacheManager.shared.clearAll()
         ImageCache.default.clearMemoryCache()
         ImageCache.default.clearDiskCache {
