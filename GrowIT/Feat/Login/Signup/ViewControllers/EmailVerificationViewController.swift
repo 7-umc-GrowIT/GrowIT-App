@@ -23,6 +23,7 @@ class EmailVerificationViewController: UIViewController {
         $0.emailField.actionButton.addTarget(self, action: #selector(didTapSendCode), for: .touchUpInside)
         $0.codeField.actionButton.addTarget(self, action: #selector(didTapVerifyCode), for: .touchUpInside)
         $0.nextButton.addTarget(self, action: #selector(didTapNextButton), for: .touchUpInside)
+        $0.infoIcon.addTarget(self, action: #selector(didTapInfoButton), for: .touchUpInside)
         
         // 텍스트필드 이벤트 연결
         $0.emailField.innerTextField.addTarget(self, action: #selector(emailFieldDidChanged), for: .editingChanged)
@@ -219,7 +220,26 @@ class EmailVerificationViewController: UIViewController {
         codeField.setButtonState(isEnabled: isCodeValid)
     }
     
-   
+    @objc
+    private func didTapInfoButton(_ sender: UIButton) {
+        let tooltip = self.emailVerificationView.tooltipView
+        
+        if tooltip.isHidden {
+            // 나타나기
+            tooltip.alpha = 0
+            tooltip.isHidden = false
+            UIView.animate(withDuration: 0.25) {
+                tooltip.alpha = 1
+            }
+        } else {
+            // 사라지기
+            UIView.animate(withDuration: 0.25, animations: {
+                tooltip.alpha = 0
+            }) { _ in
+                tooltip.isHidden = true
+            }
+        }
+    }
     
     //MARK: - Setup UI
     private func setupNavigationBar() {

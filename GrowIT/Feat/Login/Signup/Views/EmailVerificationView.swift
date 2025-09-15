@@ -34,7 +34,9 @@ class EmailVerificationView: UIView {
         $0.snp.makeConstraints { $0.size.equalTo(15) }
     }
     
-    private lazy var tooltipView = LeftToolTipView()
+    public lazy var tooltipView = LeftToolTipView().then {
+        $0.isHidden = true
+    }
     
     private lazy var mainLabel = UILabel().then {
         $0.text = "이메일 인증을 진행할게요"
@@ -84,7 +86,7 @@ class EmailVerificationView: UIView {
     
     // MARK: - SetUI
     private func addViews() {
-        addSubviews([progressStackView, infoIcon, tooltipView, mainLabel, emailField, codeField, nextButton])
+        addSubviews([progressStackView, mainLabel, emailField, codeField, nextButton, tooltipView, infoIcon])
     }
     
     private func setConstraints() {

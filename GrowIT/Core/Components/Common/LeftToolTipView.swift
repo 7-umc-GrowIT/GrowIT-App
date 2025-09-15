@@ -37,7 +37,7 @@ class LeftToolTipView: UIView {
     private func setupUI() {
         addSubview(rectView)
         rectView.snp.makeConstraints {
-            $0.trailing.verticalEdges .equalToSuperview()
+            $0.trailing.verticalEdges.equalToSuperview()
             $0.leading.equalToSuperview().inset(10)
         }
         
