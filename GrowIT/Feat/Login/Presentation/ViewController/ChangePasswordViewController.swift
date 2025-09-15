@@ -28,7 +28,8 @@ class ChangePasswordViewController: UIViewController {
         $0.emailField.actionButton.addTarget(self, action: #selector(sendCodeButtonTapped), for: .touchUpInside)
         $0.codeField.actionButton.addTarget(self, action: #selector(certificationButtonTapped), for: .touchUpInside)
         $0.changePwdButton.addTarget(self, action: #selector(changePwdButtonTapped), for: .touchUpInside)
-        
+        $0.infoIcon.addTarget(self, action: #selector(didTapInfoButton), for: .touchUpInside)
+
         // 텍스트필드 이벤트
         $0.emailField.innerTextField.addTarget(self, action: #selector(emailTextFieldsDidChange), for: .editingChanged)
         $0.codeField.innerTextField.addTarget(self, action: #selector(codeTextFieldsDidChange), for: .editingChanged)
@@ -106,7 +107,7 @@ class ChangePasswordViewController: UIViewController {
                         image: UIImage(named: "Style=check") ?? UIImage(),
                         message: "비밀번호를 변경했어요",
                         font: UIFont.heading3SemiBold()
-                    )
+                    ) 
                     
                     self?.navigationController?.popViewController(animated: true)
 
@@ -340,6 +341,27 @@ class ChangePasswordViewController: UIViewController {
     
     @objc private func changePwdButtonTapped() {
         handlePasswordChange()
+    }
+    
+    @objc
+    private func didTapInfoButton(_ sender: UIButton) {
+        let tooltip = self.changePasswordView.tooltipView
+        
+        if tooltip.isHidden {
+            // 나타나기
+            tooltip.alpha = 0
+            tooltip.isHidden = false
+            UIView.animate(withDuration: 0.25) {
+                tooltip.alpha = 1
+            }
+        } else {
+            // 사라지기
+            UIView.animate(withDuration: 0.25, animations: {
+                tooltip.alpha = 0
+            }) { _ in
+                tooltip.isHidden = true
+            }
+        }
     }
     
     @objc private func dismissKeyboard() {

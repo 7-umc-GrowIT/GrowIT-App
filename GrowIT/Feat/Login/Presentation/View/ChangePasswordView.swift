@@ -28,7 +28,9 @@ class ChangePasswordView: UIView {
         $0.snp.makeConstraints { $0.size.equalTo(15) }
     }
     
-    private lazy var tooltipView = LeftToolTipView()
+    public lazy var tooltipView = LeftToolTipView().then {
+        $0.isHidden = true
+    }
     
     public lazy var emailField = TextFieldWithButton(
         textfieldTitle: "이메일",
@@ -76,8 +78,8 @@ class ChangePasswordView: UIView {
     // MARK: - add Function & Constraints
     
     private func addComponents() {
-        [infoIcon, tooltipView, emailField, codeField, newPwdTextField,
-         pwdCheckTextField, changePwdButton].forEach(self.addSubview)
+        [emailField, codeField, newPwdTextField,
+         pwdCheckTextField, changePwdButton, tooltipView, infoIcon].forEach(self.addSubview)
     }
     
     private func constraints() {
