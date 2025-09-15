@@ -10,10 +10,13 @@ import UIKit
 class CircleCheckButton: UIButton {
     
     var isEnabledState: Bool
+    var size: CGFloat
     
-    init(isEnabled: Bool) {
+    init(isEnabled: Bool, size: CGFloat) {
         self.isEnabledState = isEnabled
+        self.size = size
         super.init(frame: .zero)
+
         updateButtonColor()
         self.addTarget(self, action: #selector(toggleState), for: .touchUpInside)
     }
@@ -28,8 +31,17 @@ class CircleCheckButton: UIButton {
     }
     
     func updateButtonColor() {
-        let tintColor: UIColor = isEnabledState ? .primary600 : .gray300
-        self.setImage(UIImage(systemName: "checkmark.circle.fill")?.withTintColor(tintColor, renderingMode: .alwaysOriginal), for: .normal)
+        if(isEnabledState) {
+            let resizedImage = UIImage(named: "check-selected")?.resized(to: CGSize(width: size, height: size))
+            self.setImage(resizedImage, for: .normal)
+            self.imageView?.contentMode = .scaleAspectFit
+            self.configuration = nil
+        }else {
+            let resizedImage = UIImage(named: "check")?.resized(to: CGSize(width: size, height: size))
+            self.setImage(resizedImage, for: .normal)
+            self.imageView?.contentMode = .scaleAspectFit
+            self.configuration = nil
+        }
     }
     
     func isSelectedState() -> Bool {

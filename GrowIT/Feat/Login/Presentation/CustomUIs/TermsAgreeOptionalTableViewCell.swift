@@ -26,7 +26,7 @@ class TermsAgreeOptionalTableViewCell: UITableViewCell {
         setupUI()
     }
     
-    let agreeButton = CircleCheckButton(isEnabled: false).then {
+    let agreeButton = CircleCheckButton(isEnabled: false, size: 24).then {
         $0.isUserInteractionEnabled = true
     }
     

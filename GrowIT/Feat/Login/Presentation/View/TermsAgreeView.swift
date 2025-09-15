@@ -43,7 +43,7 @@ class TermsAgreeView: UIView {
         $0.layer.cornerRadius = 8
     }
     
-    let checkButton = CircleCheckButton(isEnabled: false).then {
+    let checkButton = CircleCheckButton(isEnabled: false, size: 32).then {
         $0.isUserInteractionEnabled = false
     }
     
