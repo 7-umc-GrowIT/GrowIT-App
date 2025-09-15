@@ -207,10 +207,10 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         authService.postAuthSignUp(type: "email", data: request) { result in
             switch result {
             case .success(let response):
-                print("✅ 회원가입 성공: \(response.message)")
-                if let tokens = response.result?.tokens {
-                    self.handleSignUpSuccess(accessToken: tokens.accessToken)
-                }
+                guard let tokenData = response.result else { return }
+                self.handleSignUpSuccess(accessToken: tokenData.tokens.accessToken)
+                UserDefaults.standard.set(tokenData.loginMethod, forKey: "loginMethod")
+                
             case .failure(let error):
                 print("❌ 회원가입 실패: \(error.localizedDescription)")
             }
