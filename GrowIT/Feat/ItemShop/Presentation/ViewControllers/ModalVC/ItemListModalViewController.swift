@@ -105,8 +105,18 @@ class ItemListModalViewController: UIViewController {
         
         DispatchQueue.main.async {
             if isMyItems {
+                // 먼저 모든 선택 해제
+                for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
+                    self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
+                }
+                
+                // 착용 중인 아이템 선택
+                print("🔍 마이 아이템 모드 - categoryToEquippedId: \(self.itemDelegate?.categoryToEquippedId ?? [:])")
+                print("🔍 myItems count: \(self.myItems.count)")
+                
                 for (index, item) in self.myItems.enumerated() {
                     if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category], equippedItemId == item.id {
+                        print("✅ 착용 중 아이템 발견: \(item.name) (ID: \(item.id), Category: \(item.category))")
                         let indexPath = IndexPath(item: index, section: 0)
                         self.itemListModalView.itemCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
                     }
@@ -159,6 +169,12 @@ class ItemListModalViewController: UIViewController {
             // 마이 아이템 모드일 때만 착용 중 아이템 선택
             if self.isMyItems {
                 DispatchQueue.main.async {
+                    // 먼저 모든 선택 해제
+                    for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
+                        self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
+                    }
+                    
+                    // 착용 중인 아이템 선택
                     for (index, item) in self.myItems.enumerated() {
                         if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category],
                            equippedItemId == item.id {
