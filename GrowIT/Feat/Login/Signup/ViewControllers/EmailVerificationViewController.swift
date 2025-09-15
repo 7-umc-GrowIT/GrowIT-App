@@ -15,6 +15,7 @@ class EmailVerificationViewController: UIViewController {
     
     var email: String = ""
     var agreeTerms: [UserTermDTO] = []
+    private var resendTimer: Timer?
 
     // MARK: - Views
     private lazy var emailVerificationView = EmailVerificationView().then {
@@ -51,9 +52,20 @@ class EmailVerificationViewController: UIViewController {
         authService.email(type: "SIGNUP", data: request) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success:
+                case .success(let data):
                     self.showToast()
                     self.emailVerificationView.codeField.setTextFieldInteraction(enabled: true)
+                    self.emailVerificationView.emailField.innerTextField.resignFirstResponder()
+                    
+                    // 서버 만료시간 기준으로 1분 제한
+                    if let expirationDate = self.parseISO8601Date(data.expiration) {
+                        let remaining = Int(expirationDate.timeIntervalSinceNow)
+                        let duration = min(remaining, 60) // 최대 1분
+                        self.startResendCooldown(seconds: duration)
+                    } else {
+                        // 파싱 실패 시 fallback → 그냥 60초
+                        self.startResendCooldown(seconds: 60)
+                    }
                     
                 case .failure(let error):
                     print("인증 메일 전송 실패: \(error)")
@@ -117,6 +129,7 @@ class EmailVerificationViewController: UIViewController {
         )
 
         // 버튼 상태 업데이트
+        emailVerificationView.codeField.actionButton.setTitle("인증 완료", for: .normal)
         emailVerificationView.emailField.setButtonState(isEnabled: false)
         emailVerificationView.codeField.setButtonState(isEnabled: false)
         emailVerificationView.nextButton.setButtonState(
@@ -126,6 +139,20 @@ class EmailVerificationViewController: UIViewController {
             enabledTitleColor: .white,
             disabledTitleColor: .gray400
         )
+    }
+    // MARK: 타이머
+    private func startResendCooldown(seconds: Int) {
+        resendTimer?.invalidate()
+        resendTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(seconds), repeats: false) { _ in
+            self.emailVerificationView.emailField.setButtonState(isEnabled: true)
+        }
+    }
+    
+    // 날짜 변환
+    private func parseISO8601Date(_ string: String) -> Date? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.date(from: string)
     }
     
     //MARK: Event
