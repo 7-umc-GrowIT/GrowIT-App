@@ -154,6 +154,7 @@ class GroViewController: UIViewController, ItemListDelegate {
         categoryToEquippedId = data.equippedItems.reduce(into: [String: Int]()) { dict, item in
             dict[item.category] = item.id
         }
+
         categoryToEquippedName = data.equippedItems.reduce(into: [String: String]()) { dict, item in
             dict[item.category] = item.name
         }
