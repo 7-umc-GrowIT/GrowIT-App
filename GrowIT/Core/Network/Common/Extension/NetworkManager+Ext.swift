@@ -170,7 +170,7 @@ fileprivate func handleResponse<T: Decodable>(
             return .failure(.serverError(statusCode: response.statusCode, message: message))
         }
         
-        // 🔑 result 없는 경우 VerifyResponse 직접 디코딩 허용
+        // ✅ result 없는 경우 VerifyResponse 직접 디코딩 허용
         if T.self == AuthEmailVerifyResponseDTO.self {
             let decoded = try JSONDecoder().decode(AuthEmailVerifyResponseDTO.self, from: response.data)
             return .success(decoded as! T)
@@ -180,17 +180,22 @@ fileprivate func handleResponse<T: Decodable>(
         
         if let result = apiResponse.result {
             return .success(result)
-        } else if T.self == EmptyResponse.self {
-            print("📩 서버 메시지: \(apiResponse.message)")
-            return .success(EmptyResponse() as! T)
         } else {
+            // ✅ 빈 객체 {} 도 성공으로 처리
+            if let emptyDecoded = try? JSONDecoder().decode(T.self, from: "{}".data(using: .utf8)!) {
+                return .success(emptyDecoded)
+            }
+            
+            if T.self == EmptyResponse.self || T.self == EmptyResult.self {
+                return .success(EmptyResult() as! T)
+            }
+            
             return .failure(.serverError(statusCode: response.statusCode, message: "결과 없음"))
         }
     } catch {
         return .failure(.decodingError)
     }
 }
-
 
 fileprivate func handleResponseOptional<T: Decodable>(
     _ response: Response,
