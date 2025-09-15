@@ -134,10 +134,18 @@ class ChangePasswordViewController: UIViewController {
                     )
                     
                     self.changePasswordView.emailField.setButtonState(isEnabled: false)
-
+                    
                 case .failure(let error):
                     print("인증 메일 전송 실패: \(error)")
-                    self.changePasswordView.emailField.setState(.error("가입 되지 않은 이메일입니다"))
+                    if case .serverError(let statusCode, let message) = error {
+                        if statusCode == 400 {
+                            self.changePasswordView.emailField.setState(.error("소셜 로그인은 비밀번호 재설정이 불가능합니다"))
+                        } else if statusCode == 404 {
+                            self.changePasswordView.emailField.setState(.error("가입되지 않은 이메일입니다"))
+                        } else {
+                            self.changePasswordView.emailField.setState(.error(message))
+                        }
+                    }
                 }
             }
         }
