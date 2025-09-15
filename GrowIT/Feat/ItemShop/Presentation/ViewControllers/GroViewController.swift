@@ -154,6 +154,7 @@ class GroViewController: UIViewController, ItemListDelegate {
         categoryToEquippedId = data.equippedItems.reduce(into: [String: Int]()) { dict, item in
             dict[item.category] = item.id
         }
+        print("🔧 categoryToEquippedId 초기화: \(categoryToEquippedId)")
         
         for item in data.equippedItems {
             if let imageView = categoryImageViews[item.category] {
