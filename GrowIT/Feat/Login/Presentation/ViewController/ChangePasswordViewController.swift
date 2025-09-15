@@ -20,7 +20,8 @@ class ChangePasswordViewController: UIViewController {
     private var email: String = ""
     private var isMypage: Bool = false
     private var meEmail: String = ""
-
+    private var resendTimer: Timer?
+    
     // MARK: - View
     private lazy var changePasswordView = ChangePasswordView().then {
         // 버튼 액션
@@ -123,9 +124,10 @@ class ChangePasswordViewController: UIViewController {
         authService.email(type: "PASSWORD_RESET", data: request) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success:
-                    self.changePasswordView.emailField.setTextFieldInteraction(enabled: false)
+                case .success(let data):
                     self.changePasswordView.codeField.setTextFieldInteraction(enabled: true)
+                    self.changePasswordView.emailField.setButtonState(isEnabled: false)
+                    self.changePasswordView.emailField.innerTextField.resignFirstResponder()
                     
                     CustomToast(containerWidth: 225).show(
                         image: UIImage(named: "Style=Mail") ?? UIImage(),
@@ -133,7 +135,16 @@ class ChangePasswordViewController: UIViewController {
                         font: UIFont.heading3SemiBold()
                     )
                     
-                    self.changePasswordView.emailField.setButtonState(isEnabled: false)
+                    // 서버 만료시간 기준으로 1분 제한
+                    if let expirationDate = self.parseISO8601Date(data.expiration) {
+                        let remaining = Int(expirationDate.timeIntervalSinceNow)
+                        let duration = min(remaining, 60) // 최대 1분
+                        self.startResendCooldown(seconds: duration)
+                    } else {
+                        // 파싱 실패 시 fallback → 그냥 60초
+                        self.startResendCooldown(seconds: 60)
+                    }
+                    
                     
                 case .failure(let error):
                     print("인증 메일 전송 실패: \(error)")
@@ -153,13 +164,13 @@ class ChangePasswordViewController: UIViewController {
     
     private func callPostVerification(email: String, codeText: String) {
         let request = AuthEmailVerifyRequestDTO(email: email, authCode: codeText)
-
+        
         authService.verification(data: request) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:
                     self?.handleVerificationSuccess()
-
+                    
                 case .failure(let error):
                     print("인증번호 확인 실패: \(error)")
                     self?.changePasswordView.codeField.setState(.error("인증번호가 올바르지 않습니다."))
@@ -208,7 +219,7 @@ class ChangePasswordViewController: UIViewController {
         
         callPatchUserPassword(email, newPassword, passwordCheck)
     }
-
+    
     // MARK: - TextField Event
     @objc private func emailTextFieldsDidChange() {
         guard let emailText = changePasswordView.emailField.text else { return }
@@ -266,6 +277,21 @@ class ChangePasswordViewController: UIViewController {
         )
     }
     
+    // MARK: 타이머
+    private func startResendCooldown(seconds: Int) {
+        resendTimer?.invalidate()
+        resendTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(seconds), repeats: false) { _ in
+            self.changePasswordView.emailField.setButtonState(isEnabled: true)
+        }
+    }
+    
+    // 날짜 변환
+    private func parseISO8601Date(_ string: String) -> Date? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.date(from: string)
+    }
+    
     // MARK: - Events
     @objc private func prevVC() {
         if shouldShowExitModal {
@@ -303,6 +329,7 @@ class ChangePasswordViewController: UIViewController {
         
         changePasswordView.codeField.setButtonState(isEnabled: false)
         changePasswordView.emailField.setButtonState(isEnabled: false)
+        changePasswordView.codeField.actionButton.setTitle("인증 완료", for: .normal)
         
         CustomToast(containerWidth: 258).show(
             image: UIImage(named: "Style=check") ?? UIImage(),
