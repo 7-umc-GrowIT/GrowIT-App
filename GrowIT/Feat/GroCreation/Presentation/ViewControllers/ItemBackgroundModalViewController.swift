@@ -22,6 +22,7 @@ class ItemBackgroundModalViewController: UIViewController {
         self.view = itemBackgroundModalView
         ToastSecond.show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "캐릭터를 생성해 주세요!", font: .heading3SemiBold(), in: self.view)
         
+        selectDefaultBackground()
         setDelegate()
     }
     
@@ -36,6 +37,18 @@ class ItemBackgroundModalViewController: UIViewController {
     private func nextVC() {
         let nextVC = GroSetNameViewController(selectedBackground: selectedBackground)
         navigationController?.pushViewController(nextVC, animated: true)
+    }
+    
+    private func selectDefaultBackground() {
+        DispatchQueue.main.async {
+            let firstIndexPath = IndexPath(item: 0, section: 0)
+            self.itemBackgroundModalView.itemCollectionView.selectItem(
+                at: firstIndexPath,
+                animated: false,
+                scrollPosition: []
+            )
+            self.collectionView(self.itemBackgroundModalView.itemCollectionView, didSelectItemAt: firstIndexPath)
+        }
     }
 }
 
