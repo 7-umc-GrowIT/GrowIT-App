@@ -29,6 +29,13 @@ class EmailVerificationView: UIView {
         $0.snp.makeConstraints { $0.size.equalTo(24) }
     }
     
+    public lazy var infoIcon = UIButton().then {
+        $0.setImage(UIImage(named: "Info"), for: .normal)
+        $0.snp.makeConstraints { $0.size.equalTo(15) }
+    }
+    
+    private lazy var tooltipView = LeftToolTipView()
+    
     private lazy var mainLabel = UILabel().then {
         $0.text = "이메일 인증을 진행할게요"
         $0.textColor = .gray900
@@ -77,7 +84,7 @@ class EmailVerificationView: UIView {
     
     // MARK: - SetUI
     private func addViews() {
-        addSubviews([progressStackView, mainLabel, emailField, codeField, nextButton])
+        addSubviews([progressStackView, infoIcon, tooltipView, mainLabel, emailField, codeField, nextButton])
     }
     
     private func setConstraints() {
@@ -105,5 +112,17 @@ class EmailVerificationView: UIView {
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
+        
+        infoIcon.snp.makeConstraints {
+            $0.centerY.equalTo(emailField.titleLabel)
+            $0.leading.equalTo(emailField.snp.leading).offset(51)
+        }
+        
+        tooltipView.snp.makeConstraints {
+            $0.leading.equalTo(infoIcon.snp.trailing).offset(6)
+            $0.centerY.equalTo(infoIcon.snp.centerY)
+            $0.height.equalTo(33)
+        }
+        
     }
 }
