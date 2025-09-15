@@ -32,7 +32,7 @@ class ToolTipView: UIView {
         $0.adjustsFontSizeToFitWidth = true
     }
     
-    private let tipView = TipView()
+    private let tipView = TipView(direction: .down)
     
     // MARK: - Setup UI
     private func setupUI() {

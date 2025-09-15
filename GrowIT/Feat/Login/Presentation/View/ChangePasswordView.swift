@@ -23,6 +23,12 @@ class ChangePasswordView: UIView {
     }
                    
     // MARK: - UI Components
+    public lazy var infoIcon = UIButton().then {
+        $0.setImage(UIImage(named: "Info"), for: .normal)
+        $0.snp.makeConstraints { $0.size.equalTo(15) }
+    }
+    
+    private lazy var tooltipView = LeftToolTipView()
     
     public lazy var emailField = TextFieldWithButton(
         textfieldTitle: "이메일",
@@ -70,11 +76,22 @@ class ChangePasswordView: UIView {
     // MARK: - add Function & Constraints
     
     private func addComponents() {
-        [emailField, codeField, newPwdTextField,
+        [infoIcon, tooltipView, emailField, codeField, newPwdTextField,
          pwdCheckTextField, changePwdButton].forEach(self.addSubview)
     }
     
     private func constraints() {
+        infoIcon.snp.makeConstraints {
+            $0.centerY.equalTo(emailField.titleLabel)
+            $0.leading.equalTo(emailField.snp.leading).offset(51)
+        }
+        
+        tooltipView.snp.makeConstraints {
+            $0.leading.equalTo(infoIcon.snp.trailing).offset(6)
+            $0.centerY.equalTo(infoIcon.snp.centerY)
+            $0.height.equalTo(33)
+        }
+        
         emailField.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(32)
             $0.horizontalEdges.equalToSuperview().inset(24)

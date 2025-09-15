@@ -74,6 +74,10 @@ class TextFieldWithButton: UIView {
         return textField.textField
     }
     
+    var titleLabel: UILabel {
+        return textField.titleLabel
+    }
+    
     // MARK: - Functional
     func setButtonState(isEnabled: Bool) {
         // isEnabled 값에 따라 배경색을 다르게 설정
