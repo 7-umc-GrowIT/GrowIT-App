@@ -31,7 +31,6 @@ class ChallengeVerifyViewController: UIViewController {
         setupNavigationBar() // 네비게이션 바 설정 함수
         openImagePicker() // 이미지 선택 관련 함수
         setupDismissKeyboardGesture() // 키보드 해제 함수
-        setupKeyboardNotifications()
         
         challengeVerifyView.reviewTextView.delegate = self
         challengeVerifyView.challengeVerifyButton.addTarget(self, action: #selector(challengeVerifyButtonTapped), for: .touchUpInside)
@@ -125,34 +124,6 @@ class ChallengeVerifyViewController: UIViewController {
     
     @objc private func dismissKeyboard() {
         view.endEditing(true)
-    }
-    
-    /// 키보드 감지시 수행하는 함수
-    private func setupKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    @objc func keyboardWillShow(_ sender: Notification) {
-        guard let keyboardFrame = sender.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue,
-              let currentResponder = UIResponder.currentResponder as? UIView else { return }
-
-        let keyboardTopY = keyboardFrame.cgRectValue.origin.y
-        let convertedFrame = challengeVerifyView.scrollView.convert(currentResponder.frame, from: currentResponder.superview)
-        let responderBottomY = convertedFrame.maxY
-
-        // 스크롤뷰 내에서 현재 응답자가 가려지는지 확인
-        if responderBottomY > keyboardTopY {
-            let shift = responderBottomY - keyboardTopY + 16
-
-            // scrollView의 contentOffset을 변경하여 텍스트뷰가 보이도록 이동
-            challengeVerifyView.scrollView.setContentOffset(CGPoint(x: 0, y: shift), animated: true)
-        }
-    }
-
-    @objc func keyboardWillHide(_ sender: Notification) {
-        // 스크롤뷰의 contentOffset을 0,0으로 되돌립니다.
-        challengeVerifyView.scrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
     }
 
     /// 인증하기 버튼 터치 이벤트

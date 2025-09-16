@@ -42,7 +42,7 @@ class ChallengeVerifyView: UIView {
     
     public lazy var challengeName = makeLabel(title: "", color: .gray900, font: .heading1Bold())
     
-    private lazy var challengeContent = makeLabel(title: "", color: .gray900, font: .heading3Bold())
+    private lazy var challengeContent = makeLabel(title: "", color: .gray500, font: .body2Medium())
     
     private lazy var imageUploadLabel = makeLabel(title: "인증샷 업로드", color: .gray900, font: .heading3Bold())
     
@@ -57,6 +57,9 @@ class ChallengeVerifyView: UIView {
         $0.backgroundColor = .white
         $0.clipsToBounds = true
         $0.isUserInteractionEnabled = true
+        $0.layer.cornerRadius = 8
+        $0.layer.borderWidth = 1
+        $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
     }
     
     private lazy var oneLineReviewLabel = makeLabel(title: "챌린지 한줄소감", color: .gray900, font: .heading3Bold())
