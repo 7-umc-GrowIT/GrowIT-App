@@ -233,12 +233,14 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiaryCell.identifier, for: indexPath) as? DiaryCell else { return UICollectionViewCell() }
+        
         let firstDayIndex = firstWeekdayOfMonth - 1  // 0-based index
         let day = indexPath.item - firstDayIndex + 1
-
+        
         let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12] // 이전 달의 날짜 수
+        let daysToShowFromPreviousMonth = firstWeekdayOfMonth - currentCalendar.firstWeekday
         let previousMonthDay = daysInPreviousMonth + day
-
+        
         let previousMonth = currentMonthIndex! == 0 ? 12 : currentMonthIndex!
         let nextMonth = currentMonthIndex! == 11 ? 1 : currentMonthIndex! + 2
         let yearAdjustmentPrevious = currentMonthIndex! == 0 ? -1 : 0
@@ -247,55 +249,70 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
         var dateComponents = DateComponents()
         dateComponents.year = currentYear
         dateComponents.month = currentMonthIndex! + 1
-        dateComponents.day = day
 
+        // ✅ 일요일 여부를 계산하기 위한 변수
+        var isSunday: Bool = false
+        
+        // Adjust day number based on the first day of the month
         if day < 1 {
-            // 이전 달 날짜
+            // 이전 달의 날짜를 표시
             dateComponents.month = previousMonth
             dateComponents.year! += yearAdjustmentPrevious
-            dateComponents.day = daysPerMonth[previousMonth - 1] + day
+            
+            // ✅ 이전 달 날짜 계산 수정
+            let actualPreviousDay = daysInPreviousMonth + day  // day는 음수이므로
+            dateComponents.day = actualPreviousDay
+            
+            // ✅ 이전 달 날짜의 일요일 여부 계산
+            let date = currentCalendar.date(from: dateComponents)!
+            let weekday = currentCalendar.component(.weekday, from: date)
+            isSunday = (weekday == 1)
+            
+            cell.figure(day: actualPreviousDay, isSunday: isSunday, isFromCurrentMonth: false, isDark: self.isDark)
+            cell.isHidden = false
         } else if day > numberOfDaysInMonth {
-            // 다음 달 날짜
+            // 다음 달의 날짜를 표시
+            let nextMonthDay = day - numberOfDaysInMonth
+            
             dateComponents.month = nextMonth
             dateComponents.year! += yearAdjustmentNext
-            dateComponents.day = day - numberOfDaysInMonth
+            dateComponents.day = nextMonthDay 
+            
+            // 다음 달 날짜의 일요일 여부 계산
+            let date = currentCalendar.date(from: dateComponents)!
+            let weekday = currentCalendar.component(.weekday, from: date)
+            isSunday = (weekday == 1)
+            
+            print("다음 달 \(nextMonthDay)일, 요일: \(weekday), 일요일: \(isSunday)")
+            
+            cell.figure(day: nextMonthDay, isSunday: isSunday, isFromCurrentMonth: false, isDark: self.isDark)
+            cell.isHidden = false
         } else {
-            dateComponents.day = day
+            // 현재 달의 날짜를 표시
+            dateComponents.day = day + 1
+            
+            // ✅ 현재 달 날짜의 일요일 여부 계산
+            let weekdayIndex = (firstDayIndex + day - 1) % 7
+            isSunday = (weekdayIndex == 0) // 일요일
+            
+            cell.figure(day: day, isSunday: isSunday, isFromCurrentMonth: true, isDark: self.isDark)
+            cell.isHidden = false
         }
-
-        // 실제 날짜 객체 생성
-        guard let date = currentCalendar.date(from: dateComponents) else { return cell }
+        
+        let date = currentCalendar.date(from: dateComponents)!
         let dateString = dateFormatter.string(from: date)
-
-        // 요일 판별 (일요일 여부)
-        let weekday = currentCalendar.component(.weekday, from: date) // 1=일요일, 2=월요일 ...
-        let isSunday = (weekday == 1)
-
-        // 현재 달인지 여부 판별
-        let isFromCurrentMonth = (dateComponents.month == currentMonthIndex! + 1 && dateComponents.year == currentYear)
-
-        // cell 표시
-        cell.figure(
-            day: Calendar.current.component(.day, from: date),
-            isSunday: isSunday,
-            isFromCurrentMonth: isFromCurrentMonth,
-            isDark: self.isDark
-        )
-
-        // 다이어리 아이콘 표시
+        
         if let _ = callendarDiaries.first(where: { $0.date == dateString }) {
             print(dateString)
-            cell.showIcon(isShow: true)
+            cell.showIcon(isShow: true) // 해당 날짜에 일기가 있다면 아이콘 표시
         } else {
-            cell.showIcon(isShow: false)
+            cell.showIcon(isShow: false) // 아니면 숨김
         }
-
-        cell.isHidden = false
+        
         return cell
     }
-
     
-func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         //let paddingSpace = 16 * 2 // 좌우 패딩
         let availableWidth = collectionView.frame.width
         let widthPerItem = availableWidth / 7
@@ -334,27 +351,22 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
     /// 셀 선택 시 실행되는 메소드
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let firstDayIndex = firstWeekdayOfMonth - 1
-        let day = indexPath.item - firstDayIndex + 1
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
+        let day = indexPath.item - firstDayIndex
         var dateComponents = DateComponents()
         dateComponents.year = currentYear
-        
-        // 날짜 계산 (이전 달, 다음 달, 현재 달)
+
         if day < 1 {
             dateComponents.month = currentMonthIndex == 0 ? 12 : currentMonthIndex
             let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12]
             dateComponents.day = daysInPreviousMonth + day
             dateComponents.year! -= currentMonthIndex == 0 ? 1 : 0
-        } else if day > numberOfDaysInMonth {
+        } else if day >= numberOfDaysInMonth {
             dateComponents.month = currentMonthIndex == 11 ? 1 : currentMonthIndex! + 2
-            dateComponents.day = day - numberOfDaysInMonth
+            dateComponents.day = day - numberOfDaysInMonth + 1
             dateComponents.year! += currentMonthIndex == 11 ? 1 : 0
         } else {
             dateComponents.month = currentMonthIndex! + 1
-            dateComponents.day = day
+            dateComponents.day = day + 1
         }
         
         guard let date = Calendar.current.date(from: dateComponents) else { return }
