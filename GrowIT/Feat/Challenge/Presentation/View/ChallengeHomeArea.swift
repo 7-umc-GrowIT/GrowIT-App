@@ -242,12 +242,13 @@ class ChallengeHomeArea: UIView {
         emptyChallengeIcon.snp.makeConstraints {
             $0.top.equalTo(titleStack.snp.bottom).offset(53)
             $0.centerX.equalToSuperview()
-            $0.height.width.equalTo(40)
+            $0.width.height.equalTo(40)
         }
         
-        emptyChallengeLabel.snp.makeConstraints{
+        emptyChallengeLabel.snp.makeConstraints {
             $0.top.equalTo(emptyChallengeIcon.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
+            $0.height.equalTo(18)
         }
         
         challengeReportTitleStack.snp.makeConstraints{
