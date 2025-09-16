@@ -24,6 +24,11 @@ class DiaryCell: UICollectionViewCell{
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        showIcon(isShow: false) // 재사용 시 아이콘 숨기기
+    }
+    
     private lazy var dateCell = UILabel().then{
         $0.text = "1"
         $0.font = .subBody1()
