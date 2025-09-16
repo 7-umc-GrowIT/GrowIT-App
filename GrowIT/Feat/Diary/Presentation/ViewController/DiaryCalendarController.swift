@@ -232,13 +232,13 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiaryCell.identifier, for: indexPath) as? DiaryCell else { return UICollectionViewCell()}
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiaryCell.identifier, for: indexPath) as? DiaryCell else { return UICollectionViewCell() }
         let firstDayIndex = firstWeekdayOfMonth - 1  // 0-based index
         let day = indexPath.item - firstDayIndex + 1
-        
+
         let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12] // 이전 달의 날짜 수
         let previousMonthDay = daysInPreviousMonth + day
-        
+
         let previousMonth = currentMonthIndex! == 0 ? 12 : currentMonthIndex!
         let nextMonth = currentMonthIndex! == 11 ? 1 : currentMonthIndex! + 2
         let yearAdjustmentPrevious = currentMonthIndex! == 0 ? -1 : 0
@@ -249,51 +249,51 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
         dateComponents.month = currentMonthIndex! + 1
         dateComponents.day = day
 
-        // Adjust day number based on the first day of the month
         if day < 1 {
-            // 이전 달의 날짜를 표시
-            cell.figure(day: previousMonthDay, isSunday: false, isFromCurrentMonth: false, isDark: self.isDark)
-            cell.isHidden = false
-            
+            // 이전 달 날짜
             dateComponents.month = previousMonth
             dateComponents.year! += yearAdjustmentPrevious
-            dateComponents.day = daysPerMonth[previousMonth - 1] + day + 1
+            dateComponents.day = daysPerMonth[previousMonth - 1] + day
         } else if day > numberOfDaysInMonth {
-            // 다음 달의 날짜를 표시
-            cell.figure(day: day - numberOfDaysInMonth, isSunday: false, isFromCurrentMonth: false, isDark: self.isDark)
-            cell.isHidden = false
-            
+            // 다음 달 날짜
             dateComponents.month = nextMonth
             dateComponents.year! += yearAdjustmentNext
-            dateComponents.day = day - numberOfDaysInMonth + 1
+            dateComponents.day = day - numberOfDaysInMonth
         } else {
-            // 날짜 계산
-            dateComponents.day = day + 1
-            
-            // 현재 달의 날짜를 표시
-            
-            let weekdayIndex = (firstDayIndex + day - 1) % 7
-            if weekdayIndex == 0 { // 일요일
-                cell.figure(day: day, isSunday: true, isFromCurrentMonth: true, isDark: self.isDark)
-            } else {
-                cell.figure(day: day, isSunday: false, isFromCurrentMonth: true, isDark: self.isDark)
-            }
-            cell.isHidden = false
+            dateComponents.day = day
         }
-        
-        let date = currentCalendar.date(from: dateComponents)!
-            let dateString = dateFormatter.string(from: date)
-        
+
+        // 실제 날짜 객체 생성
+        guard let date = currentCalendar.date(from: dateComponents) else { return cell }
+        let dateString = dateFormatter.string(from: date)
+
+        // 요일 판별 (일요일 여부)
+        let weekday = currentCalendar.component(.weekday, from: date) // 1=일요일, 2=월요일 ...
+        let isSunday = (weekday == 1)
+
+        // 현재 달인지 여부 판별
+        let isFromCurrentMonth = (dateComponents.month == currentMonthIndex! + 1 && dateComponents.year == currentYear)
+
+        // cell 표시
+        cell.figure(
+            day: Calendar.current.component(.day, from: date),
+            isSunday: isSunday,
+            isFromCurrentMonth: isFromCurrentMonth,
+            isDark: self.isDark
+        )
+
+        // 다이어리 아이콘 표시
         if let _ = callendarDiaries.first(where: { $0.date == dateString }) {
             print(dateString)
-            cell.showIcon(isShow: true) // 해당 날짜에 일기가 있다면 아이콘 표시
-        }else {
-            cell.showIcon(isShow: false)// 아니면 숨김
+            cell.showIcon(isShow: true)
+        } else {
+            cell.showIcon(isShow: false)
         }
-        
-        
+
+        cell.isHidden = false
         return cell
     }
+
     
 func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         //let paddingSpace = 16 * 2 // 좌우 패딩
