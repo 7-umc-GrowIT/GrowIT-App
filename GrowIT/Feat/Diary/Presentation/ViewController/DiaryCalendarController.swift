@@ -276,7 +276,7 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
             
             dateComponents.month = nextMonth
             dateComponents.year! += yearAdjustmentNext
-            dateComponents.day = nextMonthDay 
+            dateComponents.day = nextMonthDay
             
             // 다음 달 날짜의 일요일 여부 계산
             let date = currentCalendar.date(from: dateComponents)!
@@ -350,35 +350,47 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
     
     /// 셀 선택 시 실행되는 메소드
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let firstDayIndex = firstWeekdayOfMonth - 1
-        let day = indexPath.item - firstDayIndex
+        let firstDayIndex = firstWeekdayOfMonth - 1  // 월의 첫 요일 인덱스 계산
+        let day = indexPath.item - firstDayIndex + 1
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd" // 날짜 형식 지정
+        
         var dateComponents = DateComponents()
         dateComponents.year = currentYear
-
+        
+        // 달력에서 셀의 날짜 계산
         if day < 1 {
+            // 이전 달
             dateComponents.month = currentMonthIndex == 0 ? 12 : currentMonthIndex
             let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12]
             dateComponents.day = daysInPreviousMonth + day
             dateComponents.year! -= currentMonthIndex == 0 ? 1 : 0
-        } else if day >= numberOfDaysInMonth {
+        } else if day > numberOfDaysInMonth {
+            // 다음 달
             dateComponents.month = currentMonthIndex == 11 ? 1 : currentMonthIndex! + 2
-            dateComponents.day = day - numberOfDaysInMonth + 1
+            dateComponents.day = day - numberOfDaysInMonth
             dateComponents.year! += currentMonthIndex == 11 ? 1 : 0
         } else {
+            // 현재 달
             dateComponents.month = currentMonthIndex! + 1
-            dateComponents.day = day + 1
+            dateComponents.day = day
         }
         
-        guard let date = Calendar.current.date(from: dateComponents) else { return }
+        guard let date = Calendar.current.date(from: dateComponents) else {
+            print("❌ 날짜 생성 실패: \(dateComponents)")
+            return
+        }
+        
         let formattedDate = dateFormatter.string(from: date)
         let today = Calendar.current.startOfDay(for: Date())
         let selectedDay = Calendar.current.startOfDay(for: date)
         
-        print("날짜 눌림: \(formattedDate)")
-        print(callendarDiaries)
-        print(formattedDate)
+        print("🗓️ 선택된 날짜: \(formattedDate)")
+        print("📋 캘린더 일기 목록: \(callendarDiaries.map { $0.date })")
+        
         if self.isDropDown {
-            print("팝업이 열림")
+            print("📝 드롭다운 모드 - 일기 작성")
             if selectedDay > today {
                 CustomToast(containerWidth: 277).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 작성이 불가능해요", font: .heading3SemiBold())
                 return
@@ -387,25 +399,34 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
             if (callendarDiaries.contains(where: {$0.date == formattedDate})){
                 CustomToast(containerWidth: 310).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 이미 일기를 작성했어요", font: .heading3SemiBold())
                 return
-            }else{
+            } else {
                 delegate?.didSelectDate(formattedDate)
             }
         } else {
-            print("팝업이 안 열림")
+            print("👁️ 보기 모드 - 일기 확인")
             if let result = callendarDiaries.first(where: { $0.date == formattedDate }) {
-                print("여기까지 들어옴")
+                print("✅ 일기를 찾았습니다. ID: \(result.diaryId)")
                 diaryService.fetchDiary(diaryId: result.diaryId) { [weak self] result in
                     guard let self = self else { return }
-                    switch result {
-                    case .success(let data):
-                        print("받은 일기 데이터는 \(data)")
-                        let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
-                        self.presentSheet(diaryPostFixVC, heightRatio: 0.6)
-                    case .failure(let error):
-                        print("Error: \(error)")
+                    DispatchQueue.main.async {  // UI 업데이트는 메인 스레드에서
+                        switch result {
+                        case .success(let data):
+                            print("📖 일기 데이터 로드 성공: \(data)")
+                            let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
+                            self.presentSheet(diaryPostFixVC, heightRatio: 0.6)
+                        case .failure(let error):
+                            print("❌ 일기 로드 실패: \(error)")
+                            // 에러 처리 추가
+                            CustomToast(containerWidth: 250).show(
+                                image: UIImage(named: "toastAlertIcon") ?? UIImage(),
+                                message: "일기를 불러올 수 없습니다",
+                                font: .heading3SemiBold()
+                            )
+                        }
                     }
                 }
-                return
+            } else {
+                print("❌ 해당 날짜에 일기가 없습니다: \(formattedDate)")
             }
         }
     }
