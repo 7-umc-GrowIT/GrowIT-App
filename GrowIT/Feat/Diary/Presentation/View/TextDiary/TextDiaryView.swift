@@ -107,12 +107,6 @@ class TextDiaryView: UIView, UITextViewDelegate {
             enabledTitleColor: .white,
             disabledTitleColor: .gray400
         )
-        
-//        if isDateSelected && isTextValid {
-//            saveButton.isUserInteractionEnabled = true
-//        } else {
-//            saveButton.isUserInteractionEnabled = false
-//        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -138,13 +132,14 @@ class TextDiaryView: UIView, UITextViewDelegate {
         }
         
         dropDownStack.snp.makeConstraints {
-            $0.top.equalTo(dayLabel.snp.bottom).offset(20)
+            $0.top.equalTo(dayLabel.snp.bottom).offset(8)
             $0.left.equalTo(dayLabel.snp.left)
+            $0.bottom.equalToSuperview().inset(20)
         }
         
         addSubview(diaryTextField)
         diaryTextField.snp.makeConstraints { make in
-            make.top.equalTo(dropDownStack.snp.bottom).offset(24)
+            make.top.equalTo(dateView.snp.bottom).offset(24)
             make.leading.equalToSuperview().offset(24)
             make.centerX.equalToSuperview()
             make.height.equalTo(360)
