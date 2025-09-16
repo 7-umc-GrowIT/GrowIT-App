@@ -17,7 +17,12 @@ extension UIViewController: @retroactive UISheetPresentationControllerDelegate {
             
         if let sheet = viewController.sheetPresentationController {
             if #available(iOS 16.0, *) {
-                sheet.detents = useLargeOnly ? [.large()] : [.custom { _ in UIScreen.main.bounds.height * heightRatio }]
+                if useLargeOnly {
+                    sheet.detents = [.large()]
+                } else {
+                    // 기본 높이는 custom, 사용자가 끌면 large까지 확장 가능
+                    sheet.detents = [.custom { _ in UIScreen.main.bounds.height * heightRatio }, .large()]
+                }
             } else {
                 sheet.detents = [.medium(), .large()]
             }
@@ -27,8 +32,8 @@ extension UIViewController: @retroactive UISheetPresentationControllerDelegate {
             }
             
             sheet.delegate = self
-            sheet.prefersGrabberVisible = false
-            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
+            sheet.prefersGrabberVisible = false // 사용자가 끌기 쉽게 그랩퍼를 보이도록
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = true // 스크롤 시 확장 허용
         }
         
         present(viewController, animated: true, completion: nil)

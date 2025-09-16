@@ -10,7 +10,7 @@ import Foundation
 import SnapKit
 import AuthenticationServices
 
-class LoginViewController: UIViewController {
+class MainLoginViewController: UIViewController {
     // MARK: - Properties
     let authService = AuthService()
     private lazy var kakaoLoginHelper = KakaoLoginHelper()
@@ -106,7 +106,7 @@ class LoginViewController: UIViewController {
     // MARK: - 서버 요청 로직
     // 인가 코드를 서버에 전달하여 로그인 요청
     private func loginWithServer(code: String, name: String, socialType: String) {
-        let request = SocialLoginRequest(code: code, name: name)
+        let request = AuthLoginSocialRequestDTO(code: code, name: name)
         
         if socialType == "KAKAO"{
             authService.postLoginKakao(data: request) { [weak self] result in
@@ -145,7 +145,7 @@ class LoginViewController: UIViewController {
     /// 로그인 응답 처리
     /// - 회원가입이 필요한 경우: 약관 동의 화면으로 이동
     /// - 회원가입 불필요: 토큰 저장 후 메인 화면 이동
-    private func handleLoginResponse(_ loginResponse: SocialLoginResponse) {
+    private func handleLoginResponse(_ loginResponse: AuthLoginSocialResponsetDTO) {
         if loginResponse.result.signupRequired {
             // 회원가입 필요 (true)
             showTermsAgree(oauthUserInfo: loginResponse.result.oauthUserInfo)
@@ -180,7 +180,7 @@ class LoginViewController: UIViewController {
 
     /// 회원가입 요청
     private func signupWithKakao(oauthUserInfo: OauthUserInfo, userTerms: [UserTermDTO]) {
-        authService.signupWithKakao(oauthUserInfo: oauthUserInfo, userTerms: userTerms) { [weak self] signupResponse in
+        authService.postAuthSocialSignUp(oauthUserInfo: oauthUserInfo, userTerms: userTerms) { [weak self] signupResponse in
             guard let self = self else { return }
             print("😎 oauthUserInfo : \(oauthUserInfo)\n userTerms: \(userTerms) ")
             DispatchQueue.main.async {
@@ -191,6 +191,10 @@ class LoginViewController: UIViewController {
                         accessToken: signupResult.result.tokens.accessToken,
                         refreshToken: signupResult.result.tokens.refreshToken
                     )
+                    
+                    // 소셜 회원가입 시 loginMethod 저장
+                    UserDefaults.standard.set(signupResult.result.loginMethod, forKey: "loginMethod")
+                    
                     // 그로 생성 화면으로 이동
                     self.navigateToGroCreation()
                 case .failure(let error):
@@ -225,14 +229,13 @@ class LoginViewController: UIViewController {
     }
     
     private func navigateToMainScreen() {
-        let tabBar = CustomTabBarController(initialIndex: 1)
-        let nav = UINavigationController(rootViewController: tabBar)
-        if let window = UIApplication.shared.windows.first {
+        let homeVC = CustomTabBarController(initialIndex: 1)
+        let nav = UINavigationController(rootViewController: homeVC)
+        
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
             window.rootViewController = nav
             window.makeKeyAndVisible()
-        } else {
-            // 폴백: 현재 내비 스택 교체
-            navigationController?.setViewControllers([tabBar], animated: true)
         }
     }
     
@@ -243,14 +246,14 @@ class LoginViewController: UIViewController {
     
 }
 
-extension LoginViewController: ASAuthorizationControllerPresentationContextProviding {
+extension MainLoginViewController: ASAuthorizationControllerPresentationContextProviding {
     // 인증창을 보여주기 위한 메서드 (인증창을 보여 줄 화면을 설정)
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         self.view.window ?? UIWindow()
     }
 }
 
-extension LoginViewController: ASAuthorizationControllerDelegate {
+extension MainLoginViewController: ASAuthorizationControllerDelegate {
     // 로그인 실패 시
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: any Error) {
         print("로그인 실패", error.localizedDescription)

@@ -24,19 +24,16 @@ class EmailLoginView: UIView {
     
     // MARK: - UI Components
     
-    public lazy var emailTextField = CustomTextField(frame: .zero, isPasswordField: false).then {
+    public lazy var emailTextField = AppTextField(isPasswordField: false).then {
         $0.setTitleLabel("이메일")
         $0.setPlaceholder("이메일을 입력해 주세요")
-        $0.setValidationRule { text in
-            let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-            return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: text)
-        }
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    public lazy var pwdTextField = CustomTextField(frame: .zero, isPasswordField: true).then {
+    public lazy var pwdTextField = AppTextField(isPasswordField: true).then {
         $0.setTitleLabel("비밀번호")
         $0.setPlaceholder("비밀번호를 입력해 주세요")
+        $0.textField.isSecureTextEntry = true
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -79,7 +76,7 @@ class EmailLoginView: UIView {
     }
     
     // 회원가입 버튼
-    public lazy var singUpButton = UIButton().then {
+    public lazy var signUpButton = UIButton().then {
         $0.setTitle("회원가입", for: .normal)
         $0.setTitleColor(.gray400, for: .normal)
         $0.titleLabel?.font = UIFont.body2Medium()
@@ -107,7 +104,7 @@ class EmailLoginView: UIView {
         $0.addArrangedSubview(divider1)
         $0.addArrangedSubview(changePwdButton)
         $0.addArrangedSubview(divider2)
-        $0.addArrangedSubview(singUpButton)
+        $0.addArrangedSubview(signUpButton)
     }
     
     // MARK: - add Function & Constraints
@@ -121,35 +118,29 @@ class EmailLoginView: UIView {
     
     private func constraints() {
         emailTextField.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(148)
-            $0.leading.equalToSuperview().offset(24)
-            $0.trailing.equalToSuperview().offset(-24)
-            $0.height.equalTo(78)
+            $0.top.equalTo(safeAreaLayoutGuide).inset(32)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         pwdTextField.snp.makeConstraints {
-            $0.top.equalTo(emailTextField.snp.bottom).offset(24)
-            $0.leading.equalTo(emailTextField.snp.leading)
-            $0.trailing.equalTo(emailTextField.snp.trailing)
-            $0.height.equalTo(78)
+            $0.top.equalTo(emailTextField.snp.bottom).offset(12)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         emailSaveButton.snp.makeConstraints {
-            $0.top.equalTo(pwdTextField.snp.bottom).offset(16.5)
-            $0.leading.equalTo(pwdTextField.snp.leading)
+            $0.top.equalTo(pwdTextField.snp.bottom).offset(16)
+            $0.leading.equalToSuperview().inset(24)
             $0.size.equalTo(CGSize(width: 20, height: 20))
         }
         
         emailSaveLabel.snp.makeConstraints {
             $0.centerY.equalTo(emailSaveButton)
-            $0.leading.equalToSuperview().offset(48)
+            $0.leading.equalTo(emailSaveButton.snp.trailing).offset(4)
         }
         
         loginButton.snp.makeConstraints {
-            $0.top.equalTo(pwdTextField.snp.bottom).offset(77)
-            $0.leading.equalTo(pwdTextField.snp.leading)
-            $0.trailing.equalTo(pwdTextField.snp.trailing)
-            $0.height.equalTo(60)
+            $0.top.equalTo(emailSaveButton.snp.bottom).offset(40)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         buttonStackView.snp.makeConstraints {

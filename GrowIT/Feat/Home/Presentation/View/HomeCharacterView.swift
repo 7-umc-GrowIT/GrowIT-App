@@ -31,7 +31,7 @@ class HomeCharacterView: UIView {
     }
     
     // 크레딧 아이콘
-    private lazy var creditIcon = makeIcon("credit")
+    private lazy var creditIcon = makeIcon("creditNumIcon")
     
     // 크레딧 개수
     public lazy var creditNum = UILabel().then{

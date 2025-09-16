@@ -15,6 +15,8 @@ class VoiceDiaryRecordErrorViewController: UIViewController {
     
     var diaryId: Int = 0
     
+    var isDeleting: Bool = false
+    
     let errorView = ErrorView().then {
         $0.configure(
             icon: "diaryIcon",
@@ -60,10 +62,13 @@ class VoiceDiaryRecordErrorViewController: UIViewController {
     
     // MARK: Setup APIs
     private func callDeleteDiary() {
+        guard !isDeleting else { return }
+        isDeleting = true
         diaryService.deleteDiary(
             diaryId: diaryId,
             completion: {[weak self] result in
                 guard let self = self else { return }
+                self.isDeleting = false
                 switch result {
                 case .success(let data):
                     print("Success: \(data)")

@@ -49,6 +49,7 @@ class AppButton: UIButton {
         // isEnabled 값에 따라 배경색을 다르게 설정
         self.backgroundColor = isEnabled ? enabledColor : disabledColor
         self.setTitleColor(isEnabled ? enabledTitleColor : disabledTitleColor, for: .normal)
+        self.isEnabled = isEnabled
     }
     
 }

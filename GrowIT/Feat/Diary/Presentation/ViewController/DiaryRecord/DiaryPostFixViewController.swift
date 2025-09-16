@@ -16,6 +16,7 @@ class DiaryPostFixViewController: UIViewController {
     let diaryPostFixView = DiaryPostFixView()
     private let diaryService = DiaryService()
     var onDismiss: (() -> Void)?
+    var isFixing: Bool = false
     
     init(text: String, date: String, diaryId: Int) {
         self.text = text
@@ -93,18 +94,23 @@ class DiaryPostFixViewController: UIViewController {
     
     
     private func callPatchFixDiary() {
+        guard !isFixing else { return }
+        isFixing = true
         diaryService.patchFixDiary(
             diaryId: diaryId,
             data: getUserContent(),
             completion: { [weak self] result in
                 guard let self = self else { return }
+                self.isFixing = false
                 switch result {
                 case .success(let data):
                     print("Success: \(data)")
                     DispatchQueue.main.async {
                         NotificationCenter.default.post(name: .diaryReloadNotification, object: nil)
                         CustomToast(containerWidth: 195).show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "일기를 수정했어요", font: .heading3SemiBold())
-                        self.dismiss(animated: true, completion: nil)
+                        self.dismiss(animated: true) {
+                            self.onDismiss?()  // 모달 해제 후 onDismiss 호출
+                        }
                     }
                 case .failure(let error):
                     print("Error: \(error)")

@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import SnapKit
 
 class CustomToast {
     private var containerWidth: CGFloat
@@ -38,6 +37,13 @@ class CustomToast {
             $0.backgroundColor = UIColor(hex: "#00000066")
             $0.layer.cornerRadius = 16
         }
+        
+        let stack = UIStackView().then {
+            $0.spacing = spaceBetweenImageAndLabel
+            $0.axis = .horizontal
+            $0.alignment = .center // 🔥 중앙 정렬 추가
+            $0.distribution = .fill // 🔥 분배 방식 명시
+        }
 
         let imageView = UIImageView().then {
             $0.image = image
@@ -50,27 +56,28 @@ class CustomToast {
             $0.textColor = .white
             $0.textAlignment = .left
             $0.numberOfLines = 0
+            $0.adjustsFontSizeToFitWidth = true
         }
 
         keyWindow.addSubview(containerView)
-        containerView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-136)
-            make.width.equalTo(containerWidth)
-            make.height.equalTo(containerHeight)
+        containerView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().offset(-136)
+            $0.width.equalTo(containerWidth)
+            $0.height.equalTo(containerHeight)
         }
-
-        containerView.addSubview(imageView)
-        imageView.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.leading.equalToSuperview().offset(20)
-            make.width.height.equalTo(imageWidthHeight)
+        
+        stack.addArrangedSubViews([imageView, label])
+        containerView.addSubview(stack)
+        
+        stack.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.verticalEdges.equalToSuperview().inset(17)
         }
-
-        containerView.addSubview(label)
-        label.snp.makeConstraints { make in
-            make.centerY.equalTo(imageView)
-            make.leading.equalTo(imageView.snp.trailing).offset(spaceBetweenImageAndLabel)
+        
+        imageView.snp.makeConstraints {
+            $0.width.height.equalTo(imageWidthHeight)
         }
 
         // 현재 토스트로 설정

@@ -27,6 +27,8 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         return textDiaryRecommendChallengeView.challengeStackView.challengeViews
     }
     
+    var isSaving: Bool = false
+    
     init(diaryId: Int, data: DiaryAnalyzeResponseDTO) {
         self.diaryId = diaryId
         self.data = data
@@ -106,8 +108,11 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
             return
         }
         
+        guard !isSaving else { return }
+        isSaving = true
         challengeService.postSelectedChallenge(data: selectedChallenges) { [weak self] result in
             guard let self = self else { return }
+            self.isSaving = false
             switch result {
             case .success(let response):
                 print("챌린지 선택 성공: \(response)")

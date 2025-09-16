@@ -61,6 +61,12 @@ class DiaryPostFixView: UIView {
         $0.backgroundColor = .gray100
     }
     
+    let buttonStack = UIStackView().then {
+        $0.axis = .horizontal
+        $0.distribution = .fillEqually
+        $0.spacing = 8
+    }
+    
     let deleteLabel = UILabel().then {
         $0.text = "삭제하기"
         $0.font = .body2Medium()
@@ -72,7 +78,7 @@ class DiaryPostFixView: UIView {
     private func setupUI() {
         backgroundColor = .white
         
-        self.addSubviews([grabberIcon, diaryIcon, fixLabel, label1, textView, cancelButton, fixButton, deleteLabel])
+        self.addSubviews([grabberIcon, diaryIcon, fixLabel, label1, textView, buttonStack, deleteLabel])
     
         grabberIcon.snp.makeConstraints {
             $0.width.equalTo(80)
@@ -99,26 +105,20 @@ class DiaryPostFixView: UIView {
         }
         
         textView.snp.makeConstraints {
-            $0.leading.equalTo(label1.snp.leading)
+            $0.horizontalEdges.equalToSuperview().inset(24)
             $0.top.equalTo(label1.snp.bottom).offset(8)
-            $0.centerX.equalToSuperview()
-            $0.height.equalToSuperview().multipliedBy(0.42)
         }
         
-        cancelButton.snp.makeConstraints {
-            $0.leading.equalTo(textView.snp.leading)
+        buttonStack.addArrangedSubViews([cancelButton, fixButton])
+        
+        buttonStack.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom).offset(40)
-            $0.width.equalTo(88)
-        }
-        
-        fixButton.snp.makeConstraints {
-            $0.leading.equalTo(cancelButton.snp.trailing).offset(8)
-            $0.trailing.equalToSuperview().offset(-24)
-            $0.top.equalTo(cancelButton.snp.top)
+            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.height.equalTo(60)
         }
         
         deleteLabel.snp.makeConstraints {
-            $0.top.equalTo(fixButton.snp.bottom).offset(15.5)
+            $0.top.equalTo(buttonStack.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
             $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
         }

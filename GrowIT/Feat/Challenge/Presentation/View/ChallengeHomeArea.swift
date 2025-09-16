@@ -137,7 +137,7 @@ class ChallengeHomeArea: UIView {
         view.backgroundColor = .white
         view.layer.cornerRadius = 20
         view.layer.borderWidth = 1
-        view.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        view.layer.borderColor = UIColor.border.cgColor
         return view
     }
     
@@ -149,7 +149,7 @@ class ChallengeHomeArea: UIView {
         label.backgroundColor = UIColor.primary100
         label.layer.cornerRadius = 6
         label.layer.borderWidth = 1
-        label.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        label.layer.borderColor = UIColor.border.cgColor
         label.layer.masksToBounds = true
         label.isUserInteractionEnabled = false
         return label
@@ -242,12 +242,13 @@ class ChallengeHomeArea: UIView {
         emptyChallengeIcon.snp.makeConstraints {
             $0.top.equalTo(titleStack.snp.bottom).offset(53)
             $0.centerX.equalToSuperview()
-            $0.height.width.equalTo(40)
+            $0.width.height.equalTo(40)
         }
         
-        emptyChallengeLabel.snp.makeConstraints{
+        emptyChallengeLabel.snp.makeConstraints {
             $0.top.equalTo(emptyChallengeIcon.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
+            $0.height.equalTo(18)
         }
         
         challengeReportTitleStack.snp.makeConstraints{

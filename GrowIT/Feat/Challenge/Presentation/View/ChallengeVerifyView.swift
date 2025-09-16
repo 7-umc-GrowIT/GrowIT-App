@@ -23,15 +23,26 @@ class ChallengeVerifyView: UIView {
     }
     
     // MARK: - Property
+    public lazy var scrollView = UIScrollView(frame: self.bounds).then{
+        $0.isScrollEnabled = true
+        $0.showsVerticalScrollIndicator = false
+        $0.showsHorizontalScrollIndicator = false
+        $0.contentOffset = CGPoint(x: 0, y: 0)
+        //$0.contentSize = contentView.bounds.size
+    }
+    
+    public lazy var contentView = UIView().then{
+        $0.backgroundColor = .clear
+    }
     
     private lazy var challengeIcon = UIImageView().then{
         $0.image = UIImage(named: "challengeListIcon")
         $0.contentMode = .scaleAspectFit
     }
     
-    private lazy var challengeName = makeLabel(title: "", color: .black, font: .heading1Bold())
+    public lazy var challengeName = makeLabel(title: "", color: .gray900, font: .heading1Bold())
     
-    private lazy var subTitle = makeLabel(title: "챌린지를 인증하고 크레딧을 얻어 보세요!", color: .gray500, font: .body2Medium())
+    private lazy var challengeContent = makeLabel(title: "", color: .gray500, font: .body2Medium())
     
     private lazy var imageUploadLabel = makeLabel(title: "인증샷 업로드", color: .gray900, font: .heading3Bold())
     
@@ -46,11 +57,12 @@ class ChallengeVerifyView: UIView {
         $0.backgroundColor = .white
         $0.clipsToBounds = true
         $0.isUserInteractionEnabled = true
+        $0.layer.cornerRadius = 8
+        $0.layer.borderWidth = 1
+        $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
     }
     
     private lazy var oneLineReviewLabel = makeLabel(title: "챌린지 한줄소감", color: .gray900, font: .heading3Bold())
-    
-    //private lazy var reviewContainer = makeContainer()
     
     public lazy var reviewTextView = UITextView().then{
         $0.backgroundColor = .white
@@ -58,9 +70,9 @@ class ChallengeVerifyView: UIView {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 8
         $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        $0.layer.borderColor = UIColor.border.cgColor
         $0.textContainerInset = .init(top: 12, left: 12, bottom: 12, right: 12)
-        $0.returnKeyType = .done
+        $0.returnKeyType = .default
         $0.textColor = UIColor.gray300 // 플레이스홀더 색상처럼 보이게
     }
     
@@ -70,9 +82,7 @@ class ChallengeVerifyView: UIView {
         $0.setButtonState(isEnabled: false, enabledColor: .black, disabledColor: .gray100, enabledTitleColor: .white, disabledTitleColor: .gray400)
     }
     
-    // MARK: - Stack
-    private lazy var titleStack = makeStack(axis: .vertical, spacing: 4)
-    
+    // MARK: - Stak
     public lazy var imageStack = makeStack(axis: .vertical, spacing: 8)
     
     public lazy var imageUploadStack = makeStack(axis: .horizontal, spacing: 10)
@@ -81,14 +91,15 @@ class ChallengeVerifyView: UIView {
     
     
     // MARK: - Func
-    private func makeLabel(title:String, color: UIColor, font: UIFont) -> UILabel {
+    private func makeLabel(title: String, color: UIColor, font: UIFont) -> UILabel {
         let label = UILabel()
         label.text = title
         label.textColor = color
         label.font = font
-        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 0
         return label
     }
+
     
     private func makeStack(axis: NSLayoutConstraint.Axis, spacing: CGFloat) -> UIStackView {
         let stackView = UIStackView()
@@ -102,7 +113,7 @@ class ChallengeVerifyView: UIView {
         view.backgroundColor = .white
         view.layer.cornerRadius = 8
         view.clipsToBounds = true
-        view.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        view.layer.borderColor = UIColor.border.cgColor
         view.layer.borderWidth = 1
         return view
     }
@@ -118,7 +129,7 @@ class ChallengeVerifyView: UIView {
         }
         
         imageStack.snp.remakeConstraints{
-            $0.top.equalTo(titleStack.snp.bottom).offset(20)
+            $0.top.equalTo(challengeContent.snp.bottom).offset(20)
             $0.left.equalTo(24)
         }
     }
@@ -132,30 +143,51 @@ class ChallengeVerifyView: UIView {
         reviewTextView.layer.borderColor = borderColor.cgColor
     }
     
-    public func setChallengeName(name: String){
-        challengeName.text = name
+    public func setChallengeName(name: String) {
+        challengeName.text = name.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    public func setContent(name: String) {
+        challengeContent.text = name.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     // MARK: - addFunc & Constraints
     private func addComponents(){
-        [challengeIcon, titleStack, imageStack, reviewStack, reviewHintText, challengeVerifyButton].forEach(self.addSubview)
-        [challengeName, subTitle].forEach(titleStack.addArrangedSubview)
+        self.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
         [imageUploadLabel, imageContainer].forEach(imageStack.addArrangedSubview)
         [oneLineReviewLabel, reviewTextView].forEach(reviewStack.addArrangedSubview)
         imageContainer.addSubview(imageUploadStack)
         [imageUploadIcon, imageUploadText].forEach(imageUploadStack.addArrangedSubview)
+        
+        [challengeIcon, challengeName, challengeContent, imageStack, reviewStack, reviewHintText, challengeVerifyButton].forEach(contentView.addSubview)
     }
     
     private func constraints(){
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalTo(scrollView.snp.width)
+        }
+        
         challengeIcon.snp.makeConstraints{
-            $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(32)
+            $0.top.equalTo(contentView.snp.top).offset(32)
             $0.left.equalToSuperview().offset(24)
             $0.width.height.equalTo(40)
         }
         
-        titleStack.snp.makeConstraints{
+        challengeName.snp.makeConstraints {
             $0.top.equalTo(challengeIcon.snp.bottom).offset(8)
-            $0.left.equalToSuperview().offset(24)
+            $0.horizontalEdges.equalToSuperview().inset(24)
+        }
+        
+        challengeContent.snp.makeConstraints {
+            $0.top.equalTo(challengeName.snp.bottom).offset(4)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         imageContainer.snp.makeConstraints{
@@ -170,14 +202,16 @@ class ChallengeVerifyView: UIView {
             $0.center.equalToSuperview()
         }
         
+        
         imageStack.snp.makeConstraints{
-            $0.top.equalTo(titleStack.snp.bottom).offset(20)
+            $0.top.equalTo(challengeContent.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         reviewTextView.snp.makeConstraints{
             $0.height.equalTo(140)
         }
+        
         reviewStack.snp.makeConstraints {
             $0.top.equalTo(imageStack.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(24)
@@ -189,9 +223,10 @@ class ChallengeVerifyView: UIView {
         }
         
         challengeVerifyButton.snp.makeConstraints {
-            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom).inset(20)
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.top.equalTo(reviewHintText.snp.bottom).offset(200)
+            $0.left.equalToSuperview().offset(24)
+            $0.right.equalToSuperview().offset(-24)
+            $0.bottom.equalToSuperview().offset(-20)
         }
     }
-    
 }

@@ -11,12 +11,15 @@ class TextDiaryErrorViewController: UIViewController {
     
     weak var delegate: VoiceDiaryErrorDelegate?
     
+    
     // MARK: - Properties
     let errorView = ErrorView()
     
     let diaryService = DiaryService()
     
     var diaryId = 0
+    
+    var isDeleting: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,10 +56,13 @@ class TextDiaryErrorViewController: UIViewController {
     
     // MARK: Setup APIs
     private func callDeleteDiary() {
+        guard !isDeleting else { return }
+        isDeleting = true
         diaryService.deleteDiary(
             diaryId: diaryId,
             completion: {[weak self] result in
                 guard let self = self else { return }
+                self.isDeleting = false
                 switch result {
                 case .success(let data):
                     print("Success: \(data)")

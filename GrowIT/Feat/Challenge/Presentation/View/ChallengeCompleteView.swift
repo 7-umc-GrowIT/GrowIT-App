@@ -269,9 +269,9 @@ class ChallengeCompleteView: UIView {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 8
         $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        $0.layer.borderColor = UIColor.border.cgColor
         $0.textContainerInset = .init(top: 12, left: 12, bottom: 12, right: 12)
-        $0.returnKeyType = .done
+        $0.returnKeyType = .default
         $0.setLineSpacing(spacing: 8, font: .body1Medium(), color: .gray900)
     }
     
@@ -328,7 +328,7 @@ class ChallengeCompleteView: UIView {
         view.backgroundColor = .white
         view.layer.cornerRadius = radius
         view.clipsToBounds = true
-        view.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        view.layer.borderColor = UIColor.border.cgColor
         view.layer.borderWidth = 1
         return view
     }
@@ -383,7 +383,7 @@ class ChallengeCompleteView: UIView {
         [imageLabel, imageContainer].forEach(imageStack.addArrangedSubview)
         [reviewLabel, reviewContainer].forEach(reviewStack.addArrangedSubview)
         [challengeExitButton, challengeUpdateButton].forEach(buttonStack.addArrangedSubview)
-//        [titleIcon, title, challengeStack, imageStack, reviewStack, reviewHintText, buttonStack].forEach(challengeCompleteStack.addArrangedSubview)
+
     }
     
     private func addComponents(){

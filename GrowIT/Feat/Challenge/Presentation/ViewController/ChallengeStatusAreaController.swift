@@ -32,18 +32,20 @@ final class ChallengeStatusAreaController: UIViewController {
         self.view = challengeStatusArea
         view.backgroundColor = .gray50
         
-        setupCollectionView()
+        setupCollections()
         setupNotifications()
         bindViewModel()
-        viewModel.moveToPage(1) // 진입 시 1페이지 조회
+        viewModel.fetchChallengesForStatus(index: 0, page: 1) // 진입 시 1페이지 조회
     }
     
     // MARK: - Setup
-    private func setupCollectionView() {
+    private func setupCollections() {
+        // 버튼 그룹은 CollectionView 유지
         challengeStatusArea.challengeStatusBtnGroup.dataSource = self
         challengeStatusArea.challengeStatusBtnGroup.delegate = self
         challengeStatusArea.challengeStatusBtnGroup.tag = 2
         
+        // 챌린지 목록은 TableView로 바인딩
         challengeStatusArea.challengeAllList.dataSource = self
         challengeStatusArea.challengeAllList.delegate = self
         challengeStatusArea.challengeAllList.tag = 1
@@ -69,7 +71,6 @@ final class ChallengeStatusAreaController: UIViewController {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.challengeStatusArea.challengeAllList.reloadData()
-                self?.challengeStatusArea.challengeStatusNum.text = "\(self?.viewModel.challenges.count ?? 0)"
                 self?.scrollToTop()
             }
             .store(in: &cancellables)
@@ -78,7 +79,6 @@ final class ChallengeStatusAreaController: UIViewController {
             .compactMap { $0 }
             .receive(on: RunLoop.main)
             .sink { error in
-                // TODO: 에러 표시(알림 등)
                 print("Error: \(error)")
             }
             .store(in: &cancellables)
@@ -96,6 +96,13 @@ final class ChallengeStatusAreaController: UIViewController {
                 self?.challengeStatusArea.totalPage = totalPages
             }
             .store(in: &cancellables)
+        
+        viewModel.$totalElements
+            .receive(on: RunLoop.main)
+            .sink { [weak self] totalElements in
+                self?.challengeStatusArea.challengeStatusNum.text = (totalElements > 0) ? "\(totalElements)" : ""
+            }
+            .store(in: &cancellables)
     }
     
     public func refreshData() {
@@ -103,108 +110,102 @@ final class ChallengeStatusAreaController: UIViewController {
     }
     
     private func scrollToTop() {
-        let collectionView = challengeStatusArea.challengeAllList
-        if collectionView.numberOfSections > 0, collectionView.numberOfItems(inSection: 0) > 0 {
-            // 첫 번째 셀로 스크롤 (애니메이션 없이)
-            collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
+        let tableView = challengeStatusArea.challengeAllList
+        if tableView.numberOfSections > 0, tableView.numberOfRows(inSection: 0) > 0 {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
         } else {
-            // 혹시 셀 없으면 그냥 offset만 0으로
-            collectionView.setContentOffset(.zero, animated: false)
+            tableView.setContentOffset(.zero, animated: false)
         }
     }
-
 }
 
-// MARK: - UICollectionViewDataSource, Delegate
+// MARK: - 버튼 그룹 CollectionView (상단 필터/상태용)
 extension ChallengeStatusAreaController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch collectionView.tag {
-        case 1:
-            return viewModel.challenges.count
-        case 2:
-            return challengeStatusType.count
-        default:
-            return 0
-        }
+        return challengeStatusType.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        switch collectionView.tag {
-        case 1:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CustomChallengeListCell.identifier, for: indexPath) as? CustomChallengeListCell else {
-                return UICollectionViewCell()
-            }
-            let challenge = viewModel.challenges[indexPath.row]
-            cell.figure(challenge: challenge)
-            return cell
-        case 2:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChallengeStatusBtnGroupCell.identifier, for: indexPath) as? ChallengeStatusBtnGroupCell else {
-                return UICollectionViewCell()
-            }
-            let isSelected = indexPath.row == selectedStatusIndex
-            cell.figure(titleText: challengeStatusType[indexPath.row], isClicked: isSelected)
-            return cell
-        default:
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChallengeStatusBtnGroupCell.identifier, for: indexPath) as? ChallengeStatusBtnGroupCell else {
             return UICollectionViewCell()
         }
+        let isSelected = indexPath.row == selectedStatusIndex
+        cell.figure(titleText: challengeStatusType[indexPath.row], isClicked: isSelected)
+        return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        switch collectionView.tag {
-        case 1:
-            let challenge = viewModel.challenges[indexPath.row]
-            let approximateWidthOfNameLabel = collectionView.frame.width * 0.5 // 아이콘, 패딩을 고려한 너비
-            let size = CGSize(width: approximateWidthOfNameLabel, height: CGFloat.greatestFiniteMagnitude)
-            let attributes = [NSAttributedString.Key.font: UIFont.heading3Bold()]
-            
-            let estimatedFrame = NSString(string: challenge.title).boundingRect(with: size, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
-            
-            let lines = ceil(estimatedFrame.height / UIFont.heading3Bold().lineHeight) // 줄 수 계산
-            let additionalHeightPerLine = UIFont.heading3Bold().lineHeight // 추가 높이 설정
-            
-            let cellHeight = 78 + (lines * additionalHeightPerLine) // 기본 높이 + 줄 수에 따른 추가 높이
-            return CGSize(width: collectionView.frame.width, height: cellHeight)
-        case 2:
-            // 버튼 그룹 셀은 기존 스타일대로 텍스트 너비+패딩으로
-            let title = challengeStatusType[indexPath.row]
-            let font = UIFont.heading3SemiBold()
-            let textWidth = title.size(withAttributes: [.font: font]).width
-            let cellWidth = textWidth + 32
-            return CGSize(width: cellWidth, height: 40)
-        default:
-            return CGSize(width: 0, height: 0)
-        }
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let title = challengeStatusType[indexPath.row]
+        let font = UIFont.heading3SemiBold()
+        let textWidth = title.size(withAttributes: [.font: font]).width
+        let cellWidth = textWidth + 32
+        return CGSize(width: cellWidth, height: 40)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        switch collectionView.tag {
-        case 1:
-            selectedChallenge = viewModel.challenges[indexPath.row]
-            if(challengeStatusType[selectedStatusIndex] == "완료"){
-                let challengeCompleteVC = ChallengeCompleteViewController()
-                
-                challengeCompleteVC.challengeId = selectedChallenge!.id
-                challengeCompleteVC.modalPresentationStyle = .pageSheet
-                
-                presentSheet(challengeCompleteVC, heightRatio: 1)
-            }else{
-                let challengeVerifyModalVC = ChallengeVerifyModalController()
-                
-                challengeVerifyModalVC.modalPresentationStyle = .pageSheet
-                
-                presentSheet(challengeVerifyModalVC, heightRatio: 0.4)
-                
-                challengeVerifyModalVC.challengeId = selectedChallenge!.id
-            }
-        case 2:
-            selectedStatusIndex = indexPath.row
-            viewModel.fetchChallengesForStatus(index: selectedStatusIndex)
-            collectionView.reloadData()
-            challengeStatusArea.challengeAllList.reloadData()
-            scrollToTop()
-        default:
-            break
-        }
+        selectedStatusIndex = indexPath.row
+        viewModel.fetchChallengesForStatus(index: selectedStatusIndex)
+        collectionView.reloadData()
+        challengeStatusArea.challengeAllList.reloadData()
+        scrollToTop()
     }
 }
 
+// MARK: - 챌린지 리스트 TableView
+extension ChallengeStatusAreaController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.challenges.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CustomChallengeListCell.identifier, for: indexPath) as? CustomChallengeListCell else {
+            return UITableViewCell()
+        }
+        let challenge = viewModel.challenges[indexPath.row]
+        cell.figure(challenge: challenge)
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedChallenge = viewModel.challenges[indexPath.row]
+        if challengeStatusType[selectedStatusIndex] == "완료" {
+            let challengeCompleteVC = ChallengeCompleteViewController()
+            challengeCompleteVC.challengeId = selectedChallenge!.id
+            challengeCompleteVC.modalPresentationStyle = .pageSheet
+            presentSheet(challengeCompleteVC, heightRatio: 1)
+        } else {
+            let challengeVerifyModalVC = ChallengeVerifyModalController()
+            challengeVerifyModalVC.modalPresentationStyle = .pageSheet
+            presentSheet(challengeVerifyModalVC, heightRatio: 0.4)
+            challengeVerifyModalVC.challengeId = selectedChallenge!.id
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let challenge = viewModel.challenges[indexPath.row]
+        
+        let label = UILabel()
+        label.font = .heading3Bold()
+        label.numberOfLines = 0
+        label.text = challenge.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let availableWidth = tableView.frame.width * 0.45 // name label 제약과 동일
+        let size = label.sizeThatFits(CGSize(width: availableWidth, height: .greatestFiniteMagnitude))
+        
+        let titleHeight = size.height
+        let baseHeight: CGFloat = 78 // top + spacing + bottom inset
+        return max(100, titleHeight + baseHeight)
+    }
+
+}

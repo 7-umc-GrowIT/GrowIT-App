@@ -12,6 +12,7 @@ class DiaryDeleteViewController: UIViewController {
     var onDismiss: (() -> Void)?
     private let diaryService = DiaryService()
     private let diaryId: Int
+    var isDeleting: Bool = false
     
     let deleteView = ErrorView().then {
         $0.configure(icon: "trashIcon", fisrtLabel: "정말 일기를 삭제할까요?", secondLabel: "삭제한 일기는 복구하기 어렵습니다. 일기 재작성 시 크레딧은 추가 지급되지 않습니다.\n그래도 일기를 삭제할까요?", firstColor: .gray900, secondColor: .gray600, title1: "나가기", title1Color1: .gray400, title1Background: .gray100, title2: "삭제하기", title1Color2: .white, title2Background: .negative400, targetText: "", viewColor: .white)
@@ -57,10 +58,13 @@ class DiaryDeleteViewController: UIViewController {
     
     // MARK: Setup APIs
     private func callDeleteDiary() {
+        guard !isDeleting else { return }
+        isDeleting = true
         diaryService.deleteDiary(
             diaryId: diaryId,
             completion: {[weak self] result in
                 guard let self = self else { return }
+                self.isDeleting = false
                 switch result {
                 case .success(let data):
                     print("Success: \(data)")

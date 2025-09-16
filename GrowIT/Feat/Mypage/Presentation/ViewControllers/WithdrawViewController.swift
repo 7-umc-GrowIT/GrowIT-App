@@ -12,6 +12,7 @@ class WithdrawViewController: UIViewController {
     // MARK: - Data
     private var reasons: [WithdrwalReasonsResponseDTO] = []
     private var selectedReasonId: Int?
+    var nickname: String
     
     // MARK: - Properties
     let navigationBarManager = NavigationManager()
@@ -20,7 +21,7 @@ class WithdrawViewController: UIViewController {
     let authService = AuthService()
     
     // MARK: - View
-    private lazy var withdrawView = WithdrawView().then {
+    private lazy var withdrawView = WithdrawView(nickname: nickname).then {
         let tap = UITapGestureRecognizer(target: self, action: #selector(toggleDropdown))
         $0.dropDownView.addGestureRecognizer(tap)
         $0.cancleButton.addTarget(self, action: #selector(prevVC), for: .touchUpInside)
@@ -44,6 +45,16 @@ class WithdrawViewController: UIViewController {
         setupTableView()
         getWithdrawalReasons()
     }
+    
+    init(nickname: String) {
+        self.nickname = nickname
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     
     // MARK: - Network
     // 탈퇴 이유 목록
