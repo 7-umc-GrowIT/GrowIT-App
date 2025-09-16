@@ -8,6 +8,7 @@
 struct UserChallenge {
     let id: Int
     let title: String
+    let content: String
     let type: ChallengeType
     let time: Int
     let completed: Bool
@@ -32,6 +33,7 @@ extension UserChallenge {
     init(dto: UserChallengeDto) {
         self.id = dto.id
         self.title = dto.title
+        self.content = dto.content
         self.type = ChallengeType(dto: dto.challengeType)
         self.time = dto.time
         self.completed = dto.completed
@@ -40,6 +42,7 @@ extension UserChallenge {
     init(dto: RecommendedChallengeDTO) {
         self.id = dto.id
         self.title = dto.title
+        self.content = dto.content
         self.type = ChallengeType(dto: dto.challengeType)
         self.time = dto.time
         self.completed = dto.completed

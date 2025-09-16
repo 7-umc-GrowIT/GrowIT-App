@@ -43,7 +43,7 @@ class VoiceChallengeItemView: UIView {
         $0.textColor = .white
     }
     
-    let button = CircleCheckButton(isEnabled: false)
+    let button = CircleCheckButton(isEnabled: false, size: 32)
     
     private let clockIcon = UIImageView().then {
         $0.image = UIImage(named: "clock")

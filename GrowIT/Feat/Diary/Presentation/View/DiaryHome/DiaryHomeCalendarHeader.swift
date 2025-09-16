@@ -27,18 +27,22 @@ class DiaryHomeCalendarHeader: UIView {
     
     private lazy var subTitle = AppLabel(text: "날짜별로 확인하고 간단하게 확인해요", font: .body2Medium(), textColor: .gray500)
     
-    lazy var collectBtn = UIButton().then{
-        $0.setTitle("한 번에 모아보기", for: .normal)
-        $0.setTitleColor(.gray500, for: .normal)
-        $0.titleLabel?.font = .detail1Medium()
-        $0.layer.cornerRadius = 16
+    let allViewContainer = UIView().then {
         $0.backgroundColor = .gray100
+        $0.layer.cornerRadius = 16
         $0.clipsToBounds = true
+    }
+    
+    let allViewText = UILabel().then {
+        $0.text = "한 번에 모아보기"
+        $0.font = .detail1Medium()
+        $0.textColor = .gray400
+        $0.adjustsFontSizeToFitWidth = true
     }
     
     // MARK: - addFunc & Constraints
     private func addComponents(){
-        [title, subTitle, collectBtn].forEach(self.addSubview)
+        [title, subTitle, allViewContainer].forEach(self.addSubview)
     }
    
     private func constraints(){
@@ -53,11 +57,18 @@ class DiaryHomeCalendarHeader: UIView {
             $0.left.equalToSuperview().offset(24)
         }
         
-        collectBtn.snp.makeConstraints{
+        allViewContainer.addSubview(allViewText)
+        
+        allViewContainer.snp.makeConstraints{
             $0.top.equalTo(title.snp.top)
             $0.right.equalToSuperview().inset(24)
             $0.width.equalToSuperview().multipliedBy(0.25)
             $0.height.equalTo(32)
+        }
+        
+        allViewText.snp.makeConstraints {
+            $0.verticalEdges.equalToSuperview().inset(7)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
     }
 }

@@ -33,7 +33,7 @@ class VoiceDiaryEntryView: UIView {
     
     // MARK: UI Components
     private let label1 = UILabel().then {
-        $0.text = "편하게 말해 보세요\n당신의 이야기를 듣고 있어요"
+        $0.text = "오늘 하루 있었던\n당신의 이야기를 들려 주세요"
         $0.font = .subTitle1()
         $0.textColor = .white
         $0.numberOfLines = 0
@@ -42,7 +42,7 @@ class VoiceDiaryEntryView: UIView {
     private let label2 = UILabel().then {
         $0.text = "버튼을 누르면 바로 통화가 시작돼요"
         $0.font = .heading3SemiBold()
-        $0.textColor = .white
+        $0.textColor = .gray100
     }
     
     var postImage = LottieAnimationView(name: "Diary").then {
@@ -54,6 +54,7 @@ class VoiceDiaryEntryView: UIView {
     
     private let tooltipView = ToolTipView().then {
         $0.configure(text: "처음이라면 크레딧 5 증정!")
+        $0.isHidden = true
     }
     
     let helpLabel = UILabel().then {
@@ -93,7 +94,7 @@ class VoiceDiaryEntryView: UIView {
         
         addSubview(tooltipView)
         tooltipView.snp.makeConstraints { make in
-            make.width.equalTo(200)
+            make.width.equalTo(168)
             make.centerX.equalTo(recordButton.snp.centerX)
             make.bottom.equalTo(recordButton.snp.top).offset(-6)
         }
@@ -106,5 +107,8 @@ class VoiceDiaryEntryView: UIView {
         }
     }
     
+    public func showEventMessage(_ hasBefore: Bool) {
+        tooltipView.isHidden = hasBefore
+    }
     
 }

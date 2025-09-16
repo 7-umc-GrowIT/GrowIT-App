@@ -13,6 +13,7 @@ struct AppFontName {
     static let pBold = "Pretendard-Bold"
     static let pSemiBold = "Pretendard-SemiBold"
     static let sExtraBold = "SUITE-ExtraBold"
+    static let sBold = "SUITE-Bold"
 }
 
 extension UIFont {
@@ -124,7 +125,7 @@ extension UIFont {
     
     // Sub Body 1 Font
     public class func subBody1() -> UIFont {
-        return createFont(name: AppFontName.pBold, size: 14, lineHeight: 1.5)
+        return createFont(name: AppFontName.sBold, size: 14, lineHeight: 1.5)
     }
     
     

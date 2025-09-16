@@ -24,7 +24,7 @@ class DiaryHomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view = diaryHomeView
-        view.backgroundColor = .white
+        view.backgroundColor = .gray50
         navigationController?.navigationBar.isHidden = true
         setupCalendarView()
         setupActions()
@@ -44,15 +44,19 @@ class DiaryHomeViewController: UIViewController {
         diaryCalendarVC.didMove(toParent: self)
         diaryCalendarVC.configureTheme(isDarkMode: false)
         
-        // 캘린더 뷰를 JDiaryHomeView에 추가
-        diaryHomeView.diaryHomeStack.addArrangedSubview(diaryCalendarVC.view)
-        setupCalendarViewConstraints()
+        // 캘린더 뷰를 DiaryHomeView에 추가
+        diaryHomeView.contentView.addSubview(diaryCalendarVC.view)
     }
     
-    private func setupCalendarViewConstraints() {
-        diaryCalendarVC.view.snp.makeConstraints{
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        // 캘린더 제약설정
+        diaryCalendarVC.view.snp.makeConstraints {
+            $0.top.equalTo(diaryHomeView.diaryHomeCalendarHeader.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview()
+            let bottomInset = self.view.bounds.height * 0.16
+            $0.bottom.equalToSuperview().inset(bottomInset)
         }
     }
     
@@ -63,7 +67,7 @@ class DiaryHomeViewController: UIViewController {
         
         diaryHomeView.diaryHomeBanner.diaryDirectWriteButton.addGestureRecognizer(textAction)
         diaryHomeView.diaryHomeBanner.diaryWriteButton.addGestureRecognizer(voiceAction)
-        diaryHomeView.diaryHomeCalendarHeader.collectBtn.addTarget(self, action: #selector(diaryAllVC), for: .touchUpInside)
+        diaryHomeView.diaryHomeCalendarHeader.allViewContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(diaryAllVC)))
     }
     
     // MARK: Diary View

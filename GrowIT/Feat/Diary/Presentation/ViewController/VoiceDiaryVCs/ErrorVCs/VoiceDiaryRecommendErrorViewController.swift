@@ -15,6 +15,8 @@ class VoiceDiaryRecommendErrorViewController: UIViewController {
     
     var diaryId: Int = 0
     
+    var isDeleting: Bool = false
+    
     let errorView = ErrorView().then {
         $0.configure(
             icon: "diaryIcon",
@@ -53,19 +55,22 @@ class VoiceDiaryRecommendErrorViewController: UIViewController {
     
     @objc func mainVC() {
         callDeleteDiary()
-        dismiss(animated: true) { [weak self] in
-            self?.delegate?.didTapExitButton()
-        }
     }
     
     // MARK: Setup APIs
     private func callDeleteDiary() {
+        guard !isDeleting else { return }
+        isDeleting = true
         diaryService.deleteDiary(
             diaryId: diaryId,
             completion: {[weak self] result in
                 guard let self = self else { return }
+                self.isDeleting = false
                 switch result {
-                case .success(let data):
+                case .success():
+                    dismiss(animated: true) { [weak self] in
+                        self?.delegate?.didTapExitButton()
+                    }
                     print("챌린지 뷰컨에서 삭제 성공 \(diaryId)")
                 case .failure(let error):
                     print("Error: \(error)")

@@ -10,4 +10,5 @@ import Foundation
 struct StatusChallenge{
     let challenge: [UserChallenge]
     let totalPages: Int
+    let totalElements: Int
 }

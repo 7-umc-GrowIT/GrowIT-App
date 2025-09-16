@@ -32,8 +32,8 @@ final class ChallengeRepositoryImpl: ChallengeRepository {
                 // totalPages 등은 그냥 넣음
                 return StatusChallenge(
                     challenge: challenges,
-                    totalPages: dto.totalPages
-                    // 필요한 경우 currentPage 등 추가
+                    totalPages: dto.totalPages,
+                    totalElements: dto.totalElements
                 )
             }
             .eraseToAnyPublisher()

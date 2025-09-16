@@ -115,18 +115,20 @@ class TextDiaryRecommendChallengeView: UIView {
         contentView.addSubview(saveButton)
         saveButton.snp.makeConstraints { make in
             make.top.equalTo(challengeStackView.snp.bottom).offset(58)
-            make.leading.equalToSuperview().offset(24)
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.centerX.equalToSuperview()
+            make.height.equalTo(60)
         }
         
         contentView.addSubview(descriptionLabel)
         descriptionLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(saveButton.snp.bottom).offset(8)
+            make.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
-            make.bottom.equalTo(descriptionLabel.snp.bottom).offset(40)
+            make.width.edges.equalToSuperview()
         }
     }
     

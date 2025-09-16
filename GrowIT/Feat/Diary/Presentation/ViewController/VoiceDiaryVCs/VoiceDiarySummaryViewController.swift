@@ -107,7 +107,6 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         nextVC.emotionKeywords = emotionKeywords
         nextVC.recommendedChallenges = recommendedChallenges
         let navController = UINavigationController(rootViewController: nextVC)
-        navController.modalPresentationStyle = .fullScreen
         presentSheet(navController, heightRatio: 0.6)
     }
     
