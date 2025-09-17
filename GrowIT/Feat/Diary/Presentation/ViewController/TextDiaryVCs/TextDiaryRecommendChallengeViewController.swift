@@ -110,7 +110,9 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         
         guard !isSaving else { return }
         isSaving = true
-        challengeService.postSelectedChallenge(data: selectedChallenges) { [weak self] result in
+        challengeService.postSelectedChallenge(data: ChallengeSelectRequestDTO(
+            diaryId: self.diaryId, challenges: selectedChallenges
+        )) { [weak self] result in
             guard let self = self else { return }
             self.isSaving = false
             switch result {
@@ -146,7 +148,7 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         navigationController?.popToRootViewController(animated: true)
     }
     
-    func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
+    func getSelectedChallenges() -> [SelectedChallengeDTO] {
         let date = UserDefaults.standard.string(forKey: "TextDate") ?? ""
         
         // 선택된 챌린지들 필터링
@@ -166,10 +168,9 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         // 각 그룹을 DTO로 변환
         return groupedChallenges.map { (challengeType, challenges) in
             let challengeIds = challenges.map { $0.id }
-            return ChallengeSelectRequestDTO(
+            return SelectedChallengeDTO(
                 challengeIds: challengeIds,
                 challengeType: challengeType,
-                date: date
             )
         }
     }

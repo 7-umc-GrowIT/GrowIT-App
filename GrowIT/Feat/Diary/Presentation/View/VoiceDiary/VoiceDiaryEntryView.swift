@@ -22,6 +22,7 @@ class VoiceDiaryEntryView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        self.setGradient(color1: .gray700, color2: .gray900)
         
         // 그라데이션 적용
         recordButton.setGradient(color1: .primary400, color2: .primary600)
@@ -64,9 +65,8 @@ class VoiceDiaryEntryView: UIView {
         $0.isUserInteractionEnabled = true
     }
     
-    // MARK: Setup UI
+    // MARK: Setup UIx
     private func setupUI() {
-        backgroundColor = .gray800
         addSubview(label1)
         label1.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)

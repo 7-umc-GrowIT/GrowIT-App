@@ -100,7 +100,7 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         
         guard !isSaving else { return }
         isSaving = true
-        challengeService.postSelectedChallenge(data: selectedChallenges) { [weak self] result in
+        challengeService.postSelectedChallenge(data: ChallengeSelectRequestDTO(diaryId: self.diaryId, challenges: selectedChallenges)) { [weak self] result in
             guard let self = self else { return }
             self.isSaving = false
             switch result {
@@ -143,10 +143,10 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         }
     }
     
-    func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
+    func getSelectedChallenges() -> [SelectedChallengeDTO] {
         let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""
         
-        return challengeViews.enumerated().compactMap { (index, challengeView) -> ChallengeSelectRequestDTO? in
+        return challengeViews.enumerated().compactMap { (index, challengeView) -> SelectedChallengeDTO? in
             // 인덱스 범위 확인
             guard index < recommendedChallenges.count else { return nil }
             
@@ -154,10 +154,9 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
             guard challengeView.button.isSelectedState() else { return nil }
             
             let challenge = recommendedChallenges[index]
-            return ChallengeSelectRequestDTO(
+            return SelectedChallengeDTO(
                 challengeIds: [challenge.id],
-                challengeType: challenge.challengeType,
-                date: date
+                challengeType: challenge.challengeType
             )
         }
     }

@@ -55,6 +55,7 @@ class ChallengeStatusArea: UIView {
         $0.isScrollEnabled = true
         $0.rowHeight = UITableView.automaticDimension
         $0.estimatedRowHeight = 100
+        $0.separatorStyle = .none
 
     }
     

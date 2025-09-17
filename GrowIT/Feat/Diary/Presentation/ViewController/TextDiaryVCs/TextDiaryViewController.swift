@@ -165,7 +165,7 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     }
     
     func diaryCalendar(_ controller: DiaryCalendarController, didChangeWeekCount count: Int, _ cellWidth: Double) {
-        let extraHeight: CGFloat = 88
+        let extraHeight: CGFloat = 92
         let totalHeight = CGFloat(count) * cellWidth + extraHeight
         
         calVC.view.snp.updateConstraints() {
