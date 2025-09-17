@@ -97,6 +97,14 @@ class ChallengeHomeView: UIView {
             $0.left.equalToSuperview().offset(24)
         }
         
+        challengeHomeBtn.snp.makeConstraints {
+            $0.height.equalTo(26)
+        }
+        
+        challengeStatusBtn.snp.makeConstraints {
+            $0.height.equalTo(26)
+        }
+        
         challengeSegmentUnderline.snp.makeConstraints{
             $0.height.equalTo(1)
             $0.width.equalTo(3)
