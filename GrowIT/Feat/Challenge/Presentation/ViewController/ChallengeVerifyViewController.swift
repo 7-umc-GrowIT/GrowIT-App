@@ -63,11 +63,13 @@ class ChallengeVerifyViewController: UIViewController {
     @objc func handleImage(_ notification: Notification) {
         if let userInfo = notification.userInfo, let image = userInfo["image"] as? UIImage {
             isImageSelected = true
-            imageData = image.pngData()
+            // JPEG 압축 (0.0 = 최대 압축, 1.0 = 원본 퀄리티)
+            imageData = image.jpegData(compressionQuality: 0.7) // 70% 퀄리티로 압축
             challengeVerifyView.imageUploadCompleted(image)
             challengeVerifyView.imageContainer.superview?.layoutIfNeeded()
         }
     }
+
     
     private func setupNavigationBar() {
         navigationBarManager.addBackButton(
@@ -152,7 +154,7 @@ class ChallengeVerifyViewController: UIViewController {
     
     /// S3 Presigned URL 요청 API
     private func getPresignedUrl(){
-        challengeService.postPresignedUrl(data: PresignedUrlRequestDTO(contentType: "image/png"), completion: { [weak self] result in
+        challengeService.postPresignedUrl(data: PresignedUrlRequestDTO(contentType: "image/jpeg"), completion: { [weak self] result in
             guard let self = self else {return}
             switch result{
             case .success(let data):
@@ -171,7 +173,7 @@ class ChallengeVerifyViewController: UIViewController {
     private func putImageToS3(presignedUrl: String, imageData: Data, fileName: String){
         var request = URLRequest(url: URL(string: presignedUrl)!)
         request.httpMethod = "PUT"
-        request.setValue("image/png", forHTTPHeaderField: "Content-Type")
+        request.setValue("image/jpeg", forHTTPHeaderField: "Content-Type") // JPEG로 변경
         request.httpBody = imageData
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -189,6 +191,7 @@ class ChallengeVerifyViewController: UIViewController {
         }
         task.resume()
     }
+
     
     /// 챌린지 인증 저장 API
     private func saveChallengeVerify(fileName: String){
