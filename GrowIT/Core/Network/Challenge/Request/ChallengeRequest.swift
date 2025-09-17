@@ -13,9 +13,13 @@ struct ChallengeRequestDTO: Codable {
 }
 
 struct ChallengeSelectRequestDTO: Codable {
+    let diaryId: Int
+    let challenges: [SelectedChallengeDTO]
+}
+
+struct SelectedChallengeDTO: Codable {
     let challengeIds: [Int]
     let challengeType: String
-    let date: String
 }
 
 typealias ChallengeSelectRequestListDTO = [ChallengeSelectRequestDTO]

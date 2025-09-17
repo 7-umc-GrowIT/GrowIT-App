@@ -38,8 +38,8 @@ final class ChallengeService: NetworkManager {
     }
     
     /// Patch Challenge API
-    func patchChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<ChallengePatchResponseDTO, NetworkError>) -> Void) {
-        request(target: .patchChallengeById(challengeId: challengeId, data: data), decodingType: ChallengePatchResponseDTO.self, completion: completion)
+    func patchChallenge(challengeId: Int, data: ChallengeRequestDTO, completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        requestStatusCode(target: .patchChallengeById(challengeId: challengeId, data: data), completion: completion)
     }
     
     
@@ -53,8 +53,8 @@ final class ChallengeService: NetworkManager {
         request(target: .getAllChallenges(challengeType: challengeType, completed: completed, page: page), decodingType: ChallengeStatusResponseDTO.self, completion: completion)
     }
     
-    func postSelectedChallenge(data: [ChallengeSelectRequestDTO], completion: @escaping (Result<ChallengeSelectResponseDTO, NetworkError>) -> Void) {
-        request(target: .postSelectChallenge(data: data), decodingType: ChallengeSelectResponseDTO.self, completion: completion)
+    func postSelectedChallenge(data: ChallengeSelectRequestDTO, completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        requestStatusCode(target: .postSelectChallenge(data: data), completion: completion)
     }
     
     func postPresignedUrl(data: PresignedUrlRequestDTO, completion: @escaping (Result<PresignedUrlResponseDTO, NetworkError>) -> Void){
