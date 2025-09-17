@@ -20,6 +20,7 @@ class VoiceDiarySummaryView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        self.setGradient(color1: .gray700, color2: .gray900)
         
         // 그라데이션 적용
         setGradient(color1: .gray700, color2: .gray900)

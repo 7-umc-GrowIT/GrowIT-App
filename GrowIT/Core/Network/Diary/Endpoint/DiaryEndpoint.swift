@@ -49,11 +49,11 @@ extension DiaryEndpoint: TargetType {
         case .postDiaryDate:
             return "/summary"
         case .postDiaryAnalyze(let diaryId):
-            return "/analyze/\(diaryId)"
+            return "/\(diaryId)/analyze"
         case .getHasVoiceDiary:
-            return "/has-voice-diary"
+            return "/voice/exists"
         default:
-            return "/"
+            return ""
         }
     }
     

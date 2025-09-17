@@ -42,7 +42,6 @@ struct DiaryResponseDTO: Decodable {
     let diaryId: Int
     let content: String
     let date: String
-    let creditInfo: CreditInfo
 }
 
 struct DiaryPatchResponseDTO: Decodable {

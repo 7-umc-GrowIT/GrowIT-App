@@ -15,7 +15,7 @@ enum ChallengeEndpoint {
     case getSummaryChallenge
     
     // Post
-    case postSelectChallenge(data: [ChallengeSelectRequestDTO])
+    case postSelectChallenge(data: ChallengeSelectRequestDTO)
     case postProveChallenge(challengeId: Int, data: ChallengeRequestDTO)
     case postPresignedUrl(data: PresignedUrlRequestDTO)
     
