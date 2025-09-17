@@ -65,7 +65,9 @@ class VoiceChallengeItemView: UIView {
         $0.text = ""
         $0.font = .body2SemiBold()
         $0.textColor = .white
-        $0.numberOfLines = 0
+        $0.lineBreakMode = .byTruncatingTail
+        $0.adjustsFontSizeToFitWidth = true
+        $0.minimumScaleFactor = 0.5
     }
     
     override init(frame: CGRect) {
@@ -88,6 +90,12 @@ class VoiceChallengeItemView: UIView {
         
         addSubview(containerView)
         containerView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        containerView.addSubview(button)
+        button.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-24)
+            make.centerY.equalToSuperview()
+        }
         
         // frontView UI
         frontView.addSubview(icon)
@@ -118,11 +126,6 @@ class VoiceChallengeItemView: UIView {
         }
         
         frontView.addSubview(button)
-        button.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-24)
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(32)
-        }
         
         // backView UI
         backView.addSubview(backIcon)
@@ -134,11 +137,9 @@ class VoiceChallengeItemView: UIView {
         
         backView.addSubview(backLabel)
         backLabel.snp.makeConstraints { make in
-            make.leading.equalTo(backIcon.snp.trailing).offset(12)
-            make.trailing.equalToSuperview().inset(12)
-            make.top.equalTo(backIcon.snp.top).offset(9.5)
+            make.left.equalTo(backIcon.snp.right).offset(12)
+            make.right.equalToSuperview().inset(80)
             make.centerY.equalTo(backIcon)
-
         }
     }
     

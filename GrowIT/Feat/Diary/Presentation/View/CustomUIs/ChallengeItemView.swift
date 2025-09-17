@@ -39,6 +39,9 @@ class ChallengeItemView: UIView {
         $0.text = ""
         $0.font = .heading3Bold()
         $0.textColor = .gray900
+        $0.lineBreakMode = .byTruncatingTail
+        $0.adjustsFontSizeToFitWidth = true
+        $0.minimumScaleFactor = 0.5
     }
     
     let button = CircleCheckButton(isEnabled: false, size: 32)
@@ -70,7 +73,9 @@ class ChallengeItemView: UIView {
         $0.text = ""
         $0.font = .body2SemiBold()
         $0.textColor = .gray900
-        $0.numberOfLines = 0
+        $0.lineBreakMode = .byTruncatingTail
+        $0.adjustsFontSizeToFitWidth = true
+        $0.minimumScaleFactor = 0.5
     }
     
     override init(frame: CGRect) {
@@ -98,6 +103,12 @@ class ChallengeItemView: UIView {
         
         addSubview(containerView)
         containerView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        containerView.addSubview(button)
+        button.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-24)
+            make.centerY.equalToSuperview()
+        }
         
         // frontView UI
         frontView.addSubview(icon)
@@ -133,13 +144,6 @@ class ChallengeItemView: UIView {
             make.top.equalToSuperview()
         }
         
-        frontView.addSubview(button)
-        button.snp.makeConstraints { make in
-            make.right.equalToSuperview().offset(-24)
-            make.centerY.equalToSuperview()
-            //make.width.height.equalTo(32).priority(.required)
-        }
-        
         // backView UI
         backView.addSubview(backIcon)
         backIcon.snp.makeConstraints { make in
@@ -151,9 +155,8 @@ class ChallengeItemView: UIView {
         backView.addSubview(backLabel)
         backLabel.snp.makeConstraints { make in
             make.left.equalTo(backIcon.snp.right).offset(12)
-            make.right.equalToSuperview().inset(12)
+            make.right.equalToSuperview().inset(80)
             make.centerY.equalTo(backIcon)
-
         }
     }
     
