@@ -41,13 +41,13 @@ extension DiaryEndpoint: TargetType {
         case.postTextDiary:
             return "/text"
         case.postVoiceDiary:
-            return "/voice"
+            return "/voice/chat"
         case.deleteDiary(let diaryId), .getDiaryID(let diaryId), .patchFixDiary(let diaryId, _):
             return "/\(diaryId)"
         case.getDiaryDates:
             return "/dates"
         case .postDiaryDate:
-            return "/summary"
+            return "/voice"
         case .postDiaryAnalyze(let diaryId):
             return "/\(diaryId)/analyze"
         case .getHasVoiceDiary:
