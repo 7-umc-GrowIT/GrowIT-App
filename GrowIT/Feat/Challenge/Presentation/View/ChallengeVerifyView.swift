@@ -78,9 +78,7 @@ class ChallengeVerifyView: UIView {
     
     private lazy var reviewHintText = makeLabel(title: "챌린지 한줄소감을 50자 이상 적어 주세요", color: .gray500, font: .detail2Regular())
     
-    public lazy var challengeVerifyButton = AppButton(title: "챌린지 인증하기", titleColor: .gray400, isEnabled: false, icon: "").then{
-        $0.setButtonState(isEnabled: false, enabledColor: .black, disabledColor: .gray100, enabledTitleColor: .white, disabledTitleColor: .gray400)
-    }
+    public lazy var challengeVerifyButton = makeButton(title: "인증하기", textColor: .gray400, bgColor: .gray100)
     
     // MARK: - Stak
     public lazy var imageStack = makeStack(axis: .vertical, spacing: 8)
@@ -116,6 +114,16 @@ class ChallengeVerifyView: UIView {
         view.layer.borderColor = UIColor.border.cgColor
         view.layer.borderWidth = 1
         return view
+    }
+    
+    private func makeButton(title:String, textColor: UIColor, bgColor: UIColor) -> UIButton {
+        let button = UIButton()
+        button.setTitle(title, for: .normal)
+        button.setTitleColor(textColor, for: .normal)
+        button.titleLabel?.font = .heading2Bold()
+        button.backgroundColor = bgColor
+        button.layer.cornerRadius = 16
+        return button
     }
     
     public func imageUploadCompleted(_ image:UIImage){
@@ -155,13 +163,14 @@ class ChallengeVerifyView: UIView {
     private func addComponents(){
         self.addSubview(scrollView)
         scrollView.addSubview(contentView)
+        self.addSubview(challengeVerifyButton)
         
         [imageUploadLabel, imageContainer].forEach(imageStack.addArrangedSubview)
         [oneLineReviewLabel, reviewTextView].forEach(reviewStack.addArrangedSubview)
         imageContainer.addSubview(imageUploadStack)
         [imageUploadIcon, imageUploadText].forEach(imageUploadStack.addArrangedSubview)
         
-        [challengeIcon, challengeName, challengeContent, imageStack, reviewStack, reviewHintText, challengeVerifyButton].forEach(contentView.addSubview)
+        [challengeIcon, challengeName, challengeContent, imageStack, reviewStack, reviewHintText].forEach(contentView.addSubview)
     }
     
     private func constraints(){
@@ -170,8 +179,9 @@ class ChallengeVerifyView: UIView {
         }
         
         contentView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.horizontalEdges.equalToSuperview()
             $0.width.equalTo(scrollView.snp.width)
+            $0.bottom.equalTo(challengeVerifyButton.snp.top)
         }
         
         challengeIcon.snp.makeConstraints{
@@ -223,10 +233,9 @@ class ChallengeVerifyView: UIView {
         }
         
         challengeVerifyButton.snp.makeConstraints {
-            $0.top.equalTo(reviewHintText.snp.bottom).offset(200)
-            $0.left.equalToSuperview().offset(24)
-            $0.right.equalToSuperview().offset(-24)
-            $0.bottom.equalToSuperview().offset(-20)
+            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
+            $0.height.equalTo(60)
         }
     }
 }
