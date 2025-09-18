@@ -36,6 +36,8 @@ class ErrorView: UIView {
         $0.text = "나가면 기록된 일기와 챌린지가 사라져요"
         $0.font = .heading2Bold()
         $0.textColor = .gray900
+        $0.adjustsFontSizeToFitWidth = true
+        $0.minimumScaleFactor = 0.5
     }
     
     private lazy var label2 = UILabel().then {
@@ -44,6 +46,8 @@ class ErrorView: UIView {
         $0.font = .heading3SemiBold()
         $0.textColor = .gray600
         $0.numberOfLines = 0
+        $0.adjustsFontSizeToFitWidth = true
+        $0.minimumScaleFactor = 0.5
         $0.setPartialTextStyle(text: allText, targetText: "처음 화면", color: .primary600, font: .heading3SemiBold())
     }
     
@@ -51,7 +55,7 @@ class ErrorView: UIView {
         $0.backgroundColor = .gray100
     }
     
-    let continueButton = AppButton(title: "계속 챌린지 진행하기", titleColor: .white).then {
+    let continueButton = AppButton(title: "계속 선택하기", titleColor: .white).then {
         $0.backgroundColor = .black
     }
     
@@ -89,16 +93,18 @@ class ErrorView: UIView {
         
         addSubview(exitButton)
         exitButton.snp.makeConstraints {
+            $0.top.equalTo(label2.snp.bottom).offset(40)
             $0.leading.equalToSuperview().inset(24)
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
+            $0.bottom.equalTo(safeAreaLayoutGuide)
             $0.width.equalTo(88)
         }
         
         addSubview(continueButton)
-        continueButton.snp.makeConstraints { 
+        continueButton.snp.makeConstraints {
+            $0.top.equalTo(label2.snp.bottom).offset(40)
             $0.leading.equalTo(exitButton.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().inset(24)
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
+            $0.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
     
