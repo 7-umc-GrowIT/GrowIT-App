@@ -74,7 +74,7 @@ class VoiceDiaryEntryViewController: UIViewController {
         let nextVC = VoiceDiaryTipViewController()
         nextVC.modalPresentationStyle = .pageSheet
         
-        presentSheet(nextVC, heightRatio: 0.336)
+        presentSheet(nextVC, heightRatio: 0.7)
     }
     
     private func checkHasVoiceDiary() {
