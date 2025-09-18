@@ -12,7 +12,6 @@ import Combine
 
 class ChallengeHomeAreaController: UIViewController {
     private let challengeHomeArea = ChallengeHomeArea()
-    private let pageControl = UIPageControl()
     private var todayChallenges: [RecommendedChallengeDTO] = []
     private var selectedIndex = 0
     
@@ -39,6 +38,26 @@ class ChallengeHomeAreaController: UIViewController {
         viewModel.refresh()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateCollectionViewHeight(for: selectedIndex)
+    }
+
+    func updateCollectionViewHeight(for index: Int) {
+        guard todayChallenges.count > index else { return }
+        let challenge = todayChallenges[index]
+        let label = UILabel()
+        label.font = .heading3Bold()
+        label.numberOfLines = 0
+        label.text = challenge.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let availableWidth = UIScreen.main.bounds.width * 0.88 * 0.45
+        let size = label.sizeThatFits(CGSize(width: availableWidth, height: .greatestFiniteMagnitude))
+        let baseHeight: CGFloat = 78
+        let targetHeight = max(100, size.height + baseHeight)
+        challengeHomeArea.todayChallengeCollectionView.snp.updateConstraints { $0.height.equalTo(targetHeight) }
+        view.layoutIfNeeded()
+    }
+    
     private func setupCollectionView() {
         challengeHomeArea.todayChallengeCollectionView.delegate = self
         challengeHomeArea.todayChallengeCollectionView.dataSource = self
@@ -58,14 +77,14 @@ class ChallengeHomeAreaController: UIViewController {
                 if isEmpty {
                     if viewModel.keywords.isEmpty {
                         self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: true, isEmptyKeyword: true)
-                        self.pageControl.isHidden = true
+                        self.challengeHomeArea.pageControl.isHidden = true
                     }else {
                         self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: true, isEmptyKeyword: false)
-                        self.pageControl.isHidden = true
+                        self.challengeHomeArea.pageControl.isHidden = true
                     }
                 } else {
                     self.challengeHomeArea.setEmptyChallenge(isEmptyChallenge: false, isEmptyKeyword: false)
-                    self.pageControl.isHidden = false
+                    self.challengeHomeArea.pageControl.isHidden = false
                 }
             }
             .store(in: &cancellables)
@@ -83,21 +102,10 @@ class ChallengeHomeAreaController: UIViewController {
     }
     
     private func setupPageControl() {
-        pageControl.numberOfPages = todayChallenges.count
-        pageControl.currentPage = selectedIndex
-        pageControl.currentPageIndicatorTintColor = .primary600
-        pageControl.pageIndicatorTintColor = .gray
-        
-        view.addSubview(pageControl)
-        pageControl.snp.makeConstraints {
-            $0.top.equalTo(challengeHomeArea.todayChallengeCollectionView.snp.bottom).offset(12)
-            $0.centerX.equalToSuperview()
-        }
-        
-        challengeHomeArea.challengeReportTitleStack.snp.remakeConstraints {
-            $0.top.equalTo(pageControl.snp.bottom).offset(44)
-            $0.left.equalToSuperview().offset(24)
-        }
+        challengeHomeArea.pageControl.numberOfPages = todayChallenges.count
+        challengeHomeArea.pageControl.currentPage = selectedIndex
+        challengeHomeArea.pageControl.currentPageIndicatorTintColor = .primary600
+        challengeHomeArea.pageControl.pageIndicatorTintColor = .gray
     }
     
     private func setupNotifications() {
@@ -121,7 +129,7 @@ class ChallengeHomeAreaController: UIViewController {
 }
 
 // MARK: - UICollectionViewDelegate, DataSource
-extension ChallengeHomeAreaController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+extension ChallengeHomeAreaController: UICollectionViewDelegate,UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return todayChallenges.count
     }
@@ -140,26 +148,19 @@ extension ChallengeHomeAreaController: UICollectionViewDelegateFlowLayout, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let challenge = todayChallenges[indexPath.row]
-        let availableWidth = collectionView.frame.width * 0.5
-        let size = CGSize(width: availableWidth, height: .greatestFiniteMagnitude)
-        let attributes = [NSAttributedString.Key.font: UIFont.heading3Bold()]
-        let estimatedFrame = NSString(string: challenge.title).boundingRect(
-            with: size,
-            options: .usesLineFragmentOrigin,
-            attributes: attributes,
-            context: nil
-        )
+        let challenge = viewModel.todayChallenges[indexPath.row]
         
-        let lines = ceil(estimatedFrame.height / UIFont.heading3Bold().lineHeight)
-        let cellHeight = 78 + (lines * UIFont.heading3Bold().lineHeight)
+        let label = UILabel()
+        label.font = .heading3Bold()
+        label.numberOfLines = 0
+        label.text = challenge.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let availableWidth = collectionView.frame.width * 0.45 // name label 제약과 동일
+        let size = label.sizeThatFits(CGSize(width: availableWidth, height: .greatestFiniteMagnitude))
         
-        challengeHomeArea.todayChallengeCollectionView.snp.updateConstraints {
-            $0.height.equalTo(cellHeight)
-        }
-        
-        view.layoutIfNeeded()
-        return CGSize(width: collectionView.frame.width, height: cellHeight)
+        let titleHeight = size.height
+        let baseHeight: CGFloat = 78 // top + spacing + bottom inset
+        print("셀 높이는 \(titleHeight + baseHeight)")
+        return CGSize(width: collectionView.frame.width, height: max(100, titleHeight + baseHeight))
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -181,10 +182,31 @@ extension ChallengeHomeAreaController: UICollectionViewDelegateFlowLayout, UICol
 // MARK: - ScrollView Delegate
 extension ChallengeHomeAreaController: UIScrollViewDelegate {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let visiblePoint = CGPoint(x: scrollView.contentOffset.x + scrollView.bounds.width / 2, y: scrollView.bounds.height / 2)
-        if let indexPath = challengeHomeArea.todayChallengeCollectionView.indexPathForItem(at: visiblePoint) {
-            selectedIndex = indexPath.row
-            pageControl.currentPage = indexPath.row
+        let visiblePoint = CGPoint(
+            x: scrollView.contentOffset.x + scrollView.bounds.width / 2,
+            y: scrollView.bounds.height / 2
+        )
+        guard let indexPath = challengeHomeArea.todayChallengeCollectionView.indexPathForItem(at: visiblePoint) else { return }
+        selectedIndex = indexPath.row
+        challengeHomeArea.pageControl.currentPage = selectedIndex
+        
+        // ---------- 동적 Height 계산 ----------
+        let challenge = todayChallenges[selectedIndex]
+        let label = UILabel()
+        label.font = .heading3Bold()
+        label.numberOfLines = 0
+        label.text = challenge.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let availableWidth = scrollView.frame.width * 0.45 // 또는 셀과 동일한 width
+        let size = label.sizeThatFits(CGSize(width: availableWidth, height: .greatestFiniteMagnitude))
+        let baseHeight: CGFloat = 78 // 패딩·여백 포함
+        let newHeight = max(100, size.height + baseHeight)
+        
+        UIView.animate(withDuration: 0.1) {
+            self.challengeHomeArea.todayChallengeCollectionView.snp.updateConstraints {
+                $0.height.equalTo(newHeight)
+            }
+            self.view.layoutIfNeeded()
         }
     }
+
 }

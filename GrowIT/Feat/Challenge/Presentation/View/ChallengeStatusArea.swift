@@ -56,7 +56,6 @@ class ChallengeStatusArea: UIView {
         $0.rowHeight = UITableView.automaticDimension
         $0.estimatedRowHeight = 100
         $0.separatorStyle = .none
-
     }
     
     // 페이징 컨트롤 관련 UI
@@ -244,7 +243,6 @@ class ChallengeStatusArea: UIView {
         challengeAllList.snp.makeConstraints{
             $0.top.equalTo(challengeStatusLabelStack.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(24)
-            
         }
         
         pagingStackView.snp.makeConstraints {
