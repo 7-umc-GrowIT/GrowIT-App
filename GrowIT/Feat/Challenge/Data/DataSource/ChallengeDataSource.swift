@@ -22,6 +22,7 @@ final class ChallengeDataSourceImpl: ChallengeDataSource {
     func fetchChallengeHome() -> AnyPublisher<ChallengeHomeResponseDTO, Error> {
         Future { promise in
             ChallengeService().fetchChallengeHome { result in
+//                let sampleData = ChallengeHomeResponseDTO(challengeKeywords: ["피곤한", "지친", "힘든"], recommendedChallenges: [RecommendedChallengeDTO(id: 0, title: "위로되는 음악 듣기", content: "", challengeType: "DAILY", time: 60, completed: false),RecommendedChallengeDTO(id: 0, title: "좋아하는 옷 입고 외출하기", content: "", challengeType: "DAILY", time: 60, completed: false),RecommendedChallengeDTO(id: 0, title: "위로되는 음악 듣기", content: "", challengeType: "DAILY", time: 60, completed: false)], challengeReport: ChallengeReportDTO(totalCredits: 1000, totalDiaries: 10, diaryDate: "D+10"))
                 switch result {
                 case .success(let data):
                     promise(.success(data))
