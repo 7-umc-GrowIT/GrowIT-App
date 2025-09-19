@@ -134,6 +134,19 @@ class DiaryCalendarController: UIViewController {
     }
     
     @objc private func todayBtnTapped() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd" // 날짜 형식 지정
+        let formattedDate = dateFormatter.string(from: today)
+        
+        if(isDropDown) {
+            if (callendarDiaries.contains(where: {$0.date == formattedDate})){
+                CustomToast(containerWidth: 310).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 이미 일기를 작성했어요", font: .heading3SemiBold())
+                return
+            } else {
+                delegate?.didSelectDate(formattedDate)
+                return
+            }
+        }
         // 오늘 날짜를 currentDate에 설정
         currentDate = Date()
 
