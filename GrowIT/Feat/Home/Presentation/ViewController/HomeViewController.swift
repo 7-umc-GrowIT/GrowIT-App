@@ -74,11 +74,19 @@ class HomeViewController: UIViewController {
     // MARK: - Set Character
     private func loadGroImage() {
         GroImageCacheManager.shared.fetchGroImage { [weak self] data in
-            guard let self = self, let data = data else { return }
-            self.updateCharacterViewImage(with: data)
+            guard let self = self else { return }
+            if let data = data {
+                self.updateCharacterViewImage(with: data)
+            } else {
+                // ❌ 그로 없음 → 생성 화면으로 이동
+                DispatchQueue.main.async {
+                    let createVC = GroSetBackgroundViewController()
+                    self.navigationController?.pushViewController(createVC, animated: true)
+                }
+            }
         }
     }
-    
+
     @objc
     private func updateCharacterView() {
         GroImageCacheManager.shared.fetchGroImage { [weak self] data in
