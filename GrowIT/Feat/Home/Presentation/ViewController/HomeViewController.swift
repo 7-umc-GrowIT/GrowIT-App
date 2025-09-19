@@ -122,7 +122,7 @@ class HomeViewController: UIViewController {
             }
         }
 
-        // 아이템들
+        // 아이템들 (서버에서 내려온 것만)
         for item in data.equippedItems {
             if let imageView = categoryImageViews[item.category],
                let url = URL(string: item.itemImageUrl) {
@@ -151,11 +151,26 @@ class HomeViewController: UIViewController {
                         pair.0.alpha = 1.0
                     }
                 }
-                self.isFirstAppear = false   // 이후부턴 애니메이션 X
+                self.isFirstAppear = false
             } else {
                 // 그냥 즉시 반영
                 for (_, pair) in loadedImages {
                     pair.0.image = pair.1
+                }
+            }
+
+            // ✅ 서버에 없는 카테고리 처리 (착용 해제된 경우)
+            let equippedCategories = Set(data.equippedItems.map { $0.category })
+            for (category, imageView) in categoryImageViews {
+                if !equippedCategories.contains(category) {
+                    switch category {
+                    case "PLANT":
+                        imageView.image = UIImage(named: "Gro_FlowerPot") // 기본 화분
+                    case "BACKGROUND":
+                        break // 배경은 유지
+                    default:
+                        imageView.image = nil // OBJECT, HEAD_ACCESSORY는 제거
+                    }
                 }
             }
         }
