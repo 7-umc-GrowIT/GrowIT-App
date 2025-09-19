@@ -45,7 +45,7 @@ class SignUpCompleteViewController: UIViewController {
     
     // MARK: - Actions
     @objc private func prevVC() {
-        navigationController?.popViewController(animated: true)
+//        navigationController?.popViewController(animated: true)
     }
     
     @objc private func loginButtonTap() {
