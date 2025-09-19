@@ -56,7 +56,7 @@ class VoiceDiaryFixView: UIView {
         $0.backgroundColor = .gray700
     }
     
-    let fixButton = AppButton(title: "수정하기", titleColor: .gray400).then {
+    let fixButton = AppButton(title: "일기 저장하기", titleColor: .gray400).then {
         $0.backgroundColor = .gray700
     }
     
