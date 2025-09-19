@@ -42,7 +42,7 @@ class ChallengeHomeArea: UIView {
     private lazy var todayChallengeBox = makeContainer()
     
     public lazy var todayChallengeCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout().then{
-        $0.minimumInteritemSpacing = 8
+        $0.minimumInteritemSpacing = 0
         $0.minimumLineSpacing = 0
         $0.scrollDirection = .horizontal
     }).then{
