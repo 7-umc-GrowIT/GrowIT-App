@@ -68,6 +68,13 @@ class MyItemCollectionViewCell: UICollectionViewCell {
             self.isOwnedLabel.text = "보유 중"
         }
     }
+    
+    func configure(item: ItemList, isEquipped: Bool) {
+        itemImageView.kf.setImage(with: URL(string: item.imageUrl))
+        isOwnedLabel.text = isEquipped ? "착용 중" : "보유 중"
+    }
+
+    
     //MARK: - 컴포넌트 추가
     private func setView() {
         itemBackGroundView.addSubview(itemImageView)

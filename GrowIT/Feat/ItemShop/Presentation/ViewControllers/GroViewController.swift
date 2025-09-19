@@ -13,6 +13,7 @@ class GroViewController: UIViewController, ItemListDelegate {
     let userService = UserService()
     let groService = GroService()
     let itemService = ItemService()
+    private lazy var itemListModalVC = ItemListModalViewController()
     private lazy var currentCredit: Int = 0
     
     private var itemListBottomConstraint: Constraint?
@@ -33,13 +34,6 @@ class GroViewController: UIViewController, ItemListDelegate {
         $0.backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
     }
     
-    private lazy var itemListModalVC = ItemListModalViewController()
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-    }
-    
     //MARK: - init
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,6 +46,11 @@ class GroViewController: UIViewController, ItemListDelegate {
         setInitialState()
         callGetCredit()
         setDelegate()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
     
     // MARK: - NetWork
@@ -73,8 +72,7 @@ class GroViewController: UIViewController, ItemListDelegate {
         itemService.patchItemState(itemId: itemId, data: ItemRequestDTO(status: status), completion: { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case.success(let data):
-                print("Success: \(data)")
+            case.success:
                 GroImageCacheManager.shared.refreshGroImage { _ in
                     NotificationCenter.default.post(name: .groImageUpdated, object: nil)
                 }
@@ -92,8 +90,6 @@ class GroViewController: UIViewController, ItemListDelegate {
         let category = selectedItem.category
         let newItemId = selectedItem.id
         let currentItemId = categoryToEquippedId[category]
-        
-        categoryToEquippedId[category] = newItemId
         
         if currentItemId == newItemId { return }
         
@@ -113,11 +109,14 @@ class GroViewController: UIViewController, ItemListDelegate {
         
         // 새로운 아이템 착용
         categoryToEquippedId[category] = newItemId
+        categoryToEquippedName[category] = selectedItem.name
         callPatchItemState(itemId: newItemId, status: "EQUIPPED")
         
         if let imageView = getImageViewForCategory(category) {
             imageView.kf.setImage(with: URL(string: selectedItem.groImageUrl), options: [.transition(.fade(0.3)), .cacheOriginalImage])
         }
+        
+        itemListModalVC.itemListModalView.itemCollectionView.reloadData()  // ✅ UI 반영
     }
     
     private func setDelegate() {
@@ -258,22 +257,12 @@ class GroViewController: UIViewController, ItemListDelegate {
         let purchaseModalVC = PurchaseModalViewController(
             isShortage: isShortage,
             credit: item.price,
-            itemId: item.id
+            itemId: item.id,
+            category: item.category
         )
         
         purchaseModalVC.modalPresentationStyle = .pageSheet
-        if let sheet = purchaseModalVC.sheetPresentationController {
-            //지원할 크기 지정
-            if #available(iOS 16.0, *) {
-                sheet.detents = [
-                    .custom{ context in
-                        0.32 * context.maximumDetentValue
-                    }
-                ]
-            } else { sheet.detents = [.medium()] }
-            sheet.prefersGrabberVisible = true
-        }
-        present(purchaseModalVC, animated: true, completion: nil)
+        presentSheet(purchaseModalVC, heightRatio: 0.33)
     }
     
     //MARK: - UI 업데이트 함수
@@ -338,7 +327,4 @@ class GroViewController: UIViewController, ItemListDelegate {
             self.itemListBottomConstraint = $0.bottom.equalToSuperview().offset(0).constraint
         }
     }
-    
-    
-    
 }
