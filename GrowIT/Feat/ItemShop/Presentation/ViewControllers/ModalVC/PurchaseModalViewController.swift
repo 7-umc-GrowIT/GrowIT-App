@@ -14,6 +14,7 @@ class PurchaseModalViewController: UIViewController {
     private let isShortage: Bool
     private let credit: Int
     private let itemId: Int
+    private let category: String
     
     //MARK: -Views
     private lazy var purchaseModalView = PurchaseModalView().then {
@@ -35,7 +36,7 @@ class PurchaseModalViewController: UIViewController {
                 print("Success: \(data)")
                 DispatchQueue.main.async {
                     self.setNotification()
-                    self.handlePurchaseSuccess(itemId: self.itemId, category: "ITEM_CATEGORY")  // category는 서버 응답 기반으로 지정
+                    self.handlePurchaseSuccess(itemId: self.itemId, category: self.category)
                     self.dismiss(animated: true, completion: nil)
                 }
             case .failure(let error):
@@ -45,12 +46,14 @@ class PurchaseModalViewController: UIViewController {
     }
     
     //MARK: init
-    init(isShortage: Bool, credit: Int, itemId: Int) {
+    init(isShortage: Bool, credit: Int, itemId: Int, category: String) {
         self.isShortage = isShortage
         self.credit = credit
         self.itemId = itemId
+        self.category = category
         super.init(nibName: nil, bundle: nil)
     }
+
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

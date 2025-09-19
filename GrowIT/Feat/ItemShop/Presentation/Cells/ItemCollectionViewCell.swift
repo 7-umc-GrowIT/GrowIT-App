@@ -63,20 +63,37 @@ class ItemCollectionViewCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override var isSelected: Bool{
-        didSet {
-            if isSelected {
-                self.layer.borderWidth = 1.5
-                self.layer.borderColor = UIColor.primary400.cgColor
-                self.layer.shadowColor = UIColor.primary400.cgColor
-                self.layer.shadowOpacity = 0.2
-                self.layer.shadowRadius = 4
-                self.layer.shadowOffset = CGSize(width: 0, height: 0)
-            } else {
-                self.layer.borderColor = UIColor.clear.cgColor
-                self.layer.shadowColor = UIColor.clear.cgColor
+
+    // ✅ 선택 상태에 따라 테두리/그림자만 세팅
+        override var isSelected: Bool {
+            didSet {
+                if isSelected {
+                    self.layer.borderWidth = 1.5
+                    self.layer.borderColor = UIColor.primary400.cgColor
+                    self.layer.shadowColor = UIColor.primary400.cgColor
+                    self.layer.shadowOpacity = 0.2
+                    self.layer.shadowRadius = 4
+                    self.layer.shadowOffset = .zero
+                } else {
+                    self.layer.borderWidth = 0
+                    self.layer.borderColor = UIColor.clear.cgColor
+                    self.layer.shadowColor = UIColor.clear.cgColor
+                }
             }
+        }
+
+        // ✅ 여기서 "착용 중 / 보유 중 / 가격" 라벨 세팅
+    func configure(item: ItemList, isEquipped: Bool) {
+        itemImageView.kf.setImage(with: URL(string: item.imageUrl))
+        
+        if item.purchased {
+            creditStackView.isHidden = true
+            isOwnedLabel.isHidden = false
+            isOwnedLabel.text = isEquipped ? "착용 중" : "보유 중"
+        } else {
+            creditStackView.isHidden = false
+            isOwnedLabel.isHidden = true
+            creditLabel.text = "\(item.price)"
         }
     }
     
