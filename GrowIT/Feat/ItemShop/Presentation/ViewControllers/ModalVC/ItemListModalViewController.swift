@@ -65,8 +65,6 @@ class ItemListModalViewController: UIViewController {
     
     // MARK: - NetWork
     func callGetItems(completion: (() -> Void)? = nil) {
-        let previousItemId = Set(self.shopItems.map { $0.id })
-        
         itemService.getItemList(category: category) { [weak self] result in
             guard let self = self else { return }
             
@@ -75,14 +73,13 @@ class ItemListModalViewController: UIViewController {
                 self.shopItems = data.itemList
                 self.myItems = data.itemList.filter { $0.purchased }
                 
-                let newItemId = Set(self.shopItems.map { $0.id })
-                if previousItemId != newItemId {
-                    DispatchQueue.main.async {
-                        self.itemListModalView.itemCollectionView.reloadData()
-                        completion?()  // reloadData 완료 후 콜백 실행
-                    }
-                } else {
-                    completion?() // 데이터 변화 없더라도 콜백 실행
+                DispatchQueue.main.async {
+                    self.itemListModalView.itemCollectionView.reloadData()
+                    
+                    //  아이템 리스트 로딩이 끝난 뒤 현재 모드에 맞게 착용 아이템 선택 표시
+                    self.updateToMyItems(self.isMyItems)
+                    
+                    completion?()
                 }
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
@@ -103,40 +100,32 @@ class ItemListModalViewController: UIViewController {
         self.isMyItems = isMyItems
         itemListModalView.itemCollectionView.reloadData()
         
-        DispatchQueue.main.async {
-            if isMyItems {
-                // 먼저 모든 선택 해제
-                for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
-                    self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            // 먼저 모든 선택 해제
+            for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
+                self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
+            }
+            
+            if let delegate = self.itemDelegate as? GroViewController {
+                let equippedIds = delegate.categoryToEquippedId
+                let equippedNames = delegate.categoryToEquippedName
+                
+                let items: [ItemList]
+                if isMyItems {
+                    items = myItems
+                } else {
+                    items = shopItems
                 }
                 
-                // 착용 중인 아이템 선택
-                print("🔍 마이 아이템 모드 - categoryToEquippedId: \(self.itemDelegate?.categoryToEquippedId ?? [:])")
-                print("🔍 myItems count: \(self.myItems.count)")
-                
-                for (index, item) in self.myItems.enumerated() {
-                    if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category], equippedItemId == item.id {
-                        print("✅ 착용 중 아이템 발견: \(item.name) (ID: \(item.id), Category: \(item.category))")
+                for (index, item) in items.enumerated() {
+                    if equippedIds[item.category] == item.id || equippedNames[item.category] == item.name {
                         let indexPath = IndexPath(item: index, section: 0)
-                        self.itemListModalView.itemCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    }
-                }
-            } else {
-                // 아이템샵 모드에서도 착용 중인 아이템 선택
-                print("🔍 아이템샵 모드 - categoryToEquippedId: \(self.itemDelegate?.categoryToEquippedId ?? [:])")
-                print("🔍 shopItems count: \(self.shopItems.count)")
-                
-                // 먼저 모든 선택 해제
-                for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
-                    self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
-                }
-                
-                // 착용 중인 아이템 선택
-                for (index, item) in self.shopItems.enumerated() {
-                    if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category], equippedItemId == item.id {
-                        print("✅ 착용 중 아이템 발견: \(item.name) (ID: \(item.id), Category: \(item.category))")
-                        let indexPath = IndexPath(item: index, section: 0)
-                        self.itemListModalView.itemCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                        self.itemListModalView.itemCollectionView.selectItem(
+                            at: indexPath,
+                            animated: false,
+                            scrollPosition: []
+                        )
                     }
                 }
             }
@@ -166,7 +155,8 @@ class ItemListModalViewController: UIViewController {
         for index in 0..<segment.numberOfSegments {
             segment.setImage(
                 defaultImages[index].withRenderingMode(.alwaysOriginal),
-                forSegmentAt: index)
+                forSegmentAt: index
+            )
         }
         
         let selectedIndex = segment.selectedSegmentIndex
@@ -180,29 +170,32 @@ class ItemListModalViewController: UIViewController {
         callGetItems { [weak self] in
             guard let self = self else { return }
             
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 // 먼저 모든 선택 해제
                 for indexPath in self.itemListModalView.itemCollectionView.indexPathsForSelectedItems ?? [] {
                     self.itemListModalView.itemCollectionView.deselectItem(at: indexPath, animated: false)
                 }
                 
-                // 현재 모드에 따라 착용 중인 아이템 선택
-                if self.isMyItems {
-                    // 마이 아이템 모드
-                    for (index, item) in self.myItems.enumerated() {
-                        if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category],
-                           equippedItemId == item.id {
-                            let indexPath = IndexPath(item: index, section: 0)
-                            self.itemListModalView.itemCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                        }
+                if let delegate = self.itemDelegate as? GroViewController {
+                    let equippedIds = delegate.categoryToEquippedId
+                    let equippedNames = delegate.categoryToEquippedName
+                    
+                    let items: [ItemList]
+                    if isMyItems {
+                        items = myItems
+                    } else {
+                        items = shopItems
                     }
-                } else {
-                    // 아이템샵 모드
-                    for (index, item) in self.shopItems.enumerated() {
-                        if let equippedItemId = self.itemDelegate?.categoryToEquippedId[item.category],
-                           equippedItemId == item.id {
+                    
+                    for (index, item) in items.enumerated() {
+                        if equippedIds[item.category] == item.id || equippedNames[item.category] == item.name {
                             let indexPath = IndexPath(item: index, section: 0)
-                            self.itemListModalView.itemCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                            self.itemListModalView.itemCollectionView.selectItem(
+                                at: indexPath,
+                                animated: false,
+                                scrollPosition: []
+                            )
                         }
                     }
                 }
@@ -260,12 +253,12 @@ extension ItemListModalViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if isMyItems {
+            // 마이 아이템 셀 설정
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: MyItemCollectionViewCell.identifier,
                 for: indexPath) as? MyItemCollectionViewCell else
             { return UICollectionViewCell() }
             
-            // 마이 아이템 셀 설정
             let item = myItems[indexPath.row]
             cell.isOwnedLabel.text = "보유 중"
             cell.itemImageView.kf.setImage(with: URL(string: item.imageUrl), options: [.transition(.fade(0.1)), .cacheOriginalImage])
@@ -273,11 +266,11 @@ extension ItemListModalViewController: UICollectionViewDataSource {
             
             return cell
         } else {
+            // 아이템샵 셀 설정
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: ItemCollectionViewCell.identifier,
                 for: indexPath) as? ItemCollectionViewCell else { return UICollectionViewCell() }
             
-            // 아이템샵 셀 설정
             let item = shopItems[indexPath.row]
             if item.purchased {
                 cell.creditStackView.isHidden = true

@@ -19,7 +19,8 @@ class GroViewController: UIViewController, ItemListDelegate {
     private var selectedItem: ItemList?
     var originalEquippedItem: [String: Int] = [:]
     var categoryToEquippedId: [String: Int] = [:]
-    
+    var categoryToEquippedName: [String: String] = [:]
+
     //MARK: - Views
     private lazy var groView = GroView().then {
         $0.zoomButton.addTarget(self, action: #selector(didTapZoomButton), for: .touchUpInside)
@@ -154,7 +155,11 @@ class GroViewController: UIViewController, ItemListDelegate {
         categoryToEquippedId = data.equippedItems.reduce(into: [String: Int]()) { dict, item in
             dict[item.category] = item.id
         }
+        categoryToEquippedName = data.equippedItems.reduce(into: [String: String]()) { dict, item in
+            dict[item.category] = item.name
+        }
         print("🔧 categoryToEquippedId 초기화: \(categoryToEquippedId)")
+        print("🔧 categoryToEquippedName 초기화: \(categoryToEquippedName)")
         
         for item in data.equippedItems {
             if let imageView = categoryImageViews[item.category] {
