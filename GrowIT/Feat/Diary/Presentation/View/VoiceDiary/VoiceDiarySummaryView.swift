@@ -20,6 +20,7 @@ class VoiceDiarySummaryView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        self.setGradient(color1: .gray700, color2: .gray900)
         
         // 그라데이션 적용
         setGradient(color1: .gray700, color2: .gray900)
@@ -36,7 +37,7 @@ class VoiceDiarySummaryView: UIView {
     private let emoLabel = UILabel().then {
         $0.text = "오늘의 감정 키워드"
         $0.font = .body1Medium()
-        $0.textColor = .gray500
+        $0.textColor = .gray100
     }
     
     private let emoStackView = EmoStackView().then {
@@ -54,12 +55,12 @@ class VoiceDiarySummaryView: UIView {
     }
     
     private let textView = UIView().then {
-        $0.backgroundColor = UIColor(hex: "#800b0b11")
+        $0.backgroundColor = UIColor(hex: "#0B0B11", alpha: 0.5)
         $0.layer.cornerRadius = 20
     }
     
     private let dateLabel = UILabel().then {
-        $0.text = "2024년 12월 15일"
+        $0.text = ""
         $0.font = .heading3Bold()
         $0.textColor = .primary400
     }
@@ -70,7 +71,7 @@ class VoiceDiarySummaryView: UIView {
         $0.font = .body1Medium()
         $0.isEditable = false
         $0.backgroundColor = .clear
-        $0.setLineSpacing(spacing: 8, font: .body1Medium(), color: .white)
+        $0.setLineSpacing(spacing: 12, font: .body1Medium(), color: .white)
     }
     
     private let aiLabel = UILabel().then {
@@ -172,7 +173,18 @@ class VoiceDiarySummaryView: UIView {
     }
     
     func updateDate(with date: String) {
-        dateLabel.text = date
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.locale = Locale(identifier: "ko_KR") // 한글 로케일
+        outputFormatter.dateFormat = "yyyy년 M월 d일"
+        
+        if let dateObj = inputFormatter.date(from: date) {
+            let formattedDate = outputFormatter.string(from: dateObj)
+            dateLabel.text = formattedDate
+        } else {
+            dateLabel.text = date // 변환 실패 시 원본 보여주기
+        }
     }
-    
 }

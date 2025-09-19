@@ -9,13 +9,14 @@ import UIKit
 import Then
 import SnapKit
 
-class CustomChallengeListCell: UICollectionViewCell{
+class CustomChallengeListCell: UITableViewCell{
     static let identifier: String = "CustomChallengeList"
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.backgroundColor = .clear
-        
+        self.selectionStyle = .none
+
         addStack()
         addComponent()
         constraints()
@@ -47,9 +48,9 @@ class CustomChallengeListCell: UICollectionViewCell{
         $0.textColor = .gray900
         $0.font = .heading3Bold()
         $0.numberOfLines = 0
-        $0.lineBreakMode = .byWordWrapping
-        $0.adjustsFontSizeToFitWidth = true
-        $0.minimumScaleFactor = 0.5
+//        $0.lineBreakMode = .byWordWrapping
+//        $0.adjustsFontSizeToFitWidth = true
+//        $0.minimumScaleFactor = 0.5
     }
     
     private lazy var clock = UIImageView().then{
@@ -105,12 +106,9 @@ class CustomChallengeListCell: UICollectionViewCell{
     private func constraints(){
         box.snp.makeConstraints{
             $0.horizontalEdges.equalToSuperview()
-            //$0.top.equalToSuperview().offset(8)
-            //$0.height.equalTo(100)
         }
         
         icon.snp.makeConstraints{
-            //$0.top.equalToSuperview().offset(30)
             $0.centerY.equalToSuperview()
             $0.left.equalToSuperview().offset(24)
             $0.width.height.equalTo(40)
@@ -119,10 +117,7 @@ class CustomChallengeListCell: UICollectionViewCell{
         name.snp.makeConstraints{
             $0.top.equalToSuperview().offset(24.5)
             $0.left.equalTo(icon.snp.right).offset(12)
-            //$0.right.equalTo(buttonContainer.snp.left).inset(15)
-            //$0.bottom.equalTo(timeStack.snp.top).inset(8)
-            $0.width.equalToSuperview().multipliedBy(0.5)
-            //$0.height.greaterThanOrEqualToSuperview().multipliedBy(0.22)
+            $0.width.equalToSuperview().multipliedBy(0.45)
         }
         
         timeStack.snp.makeConstraints{
@@ -146,7 +141,8 @@ class CustomChallengeListCell: UICollectionViewCell{
     }
     
     public func figure(challenge: UserChallenge){
-        self.name.text = challenge.title
+        self.name.text = challenge.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        //self.name.text = "아아아아아아아아아아아아"
         self.time.text = challenge.time.formattedTime
        
         var width: CGFloat = 0.0

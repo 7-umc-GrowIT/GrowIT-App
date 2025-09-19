@@ -48,14 +48,15 @@ class ChallengeStatusArea: UIView {
     
     public lazy var challengeStatusNum = makeLabel(title: "4", color: .primary700, font: .body2SemiBold())
     
-    public lazy var challengeAllList = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout().then{
-        $0.minimumLineSpacing = 8
-        $0.scrollDirection = .vertical
-    }).then{
-        $0.register(CustomChallengeListCell.self, forCellWithReuseIdentifier: CustomChallengeListCell.identifier)
+    public lazy var challengeAllList = UITableView(frame: .zero, style: .plain).then {
+        $0.register(CustomChallengeListCell.self, forCellReuseIdentifier: CustomChallengeListCell.identifier)
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = true
         $0.isScrollEnabled = true
+        $0.rowHeight = UITableView.automaticDimension
+        $0.estimatedRowHeight = 100
+        $0.separatorStyle = .none
+
     }
     
     // 페이징 컨트롤 관련 UI

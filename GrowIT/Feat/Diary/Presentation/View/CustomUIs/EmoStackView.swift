@@ -19,6 +19,8 @@ class EmoStackView: UIStackView {
     }
     
     //MARK: - Setup UI
+    private var isDark: Bool = false
+    
     private let rect1 = UIView().then {
         $0.backgroundColor = .primary100
         $0.layer.cornerRadius = 6
@@ -106,6 +108,15 @@ class EmoStackView: UIStackView {
         for index in keywords.count..<labels.count {
             labels[index].text = ""
         }
+    }
+    
+    func setDark() {
+        rect1.backgroundColor = UIColor(hex: "#00B277", alpha: 0.2)
+        label1.textColor = .primary200
+        rect2.backgroundColor = UIColor(hex: "#00B277", alpha: 0.2)
+        label2.textColor = .primary200
+        rect3.backgroundColor = UIColor(hex: "#00B277", alpha: 0.2)
+        label3.textColor = .primary200
     }
     
 }

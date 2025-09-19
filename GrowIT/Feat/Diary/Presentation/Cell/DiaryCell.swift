@@ -9,7 +9,7 @@ import UIKit
 import Then
 import SnapKit
 
-class JDiaryCell: UICollectionViewCell{
+class DiaryCell: UICollectionViewCell{
     
     static let identifier:String = "JDiaryCell"
     
@@ -22,6 +22,11 @@ class JDiaryCell: UICollectionViewCell{
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        showIcon(isShow: false) // 재사용 시 아이콘 숨기기
     }
     
     private lazy var dateCell = UILabel().then{
@@ -41,7 +46,7 @@ class JDiaryCell: UICollectionViewCell{
     
     private func constraints(){
         dateCell.snp.makeConstraints{
-            $0.top.equalToSuperview()
+            $0.top.equalToSuperview().offset(4)
             $0.centerX.equalToSuperview()
         }
         
@@ -55,7 +60,7 @@ class JDiaryCell: UICollectionViewCell{
     public func figure(day:Int, isSunday:Bool, isFromCurrentMonth: Bool, isDark: Bool){
         dateCell.text = "\(day)"
         if(isSunday){
-            dateCell.textColor = .negative400
+            dateCell.textColor = !isDark ? .negative400 : .negative400W
         }else if(!isFromCurrentMonth){
             dateCell.textColor = .gray300
         }else{
@@ -63,7 +68,7 @@ class JDiaryCell: UICollectionViewCell{
         }
         
         if(isDark){
-            dateImage.image = UIImage(named: "diaryIcondark")
+            dateImage.image = UIImage(named: "diaryIconDark")
         }else{
             dateImage.image = UIImage(named: "diaryIcon")
         }

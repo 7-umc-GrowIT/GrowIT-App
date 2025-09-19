@@ -11,6 +11,8 @@ import SnapKit
 
 protocol DiaryCalendarControllerDelegate: AnyObject {
     func didSelectDate(_ date: String)
+    
+    func diaryCalendar(_ controller: DiaryCalendarController, didChangeWeekCount count: Int, _ cellWidth: Double)
 }
 
 class DiaryCalendarController: UIViewController {
@@ -32,6 +34,7 @@ class DiaryCalendarController: UIViewController {
     var daysPerMonth: [Int] {
         return [31, isLeapYear() ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] // 윤년 고려
     }
+    let today = Calendar.current.startOfDay(for: Date())
     var currentDate = Date()
     var currentCalendar: Calendar {
         var calendar = Calendar.current
@@ -140,6 +143,7 @@ class DiaryCalendarController: UIViewController {
 
         // 캘린더를 업데이트하여 변경된 날짜를 반영
         updateCalendar()
+        getDiaryDates()
     }
     
     @objc private func backMonthTapped() {
@@ -154,6 +158,15 @@ class DiaryCalendarController: UIViewController {
     }
     
     @objc private func nextMonthTapped() {
+        let todayYear = currentCalendar.component(.year, from: today)
+        let todayMonth = currentCalendar.component(.month, from: today)
+        
+        // 오늘 연도/월을 넘으면 return
+        if (currentYear! > todayYear) ||
+           (currentYear! == todayYear && currentMonthIndex! + 1 >= todayMonth) {
+            return
+        }
+
         if currentMonthIndex == 11 {
             currentMonthIndex = 0 // 1월로 설정
             currentYear! += 1 // 연도 증가
@@ -167,9 +180,20 @@ class DiaryCalendarController: UIViewController {
     private func updateCalendar() {
         diaryCalendar.yearMonthLabel.text = "\(currentYear!)년 \(currentMonthIndex! + 1)월"
         calculateWeeksInMonth()
+        delegate?.diaryCalendar(self, didChangeWeekCount: numberOfWeeksInMonth, cellWidth)
         adjustCalendarHeightBasedOnWeeks()
         diaryCalendar.calendarCollectionView.reloadData()
         self.view.layoutIfNeeded()
+        
+        // ✅ 이번 달이면 next 버튼 숨기기
+        let todayYear = currentCalendar.component(.year, from: today)
+        let todayMonth = currentCalendar.component(.month, from: today)
+        
+        if currentYear == todayYear, currentMonthIndex! + 1 == todayMonth {
+            diaryCalendar.nextMonthBtn.isHidden = true
+        } else {
+            diaryCalendar.nextMonthBtn.isHidden = false
+        }
     }
     
     func isLeapYear() -> Bool { //윤달 계산
@@ -185,7 +209,7 @@ class DiaryCalendarController: UIViewController {
     }
 
     private func adjustCalendarHeightBasedOnWeeks() {
-        let totalHeight = CGFloat(numberOfWeeksInMonth) * cellWidth + 88
+        let totalHeight = CGFloat(numberOfWeeksInMonth) * cellWidth + 92
         diaryCalendar.calendarBg.snp.updateConstraints { make in
             make.height.equalTo(totalHeight)
         }
@@ -198,7 +222,6 @@ class DiaryCalendarController: UIViewController {
 extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int{
         let firstDayOfMonth = firstWeekdayOfMonth // 현재월의 시작
-        let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12]  // 이전 달의 날짜 수
         let daysToShowFromPrevMonth = (firstDayOfMonth - currentCalendar.firstWeekday + 7) % 7
         
         let daysInMonth = numberOfDaysInMonth
@@ -209,7 +232,8 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JDiaryCell.identifier, for: indexPath) as? JDiaryCell else { return UICollectionViewCell()}
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DiaryCell.identifier, for: indexPath) as? DiaryCell else { return UICollectionViewCell() }
+        
         let firstDayIndex = firstWeekdayOfMonth - 1  // 0-based index
         let day = indexPath.item - firstDayIndex + 1
         
@@ -226,53 +250,69 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
         dateComponents.year = currentYear
         dateComponents.month = currentMonthIndex! + 1
 
+        // ✅ 일요일 여부를 계산하기 위한 변수
+        var isSunday: Bool = false
+        
         // Adjust day number based on the first day of the month
         if day < 1 {
             // 이전 달의 날짜를 표시
-            cell.figure(day: previousMonthDay, isSunday: false, isFromCurrentMonth: false, isDark: self.isDark)
-            cell.isHidden = false
-            
             dateComponents.month = previousMonth
             dateComponents.year! += yearAdjustmentPrevious
-            dateComponents.day = daysPerMonth[previousMonth - 1] + day + 1
+            
+            // ✅ 이전 달 날짜 계산 수정
+            let actualPreviousDay = daysInPreviousMonth + day  // day는 음수이므로
+            dateComponents.day = actualPreviousDay
+            
+            // ✅ 이전 달 날짜의 일요일 여부 계산
+            let date = currentCalendar.date(from: dateComponents)!
+            let weekday = currentCalendar.component(.weekday, from: date)
+            isSunday = (weekday == 1)
+            
+            cell.figure(day: actualPreviousDay, isSunday: isSunday, isFromCurrentMonth: false, isDark: self.isDark)
+            cell.isHidden = false
         } else if day > numberOfDaysInMonth {
             // 다음 달의 날짜를 표시
-            cell.figure(day: day - numberOfDaysInMonth, isSunday: false, isFromCurrentMonth: false, isDark: self.isDark)
-            cell.isHidden = false
+            let nextMonthDay = day - numberOfDaysInMonth
             
             dateComponents.month = nextMonth
             dateComponents.year! += yearAdjustmentNext
-            dateComponents.day = day - numberOfDaysInMonth + 1
+            dateComponents.day = nextMonthDay
+            
+            // 다음 달 날짜의 일요일 여부 계산
+            let date = currentCalendar.date(from: dateComponents)!
+            let weekday = currentCalendar.component(.weekday, from: date)
+            isSunday = (weekday == 1)
+            
+            print("다음 달 \(nextMonthDay)일, 요일: \(weekday), 일요일: \(isSunday)")
+            
+            cell.figure(day: nextMonthDay, isSunday: isSunday, isFromCurrentMonth: false, isDark: self.isDark)
+            cell.isHidden = false
         } else {
-            // 날짜 계산
+            // 현재 달의 날짜를 표시
             dateComponents.day = day + 1
             
-            // 현재 달의 날짜를 표시
-            
+            // ✅ 현재 달 날짜의 일요일 여부 계산
             let weekdayIndex = (firstDayIndex + day - 1) % 7
-            if weekdayIndex == 0 { // 일요일
-                cell.figure(day: day, isSunday: true, isFromCurrentMonth: true, isDark: self.isDark)
-            } else {
-                cell.figure(day: day, isSunday: false, isFromCurrentMonth: true, isDark: self.isDark)
-            }
+            isSunday = (weekdayIndex == 0) // 일요일
+            
+            cell.figure(day: day, isSunday: isSunday, isFromCurrentMonth: true, isDark: self.isDark)
             cell.isHidden = false
         }
         
         let date = currentCalendar.date(from: dateComponents)!
-            let dateString = dateFormatter.string(from: date)
+        let dateString = dateFormatter.string(from: date)
         
         if let _ = callendarDiaries.first(where: { $0.date == dateString }) {
             print(dateString)
             cell.showIcon(isShow: true) // 해당 날짜에 일기가 있다면 아이콘 표시
-        }else {
-            cell.showIcon(isShow: false)// 아니면 숨김
+        } else {
+            cell.showIcon(isShow: false) // 아니면 숨김
         }
-        
         
         return cell
     }
     
-func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         //let paddingSpace = 16 * 2 // 좌우 패딩
         let availableWidth = collectionView.frame.width
         let widthPerItem = availableWidth / 7
@@ -337,34 +377,59 @@ func collectionView(_ collectionView: UICollectionView, layout collectionViewLay
             dateComponents.day = day
         }
         
-
-        if let date = Calendar.current.date(from: dateComponents) {
-            let formattedDate = dateFormatter.string(from: date)
-            
-            if let result = callendarDiaries.first(where: {$0.date == formattedDate}){
-                if(self.isDropDown){
-                    CustomToast(containerWidth: 310).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 이미 일기를 작성했어요", font: .heading3SemiBold())
-                }else{
-                    diaryService.fetchDiary(diaryId: result.diaryId, completion: { [weak self] result in
-                        guard let self = self else {return}
-                        switch result{
-                        case.success(let data):
-                            print("받은 일기 데이터는 \(data)")
-                            let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
-                            presentSheet(diaryPostFixVC, heightRatio: 0.6)
-                        case.failure(let error):
-                            print("Error: \(error)")
-                        }
-                    })
-                    
-                }
+        guard let date = Calendar.current.date(from: dateComponents) else {
+            print("❌ 날짜 생성 실패: \(dateComponents)")
+            return
+        }
+        
+        let formattedDate = dateFormatter.string(from: date)
+        let today = Calendar.current.startOfDay(for: Date())
+        let selectedDay = Calendar.current.startOfDay(for: date)
+        
+        print("🗓️ 선택된 날짜: \(formattedDate)")
+        print("📋 캘린더 일기 목록: \(callendarDiaries.map { $0.date })")
+        
+        if self.isDropDown {
+            print("📝 드롭다운 모드 - 일기 작성")
+            if selectedDay > today {
+                CustomToast(containerWidth: 277).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 작성이 불가능해요", font: .heading3SemiBold())
+                return
             }
-            if(!callendarDiaries.contains(where: {$0.date == formattedDate})){
+            
+            if (callendarDiaries.contains(where: {$0.date == formattedDate})){
+                CustomToast(containerWidth: 310).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 이미 일기를 작성했어요", font: .heading3SemiBold())
+                return
+            } else {
                 delegate?.didSelectDate(formattedDate)
+            }
+        } else {
+            print("👁️ 보기 모드 - 일기 확인")
+            if let result = callendarDiaries.first(where: { $0.date == formattedDate }) {
+                print("✅ 일기를 찾았습니다. ID: \(result.diaryId)")
+                diaryService.fetchDiary(diaryId: result.diaryId) { [weak self] result in
+                    guard let self = self else { return }
+                    DispatchQueue.main.async {  // UI 업데이트는 메인 스레드에서
+                        switch result {
+                        case .success(let data):
+                            print("📖 일기 데이터 로드 성공: \(data)")
+                            let diaryPostFixVC = DiaryPostFixViewController(text: data.content, date: data.date, diaryId: data.diaryId)
+                            self.presentSheet(diaryPostFixVC, heightRatio: 0.6)
+                        case .failure(let error):
+                            print("❌ 일기 로드 실패: \(error)")
+                            // 에러 처리 추가
+                            CustomToast(containerWidth: 250).show(
+                                image: UIImage(named: "toastAlertIcon") ?? UIImage(),
+                                message: "일기를 불러올 수 없습니다",
+                                font: .heading3SemiBold()
+                            )
+                        }
+                    }
+                }
+            } else {
+                print("❌ 해당 날짜에 일기가 없습니다: \(formattedDate)")
             }
         }
     }
-    
 }
 
 extension Notification.Name {

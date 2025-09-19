@@ -32,6 +32,7 @@ class WeekDayHeaderView: UICollectionReusableView {
         
         stackView.snp.makeConstraints{
             $0.top.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(32)
             $0.bottom.equalToSuperview().inset(12)
         }
         
@@ -52,7 +53,7 @@ class WeekDayHeaderView: UICollectionReusableView {
     func configureTheme(isDarkMode: Bool) {
         dayLabels.enumerated().forEach { index, label in
             if isDarkMode {
-                label.textColor = index == 0 ? .negative400 : .gray300
+                label.textColor = index == 0 ? .negative400W : .gray300
             } else {
                 label.textColor = index == 0 ? .negative400 : .gray600
             }

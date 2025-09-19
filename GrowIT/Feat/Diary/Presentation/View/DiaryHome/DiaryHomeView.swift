@@ -26,11 +26,13 @@ class DiaryHomeView: UIView {
     // MARK: - Property
     
     // 일기 홈화면 스크롤뷰
-    public lazy var diaryHomeScrollView = UIScrollView().then{
+    public lazy var diaryHomeScrollView = UIScrollView(frame: .zero).then{
         $0.showsVerticalScrollIndicator = false
         $0.showsHorizontalScrollIndicator = false
         $0.contentOffset = CGPoint(x: 0, y: 0)
     }
+    
+    public let contentView = UIView()
     
     // 일기 홈화면 상단 네비게이션바
     public lazy var diaryHomeNavbar = DiaryHomeNavbar()
@@ -40,9 +42,6 @@ class DiaryHomeView: UIView {
     
     // 캘린더 헤더
     lazy var diaryHomeCalendarHeader = DiaryHomeCalendarHeader()
-    
-    // 캘린더
-    public lazy var diaryHomeCalendar = DiaryCalendar()
 
     // 일기 홈화면 스택 뷰
     public lazy var diaryHomeStack = makeStack()
@@ -64,8 +63,8 @@ class DiaryHomeView: UIView {
     
     private func addComponents(){
         [diaryHomeNavbar, diaryHomeScrollView].forEach(self.addSubview)
-        diaryHomeScrollView.addSubview(diaryHomeStack)
-        [diaryHomeBanner, diaryHomeCalendarHeader].forEach(diaryHomeStack.addArrangedSubview)
+        diaryHomeScrollView.addSubview(contentView)
+        contentView.addSubviews([diaryHomeBanner, diaryHomeCalendarHeader])
     }
     
     private func constraints(){
@@ -79,18 +78,13 @@ class DiaryHomeView: UIView {
         diaryHomeScrollView.snp.makeConstraints{
             $0.top.equalTo(diaryHomeNavbar.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            // 높이의 17% 값을 계산하여 bottom inset으로 사용
-            let bottomInset = self.frame.size.height * 0.17
-            $0.bottom.equalToSuperview().inset(bottomInset)
-            //$0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
         
-        diaryHomeStack.snp.makeConstraints{
-            $0.horizontalEdges.top.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(165)
-            $0.width.equalTo(diaryHomeScrollView.snp.width)
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
         }
-
         
         diaryHomeBanner.snp.makeConstraints{
             $0.top.equalToSuperview()
@@ -99,11 +93,10 @@ class DiaryHomeView: UIView {
         }
         
         diaryHomeCalendarHeader.snp.makeConstraints{
-            $0.height.equalToSuperview().multipliedBy(0.125)
+            $0.top.equalTo(diaryHomeBanner.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            //$0.bottom.equalTo(diaryHomeStack.snp.bottom)
+            $0.height.equalTo(109)
         }
-
     }
 
 

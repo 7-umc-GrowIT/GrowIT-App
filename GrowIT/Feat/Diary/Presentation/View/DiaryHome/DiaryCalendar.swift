@@ -39,7 +39,7 @@ class DiaryCalendar: UIView {
     }
     
     // 년월 표시 라벨
-    public lazy var yearMonthLabel = AppLabel(text: "2025년 1월", font: .subBody1(), textColor: .gray600)
+    public lazy var yearMonthLabel = AppLabel(text: "", font: .subBody1(), textColor: .gray600)
     
     // 다음 월 이동 버튼
     public lazy var nextMonthBtn = UIButton().then{
@@ -64,7 +64,7 @@ class DiaryCalendar: UIView {
         $0.isScrollEnabled = false
         $0.showsHorizontalScrollIndicator = false
         $0.showsVerticalScrollIndicator = false
-        $0.register(JDiaryCell.self, forCellWithReuseIdentifier: JDiaryCell.identifier)
+        $0.register(DiaryCell.self, forCellWithReuseIdentifier: DiaryCell.identifier)
         $0.register(WeekDayHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: WeekDayHeaderView.reuseIdentifier)
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
@@ -110,7 +110,7 @@ class DiaryCalendar: UIView {
         yearMonthHeader.snp.makeConstraints {
             $0.top.equalToSuperview().offset(12)
             $0.left.equalToSuperview().offset(16)
-            //$0.height.equalTo(32)
+            $0.height.equalTo(32)
         }
         
         backMonthBtn.snp.makeConstraints {

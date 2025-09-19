@@ -39,6 +39,7 @@
 		<string>Pretendard-Medium.otf</string>
 		<string>Pretendard-Regular.otf</string>
 		<string>SUITE-ExtraBold.otf</string>
+		<string>SUITE-Bold.otf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

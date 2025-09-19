@@ -17,6 +17,7 @@ final class ChallengeStatusViewModel {
     // Outputs
     @Published private(set) var challenges: [UserChallenge] = []
     @Published private(set) var totalPages: Int = 0
+    @Published private(set) var totalElements: Int = 0
     @Published private(set) var error: Error?
 
     private let getChallengesUseCase: GetStatusChallengesUseCase
@@ -62,6 +63,7 @@ final class ChallengeStatusViewModel {
             }, receiveValue: { [weak self] statusChallenge in
                 self?.challenges = statusChallenge.challenge
                 self?.totalPages = statusChallenge.totalPages
+                self?.totalElements = statusChallenge.totalElements
             })
             .store(in: &cancellables)
     }

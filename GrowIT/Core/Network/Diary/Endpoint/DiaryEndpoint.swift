@@ -13,6 +13,7 @@ enum DiaryEndpoint {
     case getDiaryID(diaryId: Int)
     case getAllDiary(year: Int, month: Int)
     case getDiaryDates(year: Int, month: Int)
+    case getHasVoiceDiary
     
     // Post
     case postVoiceDiary(data: DiaryVoiceDTO)
@@ -48,9 +49,11 @@ extension DiaryEndpoint: TargetType {
         case .postDiaryDate:
             return "/summary"
         case .postDiaryAnalyze(let diaryId):
-            return "/analyze/\(diaryId)"
+            return "/\(diaryId)/analyze"
+        case .getHasVoiceDiary:
+            return "/voice/exists"
         default:
-            return "/"
+            return ""
         }
     }
     
@@ -91,6 +94,8 @@ extension DiaryEndpoint: TargetType {
             return .requestParameters(
                 parameters: ["year": year, "month": month],
                 encoding: URLEncoding.queryString)
+        case .getHasVoiceDiary:
+            return .requestPlain
         }
     }
     

@@ -20,6 +20,7 @@ class VoiceDiaryDateSelectView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        self.setGradient(color1: .gray700, color2: .gray900)
         
         // 그라데이션 적용
         setGradient(color1: .gray700, color2: .gray900)
@@ -61,7 +62,7 @@ class VoiceDiaryDateSelectView: UIView {
     
     let warningLabel = UILabel().then {
         $0.text = "일기 날짜는 필수로 선택해야 합니다"
-        $0.textColor = .negative400
+        $0.textColor = .negative400W
         $0.font = .detail2Regular()
         $0.isHidden = true
     }
@@ -121,12 +122,13 @@ class VoiceDiaryDateSelectView: UIView {
         startButton.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
             make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-84)
+            make.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom).inset(44)
         }
         
         addSubview(helpLabel)
         helpLabel.snp.makeConstraints { make in
             make.top.equalTo(startButton.snp.bottom).offset(8)
+            make.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
             make.centerX.equalToSuperview()
         }
     }

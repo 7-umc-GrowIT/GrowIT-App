@@ -24,7 +24,8 @@ final class DiaryService: NetworkManager {
     
     /// Post Text Diary API
     func postTextDiary(data: DiaryRequestDTO, completion: @escaping (Result<DiaryResponseDTO, NetworkError>) -> Void) {
-        request(target: .postTextDiary(data: data), decodingType: DiaryResponseDTO.self, completion: completion)
+        request(target: .postTextDiary(data: data), decodingType: DiaryResponseDTO.self, completion: completion
+        )
     }
     
     /// Post Voice Diary API
@@ -71,6 +72,10 @@ final class DiaryService: NetworkManager {
     
     func postVoiceDiaryAnalyze(diaryId: Int, completion: @escaping (Result<DiaryAnalyzeResponseDTO, NetworkError>) -> Void) {
         request(target: .postDiaryAnalyze(diaryId: diaryId), decodingType: DiaryAnalyzeResponseDTO.self, completion: completion)
+    }
+    
+    func fetchHasVoiceDiary(completion: @escaping (Result<Bool, NetworkError>) -> Void) {
+        request(target: .getHasVoiceDiary, decodingType: Bool.self, completion: completion)
     }
 }
 

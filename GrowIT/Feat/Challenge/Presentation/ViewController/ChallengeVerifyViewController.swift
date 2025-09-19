@@ -31,7 +31,6 @@ class ChallengeVerifyViewController: UIViewController {
         setupNavigationBar() // 네비게이션 바 설정 함수
         openImagePicker() // 이미지 선택 관련 함수
         setupDismissKeyboardGesture() // 키보드 해제 함수
-        setupKeyboardNotifications()
         
         challengeVerifyView.reviewTextView.delegate = self
         challengeVerifyView.challengeVerifyButton.addTarget(self, action: #selector(challengeVerifyButtonTapped), for: .touchUpInside)
@@ -41,7 +40,7 @@ class ChallengeVerifyViewController: UIViewController {
         setupInitialTextViewState()
         
         challengeVerifyView.setChallengeName(name: challenge?.title ?? "")
-        
+        challengeVerifyView.setContent(name: challenge?.content ?? "")
     }
     
     init(challenge: UserChallenge?){
@@ -64,11 +63,13 @@ class ChallengeVerifyViewController: UIViewController {
     @objc func handleImage(_ notification: Notification) {
         if let userInfo = notification.userInfo, let image = userInfo["image"] as? UIImage {
             isImageSelected = true
-            imageData = image.pngData()
+            // JPEG 압축 (0.0 = 최대 압축, 1.0 = 원본 퀄리티)
+            imageData = image.jpegData(compressionQuality: 0.7) // 70% 퀄리티로 압축
             challengeVerifyView.imageUploadCompleted(image)
             challengeVerifyView.imageContainer.superview?.layoutIfNeeded()
         }
     }
+
     
     private func setupNavigationBar() {
         navigationBarManager.addBackButton(
@@ -126,27 +127,7 @@ class ChallengeVerifyViewController: UIViewController {
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
-    
-    /// 키보드 감지시 수행하는 함수
-    private func setupKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    /// 키보드가 나타나면 키보드 높이만큼 화면 올리기
-    @objc private func keyboardWillShow(notification: NSNotification) {
-        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
-        if self.view.frame.origin.y == 0 {
-            self.view.frame.origin.y -= keyboardSize.height
-        }
-    }
-    
-    /// 키보드 내려가면 원래대로 복구
-    @objc private func keyboardWillHide(notification: NSNotification) {
-        if self.view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
-        }
-    }
+
     /// 인증하기 버튼 터치 이벤트
     @objc private func challengeVerifyButtonTapped() {
         
@@ -173,7 +154,7 @@ class ChallengeVerifyViewController: UIViewController {
     
     /// S3 Presigned URL 요청 API
     private func getPresignedUrl(){
-        challengeService.postPresignedUrl(data: PresignedUrlRequestDTO(contentType: "image/png"), completion: { [weak self] result in
+        challengeService.postPresignedUrl(data: PresignedUrlRequestDTO(contentType: "image/jpeg"), completion: { [weak self] result in
             guard let self = self else {return}
             switch result{
             case .success(let data):
@@ -192,7 +173,7 @@ class ChallengeVerifyViewController: UIViewController {
     private func putImageToS3(presignedUrl: String, imageData: Data, fileName: String){
         var request = URLRequest(url: URL(string: presignedUrl)!)
         request.httpMethod = "PUT"
-        request.setValue("image/png", forHTTPHeaderField: "Content-Type")
+        request.setValue("image/jpeg", forHTTPHeaderField: "Content-Type") // JPEG로 변경
         request.httpBody = imageData
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -210,6 +191,7 @@ class ChallengeVerifyViewController: UIViewController {
         }
         task.resume()
     }
+
     
     /// 챌린지 인증 저장 API
     private func saveChallengeVerify(fileName: String){
@@ -233,12 +215,17 @@ class ChallengeVerifyViewController: UIViewController {
 extension ChallengeVerifyViewController: UITextViewDelegate{
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        // "Done" 버튼을 눌렀을 때 키보드 내리기
+        // "Done" (엔터) 입력 시 키보드 내리기
         if text == "\n" {
-            textView.resignFirstResponder()
-            return false
+            //textView.resignFirstResponder()
+            return true
         }
-        return true
+        
+        // 현재 텍스트와 입력할 텍스트의 합으로 새 길이 계산
+        let currentText = textView.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
+        return updatedText.count <= 100 // 100자 제한
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
@@ -249,7 +236,7 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
         }
     
     func textViewDidChange(_ textView: UITextView) {
-        reviewLength = textView.text?.count ?? 0
+        reviewLength = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines).count ?? 0
         
         if(reviewLength < 50 || reviewLength > 100){
            isReviewValidate = false
@@ -257,7 +244,7 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
             challengeVerifyView.challengeVerifyButton.setButtonState(isEnabled: false, enabledColor: .black, disabledColor: .gray100, enabledTitleColor: .white, disabledTitleColor: .gray400)
         }else{
             isReviewValidate = true
-            challengeVerifyView.validateTextView(errorMessage: "챌린지 한줄소감을 50자 이상 적어 주세요", textColor: .gray900, bgColor: .white, borderColor: .black.withAlphaComponent(0.1), hintColor: .gray500)
+            challengeVerifyView.validateTextView(errorMessage: "챌린지 한줄소감은 50자 이상 100자 이하 적어야 합니다", textColor: .gray900, bgColor: .white, borderColor: .black.withAlphaComponent(0.1), hintColor: .gray500)
             if(isReviewValidate && isImageSelected){
                 challengeVerifyView.challengeVerifyButton.setButtonState(isEnabled: true, enabledColor: .black, disabledColor: .gray100, enabledTitleColor: .white, disabledTitleColor: .gray400)
             }
@@ -265,7 +252,7 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        reviewLength = textView.text?.count ?? 0
+        reviewLength = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines).count ?? 0
         
         if(reviewLength == 0){
             isReviewValidate = false
@@ -277,5 +264,24 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder() // 키보드 숨기기
         return true
+    }
+    
+    
+}
+
+extension UIResponder {
+    
+    private struct Static {
+        static weak var responder: UIResponder?
+    }
+    
+    static var currentResponder: UIResponder? {
+        Static.responder = nil
+        UIApplication.shared.sendAction(#selector(UIResponder._trap), to: nil, from: nil, for: nil)
+        return Static.responder
+    }
+    
+    @objc private func _trap() {
+        Static.responder = self
     }
 }

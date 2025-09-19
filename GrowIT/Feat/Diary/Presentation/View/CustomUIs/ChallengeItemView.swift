@@ -32,19 +32,24 @@ class ChallengeItemView: UIView {
     private let icon = UIImageView().then {
         $0.image = UIImage(named: "ChallengeIcon")
         $0.backgroundColor = .clear
+        $0.contentMode = .scaleAspectFit
     }
     
     private let label = UILabel().then {
         $0.text = ""
         $0.font = .heading3Bold()
         $0.textColor = .gray900
+        $0.lineBreakMode = .byTruncatingTail
+        $0.adjustsFontSizeToFitWidth = true
+        $0.minimumScaleFactor = 0.5
     }
     
-    let button = CircleCheckButton(isEnabled: false)
+    let button = CircleCheckButton(isEnabled: false, size: 32)
     
     private let clockIcon = UIImageView().then {
         $0.image = UIImage(named: "clock")
         $0.backgroundColor = .clear
+        $0.contentMode = .scaleAspectFit
     }
     
     private let clockLabel = UILabel().then {
@@ -53,16 +58,24 @@ class ChallengeItemView: UIView {
         $0.textColor = .primary600
     }
     
+    private let clockStack = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = 4
+    }
+    
     private let backIcon = UIImageView().then {
         $0.image = UIImage(named: "ChallengeIcon")
         $0.backgroundColor = .clear
+        $0.contentMode = .scaleAspectFit
     }
     
     private let backLabel = UILabel().then {
         $0.text = ""
         $0.font = .body2SemiBold()
         $0.textColor = .gray900
-        $0.numberOfLines = 0
+        $0.lineBreakMode = .byTruncatingTail
+        $0.adjustsFontSizeToFitWidth = true
+        $0.minimumScaleFactor = 0.5
     }
     
     override init(frame: CGRect) {
@@ -91,56 +104,59 @@ class ChallengeItemView: UIView {
         addSubview(containerView)
         containerView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
+        containerView.addSubview(button)
+        button.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-24)
+            make.centerY.equalToSuperview()
+        }
+        
         // frontView UI
         frontView.addSubview(icon)
         icon.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
+            make.left.equalToSuperview().offset(24)
             make.top.equalToSuperview().offset(30)
             make.centerY.equalToSuperview()
+            make.width.height.equalTo(40)
         }
         
         frontView.addSubview(label)
         label.snp.makeConstraints { make in
-            make.leading.equalTo(icon.snp.trailing).offset(12)
+            make.left.equalTo(icon.snp.right).offset(12)
             make.top.equalToSuperview().offset(24.5)
         }
         
-        frontView.addSubview(clockIcon)
+        frontView.addSubview(clockStack)
+        
+        clockStack.addArrangedSubViews([clockIcon, clockLabel])
+        clockStack.snp.makeConstraints { make in
+            make.top.equalTo(label.snp.bottom).offset(8)
+            make.left.equalTo(label.snp.left)
+            make.bottom.equalToSuperview().inset(24.5)
+        }
+        
         clockIcon.snp.makeConstraints { make in
-            make.leading.equalTo(label.snp.leading)
-            make.top.equalTo(label.snp.bottom).offset(10.5)
+            make.left.equalToSuperview()
+            make.centerY.equalToSuperview()
             make.width.height.equalTo(16)
         }
         
-        frontView.addSubview(clockLabel)
         clockLabel.snp.makeConstraints { make in
-            make.top.equalTo(clockIcon.snp.top).offset(-2.5)
-            make.centerY.equalTo(clockIcon.snp.centerY)
-            make.leading.equalTo(clockIcon.snp.trailing).offset(4)
-        }
-        
-        frontView.addSubview(button)
-        button.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-24)
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(32)
+            make.top.equalToSuperview()
         }
         
         // backView UI
         backView.addSubview(backIcon)
         backIcon.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
-            make.top.equalToSuperview().offset(30)
+            make.left.equalToSuperview().offset(24)
             make.centerY.equalToSuperview()
+            make.width.height.equalTo(40)
         }
         
         backView.addSubview(backLabel)
         backLabel.snp.makeConstraints { make in
-            make.leading.equalTo(backIcon.snp.trailing).offset(12)
-            make.trailing.equalToSuperview().inset(12)
-            make.top.equalTo(backIcon.snp.top).offset(9.5)
+            make.left.equalTo(backIcon.snp.right).offset(12)
+            make.right.equalToSuperview().inset(80)
             make.centerY.equalTo(backIcon)
-
         }
     }
     

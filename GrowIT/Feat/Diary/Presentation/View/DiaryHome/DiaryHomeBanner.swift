@@ -49,7 +49,7 @@ class DiaryHomeBanner: UIView {
     }
     
     private lazy var diaryWriteIcon = UIImageView().then{
-        $0.image = UIImage(named: "diaryIcon")
+        $0.image = UIImage(named: "diaryIconDark")
         $0.contentMode = .scaleAspectFit
     }
     
@@ -115,10 +115,12 @@ class DiaryHomeBanner: UIView {
         }
         
         postImage.snp.makeConstraints{
-//            $0.centerX.equalToSuperview()
-//            $0.centerY.equalToSuperview()
             $0.horizontalEdges.top.equalToSuperview()
             $0.bottom.equalToSuperview().inset(20)
+        }
+        
+        diaryWriteIcon.snp.makeConstraints {
+            $0.width.height.equalTo(28)
         }
         
         diaryWriteStack.snp.makeConstraints{
@@ -127,7 +129,6 @@ class DiaryHomeBanner: UIView {
         }
         
         diaryWriteButton.snp.makeConstraints{
-            //$0.top.equalTo(postImage.snp.bottom).offset(23)
             $0.bottom.equalToSuperview().inset(68)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }

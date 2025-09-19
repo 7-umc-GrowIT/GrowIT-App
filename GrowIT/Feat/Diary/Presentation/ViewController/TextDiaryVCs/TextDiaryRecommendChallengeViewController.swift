@@ -27,6 +27,8 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         return textDiaryRecommendChallengeView.challengeStackView.challengeViews
     }
     
+    var isSaving: Bool = false
+    
     init(diaryId: Int, data: DiaryAnalyzeResponseDTO) {
         self.diaryId = diaryId
         self.data = data
@@ -92,8 +94,7 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         prevVC.delegate = self
         prevVC.diaryId = diaryId
         let navController = UINavigationController(rootViewController: prevVC)
-        navController.modalPresentationStyle = .fullScreen
-        presentSheet(navController, heightRatio: 0.336)
+        presentSheet(navController, heightRatio: 0.35)
     }
     
     @objc func nextVC() {
@@ -106,8 +107,13 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
             return
         }
         
-        challengeService.postSelectedChallenge(data: selectedChallenges) { [weak self] result in
+        guard !isSaving else { return }
+        isSaving = true
+        challengeService.postSelectedChallenge(data: ChallengeSelectRequestDTO(
+            diaryId: self.diaryId, challenges: selectedChallenges
+        )) { [weak self] result in
             guard let self = self else { return }
+            self.isSaving = false
             switch result {
             case .success(let response):
                 print("챌린지 선택 성공: \(response)")
@@ -141,7 +147,7 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         navigationController?.popToRootViewController(animated: true)
     }
     
-    func getSelectedChallenges() -> [ChallengeSelectRequestDTO] {
+    func getSelectedChallenges() -> [SelectedChallengeDTO] {
         let date = UserDefaults.standard.string(forKey: "TextDate") ?? ""
         
         // 선택된 챌린지들 필터링
@@ -161,10 +167,9 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         // 각 그룹을 DTO로 변환
         return groupedChallenges.map { (challengeType, challenges) in
             let challengeIds = challenges.map { $0.id }
-            return ChallengeSelectRequestDTO(
+            return SelectedChallengeDTO(
                 challengeIds: challengeIds,
                 challengeType: challengeType,
-                date: date
             )
         }
     }

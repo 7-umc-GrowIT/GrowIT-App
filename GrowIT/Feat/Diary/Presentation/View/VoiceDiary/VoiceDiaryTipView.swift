@@ -48,7 +48,7 @@ class VoiceDiaryTipView: UIView {
     
     //MARK: - Setup UI
     private func setupUI() {
-        backgroundColor = .gray700
+        backgroundColor = .gray800
         addSubview(grabberIcon)
         grabberIcon.snp.makeConstraints {
             $0.top.equalToSuperview().offset(24)
@@ -61,6 +61,7 @@ class VoiceDiaryTipView: UIView {
         diaryIcon.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
             make.top.equalTo(grabberIcon.snp.bottom).offset(24)
+            make.width.height.equalTo(28)
         }
         
         addSubview(label1)

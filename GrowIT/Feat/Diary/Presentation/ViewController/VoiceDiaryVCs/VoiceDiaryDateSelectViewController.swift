@@ -8,7 +8,6 @@
 import UIKit
 
 class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControllerDelegate {
-    
     // MARK: Properties
     let  voiceDiaryDateSelectView = VoiceDiaryDateSelectView()
     let navigationBarManager = NavigationManager()
@@ -71,10 +70,10 @@ class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControl
             v.dateSelectLabel.textColor = .white
             v.warningLabel.isHidden = true
         } else {
-            v.dateLabel.textColor = .negative100
+            v.dateLabel.textColor = .negative400W
             v.dateView.layer.borderColor = UIColor.negative100.cgColor
-            v.toggleButton.tintColor = .negative100
-            v.dateSelectLabel.textColor = .negative100
+            v.toggleButton.tintColor = .negative400W
+            v.dateSelectLabel.textColor = .negative400W
             v.warningLabel.isHidden = false
         }
         
@@ -148,7 +147,12 @@ class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControl
         isCalendarOpen.toggle()
         
         // 현재 날짜 선택 상태가 유효한지 확인
-        let isValid = voiceDiaryDateSelectView.dateSelectLabel.textColor != .negative100
+        var isValid = voiceDiaryDateSelectView.dateSelectLabel.textColor != .negative400W
+        
+        if (isCalendarOpen && !isValid) {
+            updateDateSelectionUI(isValid: true)
+            isValid = true
+        }
         
         // 유효할 때만 초록색 테두리 적용
         voiceDiaryDateSelectView.dateView.layer.borderColor = (isCalendarOpen && isValid) ? UIColor.primary500.cgColor : UIColor.clear.cgColor
@@ -163,6 +167,19 @@ class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControl
         calVC.view.isHidden = true
         
         updateDateSelectionUI(isValid: true)
+    }
+    
+    func diaryCalendar(_ controller: DiaryCalendarController, didChangeWeekCount count: Int, _ cellWidth: Double) {
+        let extraHeight: CGFloat = 88       // 기존에 더한 높이
+        let totalHeight = CGFloat(count) * cellWidth + extraHeight
+
+        calVC.view.snp.updateConstraints { make in
+            make.height.equalTo(totalHeight)
+        }
+
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+        }
     }
 
 }
