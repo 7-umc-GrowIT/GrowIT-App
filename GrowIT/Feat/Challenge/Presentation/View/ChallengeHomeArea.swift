@@ -190,7 +190,15 @@ class ChallengeHomeArea: UIView {
         if(isEmptyChallenge && !isEmptyKeyword) {
             emptyChallengeLabel.text = "오늘의 챌린지가 존재하지 않습니다."
             emptyChallengeIcon.snp.updateConstraints {
-                $0.top.equalTo(titleStack.snp.bottom).offset(100)
+                $0.top.equalTo(titleStack.snp.bottom).offset(80)
+            }
+            self.layoutIfNeeded()
+        }
+        
+        if(isEmptyChallenge && isEmptyKeyword) {
+            emptyChallengeLabel.text = "오늘의 일기를 작성하고 챌린지를 진행해 보세요!"
+            emptyChallengeIcon.snp.updateConstraints {
+                $0.top.equalTo(titleStack.snp.bottom).offset(80)
             }
             self.layoutIfNeeded()
         }
