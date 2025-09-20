@@ -144,19 +144,26 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
     }
     
     func getSelectedChallenges() -> [SelectedChallengeDTO] {
-        let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""
+        // 선택된 챌린지들 필터링
+        let selectedChallenges = challengeViews.enumerated()
+            .filter { index, challengeView in
+                index < recommendedChallenges.count && challengeView.button.isSelectedState()
+            }
+            .map { index, _ in
+                recommendedChallenges[index]
+            }
         
-        return challengeViews.enumerated().compactMap { (index, challengeView) -> SelectedChallengeDTO? in
-            // 인덱스 범위 확인
-            guard index < recommendedChallenges.count else { return nil }
-            
-            // 선택 상태 확인
-            guard challengeView.button.isSelectedState() else { return nil }
-            
-            let challenge = recommendedChallenges[index]
+        // 챌린지 타입별로 그룹핑
+        let groupedChallenges = Dictionary(grouping: selectedChallenges) { challenge in
+            challenge.challengeType
+        }
+        
+        // 각 그룹을 DTO로 변환
+        return groupedChallenges.map { (challengeType, challenges) in
+            let challengeIds = challenges.map { $0.id }
             return SelectedChallengeDTO(
-                challengeIds: [challenge.id],
-                challengeType: challenge.challengeType
+                challengeIds: challengeIds,
+                challengeType: challengeType,
             )
         }
     }

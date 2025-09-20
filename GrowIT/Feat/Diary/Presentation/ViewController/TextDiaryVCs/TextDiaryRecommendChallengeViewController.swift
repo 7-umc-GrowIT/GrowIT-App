@@ -148,8 +148,6 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
     }
     
     func getSelectedChallenges() -> [SelectedChallengeDTO] {
-        let date = UserDefaults.standard.string(forKey: "TextDate") ?? ""
-        
         // 선택된 챌린지들 필터링
         let selectedChallenges = challengeViews.enumerated()
             .filter { index, challengeView in
