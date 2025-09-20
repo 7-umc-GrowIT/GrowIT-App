@@ -12,7 +12,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
     // MARK: Properties
     let voiceDiarySummaryView = VoiceDiarySummaryView()
     let navigationBarManager = NavigationManager()
-    let diaryContent: String
+    var diaryContent: String
     let diaryId: Int
     let date: String
     
@@ -106,6 +106,10 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         nextVC.diaryId = diaryId
         nextVC.emotionKeywords = emotionKeywords
         nextVC.recommendedChallenges = recommendedChallenges
+        nextVC.onChanged = { [weak self] updatedText in
+            self?.voiceDiarySummaryView.diaryTextView.text = updatedText
+            self?.diaryContent = updatedText
+        }
         let navController = UINavigationController(rootViewController: nextVC)
         presentSheet(navController, heightRatio: 0.6)
     }
