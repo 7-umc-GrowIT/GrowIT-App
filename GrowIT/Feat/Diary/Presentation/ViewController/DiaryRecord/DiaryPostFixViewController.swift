@@ -75,7 +75,7 @@ class DiaryPostFixViewController: UIViewController {
     }
     
     @objc func labelTapped() {
-        let nextVC = DiaryDeleteViewController(diaryId: diaryId)
+        let nextVC = DiaryDeleteViewController(diaryId: diaryId, date: date)
         
         nextVC.onDismiss = { [weak self] in
             self?.onDismiss?() // ✅ `DiaryAllViewController`의 `callGetAllDiaries()` 호출
@@ -84,7 +84,8 @@ class DiaryPostFixViewController: UIViewController {
         let navController = UINavigationController(rootViewController: nextVC)
         navController.modalPresentationStyle = .fullScreen
         
-        presentSheet(navController, heightRatio: 0.37)    }
+        presentSheet(navController, heightRatio: 0.37)
+    }
     
     // MARK: Setup APIs
     private func getUserContent() -> DiaryPatchDTO {
