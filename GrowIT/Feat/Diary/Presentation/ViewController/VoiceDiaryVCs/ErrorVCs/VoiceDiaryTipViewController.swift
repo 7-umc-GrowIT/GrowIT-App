@@ -16,7 +16,7 @@ class VoiceDiaryTipViewController: UIViewController {
     
     private var tips: [TipItem] = [
         TipItem(image: UIImage(named: "voiceDiaryTip1")!, content: "음성 통화가 시작되면 AI가 먼저 말을 걸어와요\nAI의 질문에 일기 쓰기를 시작해봐요"),
-        TipItem(image: UIImage(named: "voiceDiaryTip2")!, content: "대답의 공백이 길어지면 AI가 응답을 해요\n할 말이 남았다면 버튼을 눌러 다시 대답해보세요!"),
+        TipItem(image: UIImage(named: "voiceDiaryTip2")!, content: "대답의 공백이 길어지면 AI가 응답을 해요. 할 말이 남았다면 버튼을 눌러 다시 대답해보세요!"),
         TipItem(image: UIImage(named: "voiceDiaryTip3")!, content: "AI와 대화는 최소 1분, 최대 3분까지 할 수 있어요\n대화 종료는 1분이 지난 후부터 가능해요"),
         TipItem(image: UIImage(named: "voiceDiaryTip4")!, content: "충분히 대화를 나누고\nAI가 작성한 일기를 확인해 보세요"),
         TipItem(image: UIImage(named: "voiceDiaryTip5")!, content: "일기를 저장하면 내 감정에 맞는 챌린지를\n추천 받을 수 있어요"),
