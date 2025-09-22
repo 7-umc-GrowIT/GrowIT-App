@@ -57,8 +57,12 @@ class VoiceDiaryEndViewController: UIViewController {
     }
     
     @objc func nextVC() {
-        let nextVC = CustomTabBarController(initialIndex: 2)
-        navigationController?.pushViewController(nextVC, animated: false)
+        guard let sceneDelegate = view.window?.windowScene?.delegate as? SceneDelegate else {
+            return
+        }
+        let tabBarController = CustomTabBarController(initialIndex: 2)
+        sceneDelegate.window?.rootViewController = tabBarController
+        sceneDelegate.window?.makeKeyAndVisible()
     }
 
     

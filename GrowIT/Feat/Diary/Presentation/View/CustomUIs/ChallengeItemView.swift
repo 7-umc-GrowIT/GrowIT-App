@@ -114,7 +114,6 @@ class ChallengeItemView: UIView {
         frontView.addSubview(icon)
         icon.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(24)
-            make.top.equalToSuperview().offset(30)
             make.centerY.equalToSuperview()
             make.width.height.equalTo(40)
         }

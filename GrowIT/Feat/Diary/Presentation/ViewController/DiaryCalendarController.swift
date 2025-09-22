@@ -134,6 +134,19 @@ class DiaryCalendarController: UIViewController {
     }
     
     @objc private func todayBtnTapped() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd" // 날짜 형식 지정
+        let formattedDate = dateFormatter.string(from: today)
+        
+        if(isDropDown) {
+            if (callendarDiaries.contains(where: {$0.date == formattedDate})){
+                CustomToast(containerWidth: 310).show(image: UIImage(named: "toastAlertIcon") ?? UIImage(), message: "해당 날짜는 이미 일기를 작성했어요", font: .heading3SemiBold())
+                return
+            } else {
+                delegate?.didSelectDate(formattedDate)
+                return
+            }
+        }
         // 오늘 날짜를 currentDate에 설정
         currentDate = Date()
 
@@ -276,7 +289,7 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
             
             dateComponents.month = nextMonth
             dateComponents.year! += yearAdjustmentNext
-            dateComponents.day = nextMonthDay
+            dateComponents.day = nextMonthDay 
             
             // 다음 달 날짜의 일요일 여부 계산
             let date = currentCalendar.date(from: dateComponents)!
@@ -350,24 +363,18 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
     
     /// 셀 선택 시 실행되는 메소드
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let firstDayIndex = firstWeekdayOfMonth - 1  // 월의 첫 요일 인덱스 계산
-        let day = indexPath.item - firstDayIndex + 1
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd" // 날짜 형식 지정
-        
+        let firstDayIndex = firstWeekdayOfMonth - 1
+        let day = indexPath.item - firstDayIndex
         var dateComponents = DateComponents()
         dateComponents.year = currentYear
-        
-        // 달력에서 셀의 날짜 계산
+
         if day < 1 {
             // 이전 달
             dateComponents.month = currentMonthIndex == 0 ? 12 : currentMonthIndex
             let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12]
             dateComponents.day = daysInPreviousMonth + day
             dateComponents.year! -= currentMonthIndex == 0 ? 1 : 0
-        } else if day > numberOfDaysInMonth {
-            // 다음 달
+        } else if day >= numberOfDaysInMonth {
             dateComponents.month = currentMonthIndex == 11 ? 1 : currentMonthIndex! + 2
             dateComponents.day = day - numberOfDaysInMonth
             dateComponents.year! += currentMonthIndex == 11 ? 1 : 0

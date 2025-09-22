@@ -16,7 +16,7 @@ enum DiaryEndpoint {
     case getHasVoiceDiary
     
     // Post
-    case postVoiceDiary(data: DiaryVoiceDTO)
+    case postVoiceDiary(data: DiaryVoiceRequestDTO)
     case postTextDiary(data: DiaryRequestDTO)
     case postDiaryDate(data: DiaryVoiceDateRequestDTO)
     case postDiaryAnalyze(diaryId: Int)
@@ -41,13 +41,13 @@ extension DiaryEndpoint: TargetType {
         case.postTextDiary:
             return "/text"
         case.postVoiceDiary:
-            return "/voice"
+            return "/voice/chat"
         case.deleteDiary(let diaryId), .getDiaryID(let diaryId), .patchFixDiary(let diaryId, _):
             return "/\(diaryId)"
         case.getDiaryDates:
             return "/dates"
         case .postDiaryDate:
-            return "/summary"
+            return "/voice"
         case .postDiaryAnalyze(let diaryId):
             return "/\(diaryId)/analyze"
         case .getHasVoiceDiary:

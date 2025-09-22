@@ -183,8 +183,7 @@ extension ChallengeStatusAreaController: UITableViewDelegate, UITableViewDataSou
         if challengeStatusType[selectedStatusIndex] == "완료" {
             let challengeCompleteVC = ChallengeCompleteViewController()
             challengeCompleteVC.challengeId = selectedChallenge!.id
-            challengeCompleteVC.modalPresentationStyle = .pageSheet
-            presentSheet(challengeCompleteVC, heightRatio: 1)
+            presentSheet(challengeCompleteVC, heightRatio: 1, useLargeOnly: true)
         } else {
             let challengeVerifyModalVC = ChallengeVerifyModalController()
             challengeVerifyModalVC.modalPresentationStyle = .pageSheet

@@ -48,7 +48,7 @@ class VoiceDiaryFixView: UIView {
     private let errorLabel = UILabel().then {
         $0.text = "감정 분석을 위해 100자 이내로 작성한 경우 수정이 불가합니다"
         $0.font = .detail2Regular()
-        $0.textColor = .negative400
+        $0.textColor = .negative400W
         $0.isHidden = true
     }
     
@@ -56,7 +56,7 @@ class VoiceDiaryFixView: UIView {
         $0.backgroundColor = .gray700
     }
     
-    let fixButton = AppButton(title: "수정하기", titleColor: .gray400).then {
+    let fixButton = AppButton(title: "일기 저장하기", titleColor: .gray400).then {
         $0.backgroundColor = .gray700
     }
     
@@ -116,9 +116,9 @@ class VoiceDiaryFixView: UIView {
     }
     
     func lessThanHundred(isEnabled: Bool) {
-        label1.textColor = isEnabled ? .negative400 : .gray300
-        textView.textColor = isEnabled ? .negative400 : .white
-        textView.layer.borderColor =  isEnabled ? UIColor.negative400.cgColor : UIColor.clear.cgColor
+        label1.textColor = isEnabled ? .negative400W : .gray300
+        textView.textColor = isEnabled ? .negative400W : .white
+        textView.layer.borderColor =  isEnabled ? UIColor.negative400W.cgColor : UIColor.clear.cgColor
         textView.layer.borderWidth = isEnabled ? 1 : 0
         errorLabel.isHidden = !isEnabled
     }

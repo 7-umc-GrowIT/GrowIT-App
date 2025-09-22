@@ -101,8 +101,8 @@ class VoiceChallengeItemView: UIView {
         frontView.addSubview(icon)
         icon.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
-            make.top.equalToSuperview().offset(30)
             make.centerY.equalToSuperview()
+            make.width.height.equalTo(40)
         }
         
         frontView.addSubview(label)
@@ -124,8 +124,6 @@ class VoiceChallengeItemView: UIView {
             make.centerY.equalTo(clockIcon.snp.centerY)
             make.leading.equalTo(clockIcon.snp.trailing).offset(4)
         }
-        
-        frontView.addSubview(button)
         
         // backView UI
         backView.addSubview(backIcon)

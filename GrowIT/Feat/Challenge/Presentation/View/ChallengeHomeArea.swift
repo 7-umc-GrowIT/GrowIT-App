@@ -28,6 +28,9 @@ class ChallengeHomeArea: UIView {
     
     // MARK: - Property
     
+    var currentPage: Int = 0
+    var totalPages: Int = 0
+    
     private lazy var bg = UIView().then{
         $0.backgroundColor = .red
     }
@@ -42,14 +45,15 @@ class ChallengeHomeArea: UIView {
         $0.minimumInteritemSpacing = 0
         $0.minimumLineSpacing = 0
         $0.scrollDirection = .horizontal
-        //$0.itemSize = CGSize(width: 382, height: 100)
-        
     }).then{
         $0.register(TodayChallengeCollectionViewCell.self, forCellWithReuseIdentifier: TodayChallengeCollectionViewCell.identifier)
         $0.showsHorizontalScrollIndicator = false
         $0.backgroundColor = .clear
         $0.isPagingEnabled = true
     }
+    
+    public lazy var pageControl = UIPageControl()
+    
     private lazy var emptyChallengeIcon = UIImageView().then{
         $0.image = UIImage(named: "diary")
         $0.contentMode = .scaleAspectFit
@@ -98,7 +102,10 @@ class ChallengeHomeArea: UIView {
     public lazy var hashTagStack = makeStack(axis: .horizontal, spacing: 8)
     
     
-    public lazy var challengeReportTitleStack = makeStack(axis: .vertical, spacing: 4)
+    public lazy var challengeReportTitleStack = makeStack(axis: .vertical, spacing: 4).then {
+        $0.layer.borderColor = UIColor.green.cgColor
+        $0.layer.borderWidth = 1
+    }
     
     private lazy var creditNumStack1 = makeStack(axis: .horizontal, spacing: 4)
     
@@ -113,6 +120,8 @@ class ChallengeHomeArea: UIView {
     private lazy var challengeReportContainerStack = makeStack(axis: .horizontal, spacing: 8).then{
         $0.distribution = .fillEqually
     }
+    
+    private lazy var challengePageContainer = makeStack(axis: .vertical, spacing: 0)
     
     // MARK: - Func
     
@@ -173,7 +182,7 @@ class ChallengeHomeArea: UIView {
     }
     
     public func setEmptyChallenge(isEmptyChallenge: Bool, isEmptyKeyword: Bool){
-        todayChallengeCollectionView.isHidden = isEmptyChallenge
+        challengePageContainer.isHidden = isEmptyChallenge
         emptyChallengeIcon.isHidden = !isEmptyChallenge
         emptyChallengeLabel.isHidden = !isEmptyChallenge
         hashTagStack.isHidden = isEmptyKeyword
@@ -181,13 +190,22 @@ class ChallengeHomeArea: UIView {
         if(isEmptyChallenge && !isEmptyKeyword) {
             emptyChallengeLabel.text = "오늘의 챌린지가 존재하지 않습니다."
             emptyChallengeIcon.snp.updateConstraints {
-                $0.top.equalTo(titleStack.snp.bottom).offset(100)
+                $0.top.equalTo(titleStack.snp.bottom).offset(80)
             }
             self.layoutIfNeeded()
         }
         
-        challengeReportTitle.snp.updateConstraints{
-            $0.top.equalTo(emptyChallengeLabel.snp.bottom).offset(34)
+        if(isEmptyChallenge && isEmptyKeyword) {
+            emptyChallengeLabel.text = "오늘의 일기를 작성하고 챌린지를 진행해 보세요!"
+            emptyChallengeIcon.snp.updateConstraints {
+                $0.top.equalTo(titleStack.snp.bottom).offset(80)
+            }
+            self.layoutIfNeeded()
+        }
+        
+        challengeReportTitle.snp.remakeConstraints {
+            $0.top.equalTo(challengePageContainer.snp.bottom)
+            $0.left.equalToSuperview().offset(24)
         }
     }
     
@@ -204,17 +222,17 @@ class ChallengeHomeArea: UIView {
             let keywordBox = makeChallengeHashTagLabel(title: $0)
             hashTagStack.addArrangedSubview(keywordBox)
         }
-        [challengeReportTitle, challengeReportSubTitle].forEach(challengeReportTitleStack.addArrangedSubview)
         [creditNumIcon, creditNum].forEach(creditNumStack1.addArrangedSubview)
         [creditNumLabel, creditNumStack1].forEach(creditNumStack2.addArrangedSubview)
         [writtenDiaryIcon, writtenDiaryNum, diaryDatesLabel].forEach(writtenDiaryStack1.addArrangedSubview)
         [writtenDiaryLabel, writtenDiaryStack1].forEach(writtenDiaryStack2.addArrangedSubview)
         [creditNumberContainer, writtenDiaryNumContainer].forEach(challengeReportContainerStack.addArrangedSubview)
         [emptyChallengeIcon, emptyChallengeLabel].forEach(emptyChallengeStack.addArrangedSubview)
+        [todayChallengeCollectionView, pageControl].forEach(challengePageContainer.addArrangedSubview)
     }
     
     private func addComponents(){
-        [titleStack, hashTagStack, todayChallengeCollectionView, emptyChallengeIcon, emptyChallengeLabel, challengeReportTitleStack, challengeReportContainerStack].forEach(self.addSubview)
+        [titleStack, hashTagStack, challengePageContainer, emptyChallengeIcon, emptyChallengeLabel, challengeReportTitle, challengeReportSubTitle, challengeReportContainerStack].forEach(self.addSubview)
         
         creditNumberContainer.addSubview(creditNumStack2)
         writtenDiaryNumContainer.addSubview(writtenDiaryStack2)
@@ -232,11 +250,22 @@ class ChallengeHomeArea: UIView {
             $0.left.equalToSuperview().offset(24)
         }
         
-        todayChallengeCollectionView.snp.makeConstraints{
+        challengePageContainer.snp.makeConstraints {
             $0.top.equalTo(hashTagStack.snp.bottom).offset(8)
-            $0.centerX.equalToSuperview()
-            $0.height.equalTo(100)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(160)
+        }
+        
+        todayChallengeCollectionView.snp.makeConstraints{
+            $0.top.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(24)
             $0.width.equalToSuperview().multipliedBy(0.88)
+            $0.height.equalTo(130)
+        }
+    
+        pageControl.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(12)
         }
         
         emptyChallengeIcon.snp.makeConstraints {
@@ -251,10 +280,16 @@ class ChallengeHomeArea: UIView {
             $0.height.equalTo(18)
         }
         
-        challengeReportTitleStack.snp.makeConstraints{
-            $0.top.equalTo(todayChallengeCollectionView.snp.bottom).offset(32)
+        challengeReportTitle.snp.makeConstraints {
+            $0.top.equalTo(challengePageContainer.snp.bottom)
             $0.left.equalToSuperview().offset(24)
         }
+        
+        challengeReportSubTitle.snp.makeConstraints {
+            $0.top.equalTo(challengeReportTitle.snp.bottom).offset(4)
+            $0.left.equalToSuperview().offset(24)
+        }
+        
         creditNumIcon.snp.makeConstraints{
             $0.height.width.equalTo(28)
         }
@@ -274,7 +309,7 @@ class ChallengeHomeArea: UIView {
         }
         
         challengeReportContainerStack.snp.makeConstraints {
-            $0.top.equalTo(challengeReportTitleStack.snp.bottom).offset(20)
+            $0.top.equalTo(challengeReportSubTitle.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
     }

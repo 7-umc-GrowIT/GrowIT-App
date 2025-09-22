@@ -7,7 +7,12 @@
 
 import UIKit
 
+protocol VoiceDiaryFixDelegate: AnyObject {
+    func didModifyDiary(with newText: String)
+}
+
 class VoiceDiaryFixViewController: UIViewController {
+    weak var delegate: VoiceDiaryFixDelegate?
     
     // MARK: Properties
     let text: String
@@ -18,6 +23,10 @@ class VoiceDiaryFixViewController: UIViewController {
     
     var recommendedChallenges: [RecommendedDiaryChallengeDTO] = []
     var emotionKeywords: [EmotionKeyword] = []
+    
+    var isFixing: Bool = false
+    
+    var onChanged: ((String) -> Void)?
     
     init(text: String) {
         self.text = text
@@ -62,13 +71,21 @@ class VoiceDiaryFixViewController: UIViewController {
     }
     
     @objc func nextVC() {
-        if let presentingVC = presentingViewController as? UINavigationController {
-            dismiss(animated: true) {
-                let nextVC = VoiceDiaryRecommendChallengeViewController()
-                nextVC.diaryId = self.diaryId
-                nextVC.recommendedChallenges = self.recommendedChallenges
-                nextVC.emotionKeywords = self.emotionKeywords
-                presentingVC.pushViewController(nextVC, animated: true)
+        fixDiary()
+    }
+    
+    private func fixDiary() {
+        guard !isFixing else { return }
+        isFixing = true
+        diaryService.patchFixDiary(diaryId: diaryId, data: DiaryPatchDTO(content: self.voiceDiaryFixView.textView.text)) { result in
+            switch result {
+            case .success(let data):
+                // 수정된 텍스트 delegate로 전달
+                self.isFixing = false
+                self.onChanged?(self.voiceDiaryFixView.textView.text)
+                self.dismiss(animated: true, completion: nil)
+            case .failure(let error):
+                print(error)
             }
         }
     }
@@ -77,18 +94,29 @@ class VoiceDiaryFixViewController: UIViewController {
 extension VoiceDiaryFixViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         let textLength = textView.text.count
+
         if textLength < 100 {
+            // 100자 미만 → 무조건 비활성화
             voiceDiaryFixView.lessThanHundred(isEnabled: true)
-            voiceDiaryFixView.fixButton.setButtonState(isEnabled: false, enabledColor: .primary400, disabledColor: .gray700, enabledTitleColor: .black, disabledTitleColor: .gray400)
+            voiceDiaryFixView.fixButton.setButtonState(
+                isEnabled: false,
+                enabledColor: .primary400,
+                disabledColor: .gray700,
+                enabledTitleColor: .black,
+                disabledTitleColor: .gray400
+            )
         } else {
+            // 100자 이상일 때 → 원래 텍스트와 달라야 활성화
             voiceDiaryFixView.lessThanHundred(isEnabled: false)
-            let changedState = textView.text == self.text ? false : true
+            let changedState = textView.text != self.text
             voiceDiaryFixView.fixButton.setButtonState(
                 isEnabled: changedState,
                 enabledColor: .primary400,
                 disabledColor: .gray700,
                 enabledTitleColor: .black,
-                disabledTitleColor: .gray400)
+                disabledTitleColor: .gray400
+            )
         }
     }
 }
+

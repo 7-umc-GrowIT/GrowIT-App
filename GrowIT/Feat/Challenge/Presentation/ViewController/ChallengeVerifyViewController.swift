@@ -41,6 +41,19 @@ class ChallengeVerifyViewController: UIViewController {
         
         challengeVerifyView.setChallengeName(name: challenge?.title ?? "")
         challengeVerifyView.setContent(name: challenge?.content ?? "")
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     init(challenge: UserChallenge?){
@@ -63,14 +76,19 @@ class ChallengeVerifyViewController: UIViewController {
     @objc func handleImage(_ notification: Notification) {
         if let userInfo = notification.userInfo, let image = userInfo["image"] as? UIImage {
             isImageSelected = true
-            // JPEG 압축 (0.0 = 최대 압축, 1.0 = 원본 퀄리티)
-            imageData = image.jpegData(compressionQuality: 0.7) // 70% 퀄리티로 압축
+            imageData = image.jpegData(compressionQuality: 0.7)
             challengeVerifyView.imageUploadCompleted(image)
             challengeVerifyView.imageContainer.superview?.layoutIfNeeded()
+            
+            // ✅ 소감까지 유효하다면 버튼 활성화
+            if isReviewValidate {
+                challengeVerifyView.challengeVerifyButton.backgroundColor = .black
+                challengeVerifyView.challengeVerifyButton.setTitleColor(.white, for: .normal)
+            }
         }
     }
 
-    
+
     private func setupNavigationBar() {
         navigationBarManager.addBackButton(
             to: navigationItem,
@@ -127,30 +145,60 @@ class ChallengeVerifyViewController: UIViewController {
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
-
-    /// 인증하기 버튼 터치 이벤트
-    @objc private func challengeVerifyButtonTapped() {
-        
-        if(!isImageSelected){
-            isImageSelected = false
-            CustomToast(containerWidth: 244).show(image: UIImage(named: "challengeToastIcon") ?? UIImage(), message: "인증샷을 업로드해 주세요", font: .heading3SemiBold())
-        }else{
-            if(isReviewValidate){
-                review = challengeVerifyView.reviewTextView.text
-                getPresignedUrl()
-            }else{
-                if(reviewLength > 0 || reviewLength < 50){
-                    isReviewValidate = false
-                    challengeVerifyView.validateTextView(errorMessage: "챌린지 한줄소감은 50자 이상 100자 이하 적어야 합니다", textColor: .negative400, bgColor: .negative50, borderColor: .negative400, hintColor: .negative400)
-                }else{
-                    challengeVerifyView.reviewTextView.text = ""
-                    isReviewValidate = false
-                    challengeVerifyView.reviewTextView.text = "챌린지 소감을 간단하게 입력해주세요"
-                    challengeVerifyView.validateTextView(errorMessage: "챌린지 한줄소감은 필수로 입력해야 합니다", textColor: .negative400, bgColor: .negative50, borderColor: .negative400, hintColor: .negative400)
-                }
+    
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+            let height = keyboardFrame.height - view.safeAreaInsets.bottom
+            challengeVerifyView.challengeVerifyButton.snp.updateConstraints {
+                $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+            }
+            UIView.animate(withDuration: 0.25) {
+                self.view.layoutIfNeeded()
             }
         }
     }
+
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        challengeVerifyView.challengeVerifyButton.snp.updateConstraints {
+            $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+        }
+    }
+
+    /// 인증하기 버튼 터치 이벤트
+    /// 인증하기 버튼 터치 이벤트
+    @objc private func challengeVerifyButtonTapped() {
+        print("verify button tapped")
+        
+        // 1. 이미지 선택 안됨
+        if !isImageSelected {
+            CustomToast(containerWidth: 244).show(
+                image: UIImage(named: "challengeToastIcon") ?? UIImage(),
+                message: "인증샷을 업로드해 주세요",
+                font: .heading3SemiBold()
+            )
+            return
+        }
+        
+        // 2. 이미지 선택했지만 소감이 유효하지 않음
+        if !isReviewValidate {
+            challengeVerifyView.validateTextView(
+                errorMessage: "챌린지 한줄소감은 50자 이상 100자 이하 적어야 합니다",
+                textColor: .negative400,
+                bgColor: .negative50,
+                borderColor: .negative400,
+                hintColor: .negative400
+            )
+            return
+        }
+        
+        // 3. 이미지도 있고 소감도 유효 → API 호출
+        review = challengeVerifyView.reviewTextView.text
+        getPresignedUrl()
+    }
+
     
     /// S3 Presigned URL 요청 API
     private func getPresignedUrl(){
@@ -238,15 +286,29 @@ extension ChallengeVerifyViewController: UITextViewDelegate{
     func textViewDidChange(_ textView: UITextView) {
         reviewLength = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines).count ?? 0
         
-        if(reviewLength < 50 || reviewLength > 100){
-           isReviewValidate = false
-           challengeVerifyView.validateTextView(errorMessage: "챌린지 한줄소감은 50자 이상 100자 이하 적어야 합니다", textColor: .negative400, bgColor: .negative50, borderColor: .negative400, hintColor: .negative400)
-            challengeVerifyView.challengeVerifyButton.setButtonState(isEnabled: false, enabledColor: .black, disabledColor: .gray100, enabledTitleColor: .white, disabledTitleColor: .gray400)
-        }else{
+        if reviewLength < 50 || reviewLength > 100 {
+            isReviewValidate = false
+            challengeVerifyView.validateTextView(
+                errorMessage: "챌린지 한줄소감은 50자 이상 100자 이하 적어야 합니다",
+                textColor: .negative400,
+                bgColor: .negative50,
+                borderColor: .negative400,
+                hintColor: .negative400
+            )
+        } else {
             isReviewValidate = true
-            challengeVerifyView.validateTextView(errorMessage: "챌린지 한줄소감은 50자 이상 100자 이하 적어야 합니다", textColor: .gray900, bgColor: .white, borderColor: .black.withAlphaComponent(0.1), hintColor: .gray500)
-            if(isReviewValidate && isImageSelected){
-                challengeVerifyView.challengeVerifyButton.setButtonState(isEnabled: true, enabledColor: .black, disabledColor: .gray100, enabledTitleColor: .white, disabledTitleColor: .gray400)
+            challengeVerifyView.validateTextView(
+                errorMessage: "챌린지 한줄소감은 50자 이상 100자 이하 적어야 합니다",
+                textColor: .gray900,
+                bgColor: .white,
+                borderColor: .black.withAlphaComponent(0.1),
+                hintColor: .gray500
+            )
+            
+            // ✅ 이미지까지 있으면 버튼 활성화
+            if isImageSelected {
+                challengeVerifyView.challengeVerifyButton.backgroundColor = .black
+                challengeVerifyView.challengeVerifyButton.setTitleColor(.white, for: .normal)
             }
         }
     }

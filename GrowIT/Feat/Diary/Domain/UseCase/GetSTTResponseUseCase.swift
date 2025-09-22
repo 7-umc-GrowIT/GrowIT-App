@@ -14,8 +14,8 @@ class GetSTTResponseUseCase {
         self.diaryVoiceRepository  = diaryVoiceRepository
     }
     
-    func execute(chat: String) async throws -> String {
-        return try await diaryVoiceRepository.postVoiceDiary(chat: chat)
+    func execute(data: DiaryVoiceRequestDTO) async throws -> String {
+        return try await diaryVoiceRepository.postVoiceDiary(data: data)
     }
 }
 

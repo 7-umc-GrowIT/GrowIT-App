@@ -33,7 +33,7 @@ class VoiceDiaryRecordView: UIView {
         super.init(frame: frame)
         setupUI()
         startAnimation()
-        hideTipView()
+        //hideTipView()
     }
     
     required init?(coder: NSCoder) {
@@ -58,15 +58,15 @@ class VoiceDiaryRecordView: UIView {
         stopTimer()
     }
     
-    private func hideTipView() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            UIView.animate(withDuration: 1.0, animations: {
-                self?.tipView.alpha = 0
-            }) { _ in
-                self?.tipView.isHidden = true
-            }
-        }
-    }
+//    private func hideTipView() {
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+//            UIView.animate(withDuration: 1.0, animations: {
+//                self?.tipView.alpha = 0
+//            }) { _ in
+//                self?.tipView.isHidden = true
+//            }
+//        }
+//    }
     
     private func startTimer() {
         stopTimer() // 기존 타이머 중지
@@ -132,9 +132,9 @@ class VoiceDiaryRecordView: UIView {
         $0.clipsToBounds = true
     }
     
-    let tipView = ToolTipView().then {
-        $0.configure(text: "AI와의 대화를 시작해 보세요!")
-    }
+//    let tipView = ToolTipView().then {
+//        $0.configure(text: "AI와의 대화를 시작해 보세요!")
+//    }
     
     let tipView2 = ToolTipView().then {
         $0.configure(text: "AI와의 대답이 끝나면 눌러 주세요")
@@ -175,6 +175,20 @@ class VoiceDiaryRecordView: UIView {
         $0.clipsToBounds = true
     }
     
+    let addLabel = UILabel().then {
+        $0.text = "할 말이 더 있어요"
+        $0.textColor = .gray400
+        $0.font = .body2Medium()
+        
+        // attributed string으로 밑줄 속성 적용
+        let attributedString = NSMutableAttributedString(string: "할 말이 더 있어요")
+        attributedString.addAttribute(.underlineStyle,
+                                      value: NSUnderlineStyle.single.rawValue,
+                                      range: NSRange(location: 0, length: attributedString.length))
+
+        $0.attributedText = attributedString
+    }
+    
     // MARK: Setup UI
     private func setupUI() {
         backgroundColor = .gray700
@@ -196,11 +210,17 @@ class VoiceDiaryRecordView: UIView {
             make.top.equalTo(label2.snp.bottom).offset(-100)
         }
         
+        addSubview(helpLabel)
+        helpLabel.snp.makeConstraints { make in
+            make.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(36)
+        }
+        
         addSubview(endButton)
         endButton.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
-            make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-84)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.bottom.equalTo(helpLabel.snp.top).offset(-5)
         }
         
         addSubview(timeLabel)
@@ -211,26 +231,37 @@ class VoiceDiaryRecordView: UIView {
         
         addSubview(recordButton)
         recordButton.snp.makeConstraints { make in
-            make.top.equalTo(timeLabel.snp.bottom).offset(85)
+            make.top.equalTo(timeLabel.snp.bottom).offset(60)
             make.centerX.equalToSuperview()
             make.width.height.equalTo(80)
         }
-        addSubview(tipView)
-        tipView.snp.makeConstraints { make in
-            make.bottom.equalTo(recordButton.snp.top).offset(-10)
-            make.centerX.equalTo(recordButton)
-        }
+//        addSubview(tipView)
+//        tipView.snp.makeConstraints { make in
+//            make.bottom.equalTo(recordButton.snp.top).offset(-10)
+//            make.centerX.equalTo(recordButton)
+//        }
         
-        addSubview(tipView2)
-        tipView2.snp.makeConstraints { make in
-            make.bottom.equalTo(recordButton.snp.top).offset(-10)
-            make.centerX.equalTo(recordButton)
+//        addSubview(tipView2)
+//        tipView2.snp.makeConstraints { make in
+//            make.bottom.equalTo(recordButton.snp.top).offset(-10)
+//            make.centerX.equalTo(recordButton)
+//        }
+        
+        
+        addSubview(addLabel)
+        addLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.height.equalTo(36)
+            make.bottom.equalTo(endButton.snp.top).offset(-30)
         }
         
         addSubview(loadingButton)
         loadingButton.snp.makeConstraints { make in
-            make.edges.equalTo(recordButton)
+            make.bottom.equalTo(addLabel.snp.top).offset(-12)
+            make.centerX.equalToSuperview()
+            make.width.height.equalTo(80)
         }
+        
         
         addSubview(clockIcon)
         clockIcon.snp.makeConstraints { make in
@@ -238,10 +269,6 @@ class VoiceDiaryRecordView: UIView {
             make.centerY.equalTo(timeLabel)
         }
         
-        addSubview(helpLabel)
-        helpLabel.snp.makeConstraints { make in
-            make.top.equalTo(endButton.snp.bottom).offset(8)
-            make.centerX.equalToSuperview()
-        }
+        
     }
 }

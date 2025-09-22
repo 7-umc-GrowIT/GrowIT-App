@@ -103,7 +103,7 @@ class TodayChallengeCollectionViewCell: UICollectionViewCell {
     private func constraints(){
         box.snp.makeConstraints{
             $0.horizontalEdges.equalToSuperview()
-            //$0.top.equalToSuperview().offset(8)
+            $0.top.equalToSuperview()
             //$0.height.equalTo(100)
         }
         
@@ -117,7 +117,7 @@ class TodayChallengeCollectionViewCell: UICollectionViewCell {
             $0.top.equalToSuperview().offset(24.5)
             $0.left.equalTo(icon.snp.right).offset(12)
             //$0.right.equalTo(buttonContainer.snp.left).inset(10)
-            $0.width.equalToSuperview().multipliedBy(0.5)
+            $0.width.equalToSuperview().multipliedBy(0.4)
         }
         
         timeStack.snp.makeConstraints{
@@ -143,7 +143,7 @@ class TodayChallengeCollectionViewCell: UICollectionViewCell {
         var width: CGFloat = 0.0
         var textWidth: CGFloat = 0.0
         
-        self.name.text = title
+        self.name.text = title.trimmingCharacters(in: .whitespacesAndNewlines)
         self.time.text = time.formattedTime
         //self.time.text = "\(time)시간"
         
