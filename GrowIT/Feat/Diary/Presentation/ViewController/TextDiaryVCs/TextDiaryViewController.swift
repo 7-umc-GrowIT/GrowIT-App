@@ -64,11 +64,13 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
     }
     
     @objc func nextVC() {
+        print("클릭됨")
         if (textDiaryView.dateLabel.text == "날짜를 선택해주세요") {
             showCalendarOverlay()
-        } else if(textDiaryView.saveButton.backgroundColor != .black) {
+        } else if(textDiaryView.diaryTextField.text.count < 100) {
             CustomToast(containerWidth: 232).show(image: UIImage(named: "toastIcon") ?? UIImage(), message: "일기를 더 작성해 주세요", font: .heading3SemiBold())
         } else {
+            textDiaryView.checkButtonState()
             let userDiary = textDiaryView.diaryTextField.text ?? ""
             let date = textDiaryView.dateLabel.text ?? ""
             
