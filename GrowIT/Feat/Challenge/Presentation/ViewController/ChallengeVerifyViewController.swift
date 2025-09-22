@@ -147,25 +147,61 @@ class ChallengeVerifyViewController: UIViewController {
     }
     
     @objc private func keyboardWillShow(_ notification: Notification) {
-        if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-            let height = keyboardFrame.height - view.safeAreaInsets.bottom
-            challengeVerifyView.challengeVerifyButton.snp.updateConstraints {
-                $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
-            }
-            UIView.animate(withDuration: 0.25) {
-                self.view.layoutIfNeeded()
-            }
-        }
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let scrollView = challengeVerifyView.scrollView
+        let bottomInset = keyboardFrame.height + 30 // 버튼과 간격 여유
+
+        scrollView.contentInset.bottom = bottomInset
+        scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
+
+        // TextView가 가려지지 않게 스크롤
+        let textViewFrame = challengeVerifyView.reviewTextView.convert(challengeVerifyView.reviewTextView.bounds, to: scrollView)
+        scrollView.scrollRectToVisible(textViewFrame, animated: true)
     }
 
     @objc private func keyboardWillHide(_ notification: Notification) {
-        challengeVerifyView.challengeVerifyButton.snp.updateConstraints {
-            $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
-        }
+        let scrollView = challengeVerifyView.scrollView
         UIView.animate(withDuration: 0.25) {
-            self.view.layoutIfNeeded()
+            scrollView.contentInset.bottom = 0
+            scrollView.verticalScrollIndicatorInsets.bottom = 0
         }
     }
+
+
+
+
+
+    
+//    @objc private func keyboardWillShow(_ notification: Notification) {
+//        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+//
+//        // 레이아웃 최신화
+//        view.layoutIfNeeded()
+//        
+//        let textViewMaxY = challengeVerifyView.reviewTextView.convert(challengeVerifyView.reviewTextView.bounds, to: view).maxY
+//        let keyboardY = view.frame.height - keyboardFrame.height
+//        
+//        if textViewMaxY > keyboardY {
+//            let diff = textViewMaxY - keyboardY + 16
+//            UIView.animate(withDuration: 0.25) {
+//                self.view.transform = CGAffineTransform(translationX: 0, y: -diff)
+//            }
+//        } else {
+//            UIView.animate(withDuration: 0.25) {
+//                self.view.transform = .identity
+//            }
+//        }
+//    }
+//
+//
+//    @objc private func keyboardWillHide(_ notification: Notification) {
+//        challengeVerifyView.challengeVerifyButton.snp.updateConstraints {
+//            $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+//        }
+//        UIView.animate(withDuration: 0.25) {
+//            self.view.layoutIfNeeded()
+//        }
+//    }
 
     /// 인증하기 버튼 터치 이벤트
     /// 인증하기 버튼 터치 이벤트
