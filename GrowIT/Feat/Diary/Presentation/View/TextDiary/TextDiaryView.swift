@@ -73,7 +73,7 @@ class TextDiaryView: UIView, UITextViewDelegate {
     }
     
     let saveButton = AppButton(title: "내가 입력한 일기 저장하기").then {
-        $0.setButtonState(isEnabled: false, enabledColor: .black, disabledColor: .gray100, enabledTitleColor: .white, disabledTitleColor: .gray400)
+        $0.setButtonState(isEnabled: true, enabledColor: .gray100, disabledColor: .black, enabledTitleColor: .gray400, disabledTitleColor: .white)
     }
     
     // MARK: - Setup TextView
@@ -95,7 +95,7 @@ class TextDiaryView: UIView, UITextViewDelegate {
         checkButtonState()
     }
     
-    private func checkButtonState() {
+    func checkButtonState() {
         let isDateSelected = dateLabel.text != "날짜를 선택해 주세요"
         let trimmedText = diaryTextField.text.trimmingCharacters(in: .whitespacesAndNewlines)
         let isTextValid = !trimmedText.isEmpty && trimmedText != placeholder && trimmedText.count >= 100
@@ -161,6 +161,6 @@ class TextDiaryView: UIView, UITextViewDelegate {
     
     func updateDateLabel(_ date: String) {
         dateLabel.text = date.formattedDate()
-        checkButtonState()
+        //checkButtonState()
     }
 }

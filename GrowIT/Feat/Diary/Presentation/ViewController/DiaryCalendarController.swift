@@ -283,13 +283,14 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
             
             cell.figure(day: actualPreviousDay, isSunday: isSunday, isFromCurrentMonth: false, isDark: self.isDark)
             cell.isHidden = false
+            cell.showIcon(isShow: false)
         } else if day > numberOfDaysInMonth {
             // 다음 달의 날짜를 표시
             let nextMonthDay = day - numberOfDaysInMonth
             
             dateComponents.month = nextMonth
             dateComponents.year! += yearAdjustmentNext
-            dateComponents.day = nextMonthDay 
+            dateComponents.day = nextMonthDay
             
             // 다음 달 날짜의 일요일 여부 계산
             let date = currentCalendar.date(from: dateComponents)!
@@ -300,6 +301,7 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
             
             cell.figure(day: nextMonthDay, isSunday: isSunday, isFromCurrentMonth: false, isDark: self.isDark)
             cell.isHidden = false
+            cell.showIcon(isShow: false)
         } else {
             // 현재 달의 날짜를 표시
             dateComponents.day = day + 1
@@ -315,12 +317,17 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
         let date = currentCalendar.date(from: dateComponents)!
         let dateString = dateFormatter.string(from: date)
         
-        if let _ = callendarDiaries.first(where: { $0.date == dateString }) {
-            print(dateString)
-            cell.showIcon(isShow: true) // 해당 날짜에 일기가 있다면 아이콘 표시
+        if callendarDiaries.contains(where: { $0.date == dateString }) {
+            // 현재 달 날짜인 경우에만 아이콘 표시
+            if day >= 1 && day <= numberOfDaysInMonth {
+                cell.showIcon(isShow: true)
+            } else {
+                cell.showIcon(isShow: false)
+            }
         } else {
-            cell.showIcon(isShow: false) // 아니면 숨김
+            cell.showIcon(isShow: false)
         }
+
         
         return cell
     }
@@ -363,18 +370,24 @@ extension DiaryCalendarController: UICollectionViewDelegateFlowLayout, UICollect
     
     /// 셀 선택 시 실행되는 메소드
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let firstDayIndex = firstWeekdayOfMonth - 1
-        let day = indexPath.item - firstDayIndex
+        let firstDayIndex = firstWeekdayOfMonth - 1  // 월의 첫 요일 인덱스 계산
+        let day = indexPath.item - firstDayIndex + 1
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd" // 날짜 형식 지정
+        
         var dateComponents = DateComponents()
         dateComponents.year = currentYear
-
+        
+        // 달력에서 셀의 날짜 계산
         if day < 1 {
             // 이전 달
             dateComponents.month = currentMonthIndex == 0 ? 12 : currentMonthIndex
             let daysInPreviousMonth = daysPerMonth[(currentMonthIndex! + 11) % 12]
             dateComponents.day = daysInPreviousMonth + day
             dateComponents.year! -= currentMonthIndex == 0 ? 1 : 0
-        } else if day >= numberOfDaysInMonth {
+        } else if day > numberOfDaysInMonth {
+            // 다음 달
             dateComponents.month = currentMonthIndex == 11 ? 1 : currentMonthIndex! + 2
             dateComponents.day = day - numberOfDaysInMonth
             dateComponents.year! += currentMonthIndex == 11 ? 1 : 0
