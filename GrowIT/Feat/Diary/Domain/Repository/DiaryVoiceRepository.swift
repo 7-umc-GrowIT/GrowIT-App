@@ -6,7 +6,7 @@
 //
 
 protocol DiaryVoiceRepository {
-    func postVoiceDiary(chat: String) async throws -> String
+    func postVoiceDiary(data: DiaryVoiceRequestDTO) async throws -> String
     
     func postVoiceDiaryDate(date: String) async throws -> Diary
 }

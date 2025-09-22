@@ -12,8 +12,7 @@ class DiaryVoiceRepositoryImpl: DiaryVoiceRepository {
         self.dataSource = dataSource
     }
     
-    func postVoiceDiary(chat: String) async throws -> String {
-        let data = DiaryVoiceDTO(chat: chat)
+    func postVoiceDiary(data: DiaryVoiceRequestDTO) async throws -> String {
         let response = try await dataSource.postVoiceDiary(data: data)
         return response.chat
     }

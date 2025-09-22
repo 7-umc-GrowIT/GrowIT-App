@@ -16,6 +16,12 @@ struct DiaryVoiceDateRequestDTO: Codable {
     let date: String
 }
 
+struct DiaryVoiceRequestDTO: Codable {
+    let isNewConversation: Bool
+    let chat: String
+    let hasAdditionalChat: Bool
+}
+
 struct DiaryPatchDTO: Codable {
     let content: String
 }
