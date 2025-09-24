@@ -76,7 +76,7 @@ class ChallengeVerifyViewController: UIViewController {
     @objc func handleImage(_ notification: Notification) {
         if let userInfo = notification.userInfo, let image = userInfo["image"] as? UIImage {
             isImageSelected = true
-            imageData = image.jpegData(compressionQuality: 0.7)
+            imageData = image.jpegData(compressionQuality: 0.3)
             challengeVerifyView.imageUploadCompleted(image)
             challengeVerifyView.imageContainer.superview?.layoutIfNeeded()
             
