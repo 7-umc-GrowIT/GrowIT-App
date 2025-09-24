@@ -117,7 +117,7 @@ class TodayChallengeCollectionViewCell: UICollectionViewCell {
             $0.top.equalToSuperview().offset(24.5)
             $0.left.equalTo(icon.snp.right).offset(12)
             //$0.right.equalTo(buttonContainer.snp.left).inset(10)
-            $0.width.equalToSuperview().multipliedBy(0.4)
+            $0.width.equalToSuperview().multipliedBy(0.45)
         }
         
         timeStack.snp.makeConstraints{
