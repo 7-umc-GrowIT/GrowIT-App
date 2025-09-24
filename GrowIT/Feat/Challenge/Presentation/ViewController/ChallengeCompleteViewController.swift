@@ -60,9 +60,9 @@ class ChallengeCompleteViewController: UIViewController {
                     print("이미지가 변경되었습니다")
                     isImageModified = true
                     challengeCompleteView.setUpdateBtnActivate(true)
-                    newImageData = image.pngData()
+                    newImageData = image.jpegData(compressionQuality: 0.3)
                 }else{
-                    print("이미지가 변경되지않았습니다")
+                    print("이미지가 변경되지 않았습니다")
                     isImageModified = false
                     challengeCompleteView.setUpdateBtnActivate(isReviewModified)
                 }
