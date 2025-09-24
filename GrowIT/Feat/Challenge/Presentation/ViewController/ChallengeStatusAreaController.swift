@@ -69,9 +69,10 @@ final class ChallengeStatusAreaController: UIViewController {
     private func bindViewModel() {
         viewModel.$challenges
             .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] challenges in
                 self?.challengeStatusArea.challengeAllList.reloadData()
                 self?.scrollToTop()
+            
             }
             .store(in: &cancellables)
         
@@ -100,7 +101,13 @@ final class ChallengeStatusAreaController: UIViewController {
         viewModel.$totalElements
             .receive(on: RunLoop.main)
             .sink { [weak self] totalElements in
-                self?.challengeStatusArea.challengeStatusNum.text = (totalElements > 0) ? "\(totalElements)" : ""
+                self?.challengeStatusArea.challengeStatusNum.text = "\(totalElements)"
+                
+                if totalElements == 0 {
+                    self?.challengeStatusArea.showEmptyChallenge(true)
+                }else {
+                    self?.challengeStatusArea.showEmptyChallenge(false)
+                }
             }
             .store(in: &cancellables)
     }

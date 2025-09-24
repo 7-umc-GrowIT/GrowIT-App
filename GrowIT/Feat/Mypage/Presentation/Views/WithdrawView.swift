@@ -135,7 +135,8 @@ class WithdrawView: UIView {
     
     //MARK: - SetUI
     private func setView() {
-        addSubviews([mainLabel, descLabel, reasonLabel, dropDownView, dropdownTableView, bottomGrayView, buttonStackView])
+        addSubviews([mainLabel, descLabel, reasonLabel, dropDownView, bottomGrayView,
+                     dropdownTableView, buttonStackView])
         
         dropDownView.addSubviews([dropDownLabel, dropdownIcon])
         bottomGrayView.addSubviews([bottomTitleLabel, subLabel])

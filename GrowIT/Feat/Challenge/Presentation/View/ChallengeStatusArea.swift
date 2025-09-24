@@ -58,6 +58,19 @@ class ChallengeStatusArea: UIView {
         $0.separatorStyle = .none
     }
     
+    private let emptyChallengeIcon = UIImageView().then{
+        $0.image = UIImage(named: "diary")
+        $0.contentMode = .scaleAspectFit
+        $0.isHidden = true
+    }
+    
+    private let emptyChallengeLabel = UILabel().then {
+        $0.text = "저장된 챌린지가 없습니다.. 일기를 작성해 주세요!"
+        $0.textColor = .gray400
+        $0.font = .detail1Medium()
+        $0.isHidden = true
+    }
+    
     // 페이징 컨트롤 관련 UI
     private lazy var pagingStackView: UIStackView = {
         let stack = UIStackView()
@@ -205,6 +218,10 @@ class ChallengeStatusArea: UIView {
         }
     }
     
+    func showEmptyChallenge(_ isEmpty: Bool) {
+        emptyChallengeIcon.isHidden = !isEmpty
+        emptyChallengeLabel.isHidden = !isEmpty
+    }
     
     @objc private func pageTapped(_ sender: UIButton) {
         let page = sender.tag
@@ -223,7 +240,7 @@ class ChallengeStatusArea: UIView {
     }
     
     private func addComponents(){
-        [challengeStatusBtnGroup, challengeStatusLabelStack, challengeAllList, pagingStackView].forEach(self.addSubview)
+        [challengeStatusBtnGroup, challengeStatusLabelStack, challengeAllList, pagingStackView, emptyChallengeIcon, emptyChallengeLabel].forEach(self.addSubview)
     }
     
     private func constraints(){
@@ -250,6 +267,16 @@ class ChallengeStatusArea: UIView {
             $0.centerX.equalToSuperview()
             $0.height.equalTo(24)
             $0.bottom.equalToSuperview().inset(65 + 100)
+        }
+        
+        emptyChallengeIcon.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.size.equalTo(40)
+        }
+        
+        emptyChallengeLabel.snp.makeConstraints {
+            $0.top.equalTo(emptyChallengeIcon.snp.bottom).offset(16)
+            $0.centerX.equalToSuperview()
         }
     }
     

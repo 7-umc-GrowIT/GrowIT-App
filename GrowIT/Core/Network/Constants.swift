@@ -11,7 +11,7 @@ import UIKit
 struct Constants {
 
     public struct API {
-        static let baseURL = "http://43.200.242.14:8080"
+        static let baseURL = "https://growitserver.shop"
         static let diaryURL = "\(baseURL)/diaries"
 
         static let GroURL = baseURL + "/characters"
