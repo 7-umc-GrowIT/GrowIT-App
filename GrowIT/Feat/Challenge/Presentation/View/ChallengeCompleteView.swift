@@ -224,7 +224,10 @@ class ChallengeCompleteView: UIView {
     
     private lazy var challengeIcon = makeIcon(name: "challengeListIcon")
     
-    private lazy var challengeName = makeLabel(title: "", color: .gray900, font: .heading3Bold())
+    private lazy var challengeName = makeLabel(title: "", color: .gray900, font: .heading3Bold()).then {
+        $0.numberOfLines = 0
+        $0.lineBreakMode = .byWordWrapping
+    }
     
     private lazy var clockIcon = makeIcon(name: "timeIcon")
     
@@ -425,7 +428,7 @@ class ChallengeCompleteView: UIView {
         }
         
         challengeIcon.snp.makeConstraints{
-            $0.verticalEdges.equalToSuperview().inset(30)
+            $0.centerY.equalToSuperview()
             $0.left.equalToSuperview().offset(24)
             $0.width.height.equalTo(40)
         }
@@ -433,16 +436,18 @@ class ChallengeCompleteView: UIView {
         challengeName.snp.makeConstraints{
             $0.top.equalToSuperview().offset(24.5)
             $0.left.equalTo(challengeIcon.snp.right).offset(12)
+            $0.width.equalToSuperview().multipliedBy(0.45)
         }
         
         clockIcon.snp.makeConstraints{
+            $0.top.equalTo(challengeName.snp.bottom).offset(8)
             $0.bottom.equalToSuperview().inset(24.5)
             $0.left.equalTo(challengeIcon.snp.right).offset(12)
             $0.width.height.equalTo(16)
         }
         
         challengeTime.snp.makeConstraints{
-            $0.top.equalTo(clockIcon.snp.top)
+            $0.centerY.equalTo(clockIcon)
             $0.left.equalTo(clockIcon.snp.right).offset(4)
         }
         
