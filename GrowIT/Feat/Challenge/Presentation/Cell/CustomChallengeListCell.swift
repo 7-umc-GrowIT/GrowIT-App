@@ -142,7 +142,6 @@ class CustomChallengeListCell: UITableViewCell{
     
     public func figure(challenge: UserChallenge){
         self.name.text = challenge.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        //self.name.text = "아아아아아아아아아아아아"
         self.time.text = challenge.time.formattedTime
        
         var width: CGFloat = 0.0
