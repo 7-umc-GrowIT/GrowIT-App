@@ -55,7 +55,7 @@ class ChallengeHomeAreaController: UIViewController {
         label.numberOfLines = 0
         label.text = challenge.title.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        let availableWidth = collectionViewWidth * 0.4 // name label 제약과 동일
+        let availableWidth = collectionViewWidth * 0.45 // name label 제약과 동일
         let size = label.sizeThatFits(CGSize(width: availableWidth, height: .greatestFiniteMagnitude))
         
         let titleHeight = size.height
