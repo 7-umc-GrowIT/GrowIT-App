@@ -58,5 +58,9 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIDeviceFamily</key>
+	<integer>1</integer>
+	<key>cFBundleLocalizations</key>
+	<string>ko</string>
 </dict>
 </plist>
