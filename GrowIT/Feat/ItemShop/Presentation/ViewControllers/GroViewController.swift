@@ -86,13 +86,11 @@ class GroViewController: UIViewController, ItemListDelegate {
     func didSelectItem(_ isPurchased: Bool, selectedItem: ItemList?) {
         groView.purchaseButton.isHidden = isPurchased
         guard let selectedItem = selectedItem else { return }
-        
+
         let category = selectedItem.category
         let newItemId = selectedItem.id
         let currentItemId = categoryToEquippedId[category]
-        
-        if currentItemId == newItemId { return }
-        
+
         // 구매하지 않은 경우 UI만 변경
         if !isPurchased {
             if let imageView = getImageViewForCategory(category) {
@@ -101,21 +99,30 @@ class GroViewController: UIViewController, ItemListDelegate {
             groView.purchaseButton.updateCredit(selectedItem.price)
             return
         }
-        
+
+        // 같은 아이템을 다시 클릭한 경우 (구매하지 않은 아이템을 먼저 선택했다가 착용 중인 아이템으로 돌아온 경우)
+        if currentItemId == newItemId {
+            // 이미지를 원래대로 복구
+            if let imageView = getImageViewForCategory(category) {
+                imageView.kf.setImage(with: URL(string: selectedItem.groImageUrl), options: [.transition(.fade(0.3)), .cacheOriginalImage])
+            }
+            return
+        }
+
         // 기존 착용 아이템 해제
         if let currentItemId = currentItemId {
             callPatchItemState(itemId: currentItemId, status: "UNEQUIPPED")
         }
-        
+
         // 새로운 아이템 착용
         categoryToEquippedId[category] = newItemId
         categoryToEquippedName[category] = selectedItem.name
         callPatchItemState(itemId: newItemId, status: "EQUIPPED")
-        
+
         if let imageView = getImageViewForCategory(category) {
             imageView.kf.setImage(with: URL(string: selectedItem.groImageUrl), options: [.transition(.fade(0.3)), .cacheOriginalImage])
         }
-        
+
         itemListModalVC.itemListModalView.itemCollectionView.reloadData()  // ✅ UI 반영
     }
     

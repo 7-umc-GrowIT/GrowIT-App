@@ -163,7 +163,7 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
             let challengeIds = challenges.map { $0.id }
             return SelectedChallengeDTO(
                 challengeIds: challengeIds,
-                challengeType: challengeType,
+                challengeType: challengeType
             )
         }
     }
