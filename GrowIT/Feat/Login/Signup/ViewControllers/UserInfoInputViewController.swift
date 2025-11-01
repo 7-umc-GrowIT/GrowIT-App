@@ -26,6 +26,7 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
         setupView()
         setupActions()
         nextButtonState()
+        setupKeyboardObservers()
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
@@ -53,6 +54,38 @@ class UserInfoInputViewController: UIViewController, UITextFieldDelegate {
             action: #selector(prevVC)
         )
     }
+    
+    private func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+        let keyboardHeight = keyboardFrame.height
+        userInfoView.scrollView.contentInset.bottom = keyboardHeight + 20
+        
+        userInfoView.scrollView.verticalScrollIndicatorInsets.bottom = keyboardHeight + 20
+    }
+
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        userInfoView.scrollView.contentInset.bottom = 0
+        userInfoView.scrollView.verticalScrollIndicatorInsets.bottom = 0
+    }
+
+    
     
     // MARK: - Setup Actions
     private func setupActions() {

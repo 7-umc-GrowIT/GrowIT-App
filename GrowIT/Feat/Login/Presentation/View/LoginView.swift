@@ -23,6 +23,8 @@ class LoginView: UIView {
     }
     
     // MARK: - UI Components
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     
     // 타이틀 라벨
     private lazy var titleLabel = UILabel().then {
@@ -149,15 +151,25 @@ class LoginView: UIView {
     // MARK: - add Function & Constraints
     
     private func addComponents() {
-        [titleLabel, logoImageView, kakaoLoginButton,
-         appleLoginButton, emailLoginButton, findAccountButton]
-            .forEach(self.addSubview)
+        self.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+
+        contentView.addSubviews([titleLabel, logoImageView, kakaoLoginButton, appleLoginButton, emailLoginButton, findAccountButton])
+
     }
     
     private func constraints() {
-        
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview() // 가로 스크롤 방지
+        }
+
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(200)
+            $0.top.equalToSuperview().offset(UIScreen.main.bounds.height * (144.0 / 932.0))
             $0.centerX.equalToSuperview()
         }
         
@@ -188,6 +200,7 @@ class LoginView: UIView {
         findAccountButton.snp.makeConstraints {
             $0.top.equalTo(emailLoginButton.snp.bottom).offset(20)
             $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().offset(-40)
         }
     }
     
