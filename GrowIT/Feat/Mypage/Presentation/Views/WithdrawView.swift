@@ -12,6 +12,9 @@ class WithdrawView: UIView {
     var nickname: String
     
     //MARK: - Components
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    
     private lazy var mainLabel = AppLabel(
         text: "\(nickname) 님, 탈퇴하신다니 아쉬워요",
         font: .heading1Bold(),
@@ -135,7 +138,10 @@ class WithdrawView: UIView {
     
     //MARK: - SetUI
     private func setView() {
-        addSubviews([mainLabel, descLabel, reasonLabel, dropDownView, bottomGrayView,
+        self.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubviews([mainLabel, descLabel, reasonLabel, dropDownView, bottomGrayView,
                      dropdownTableView, buttonStackView])
         
         dropDownView.addSubviews([dropDownLabel, dropdownIcon])
@@ -144,9 +150,19 @@ class WithdrawView: UIView {
     }
     
     private func setConstraints() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview() // 가로 스크롤 방지
+            $0.height.greaterThanOrEqualTo(scrollView.snp.height)
+        }
+        
         mainLabel.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.top.equalTo(safeAreaLayoutGuide).inset(32)
+            $0.top.equalTo(contentView.safeAreaLayoutGuide).inset(32)
         }
         
         descLabel.snp.makeConstraints {
@@ -203,7 +219,7 @@ class WithdrawView: UIView {
         
         buttonStackView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.bottom.equalTo(safeAreaLayoutGuide)
+            $0.bottom.equalTo(bottomGrayView.snp.bottom).offset(-24)
         }
     }
 }

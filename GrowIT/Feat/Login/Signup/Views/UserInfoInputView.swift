@@ -23,6 +23,8 @@ class UserInfoInputView: UIView {
     }
     
     // MARK: - UI Components
+    public let scrollView = UIScrollView()
+    public let contentView = UIView()
     
     public lazy var num1View = UIImageView().then {
         $0.image = UIImage(named: "num1default")
@@ -72,16 +74,27 @@ class UserInfoInputView: UIView {
     // MARK: - Constraints
     
     private func addComponents() {
-        [num1View, num2View, mainLabel,
-         nameTextField, passwordTextField, passwordCheckTextField,
-         nextButton]
-            .forEach(self.addSubview)
+        self.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubviews([num1View, num2View, mainLabel,
+         nameTextField, passwordTextField, passwordCheckTextField, nextButton])
     }
 
     
     private func constraints() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview() // 가로 스크롤 방지
+            $0.bottom.equalTo(nextButton.snp.bottom).offset(20)
+        }
+        
         num1View.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(148)
+            $0.top.equalTo(contentView.safeAreaLayoutGuide).inset(32)
             $0.leading.equalToSuperview().offset(24)
             $0.width.height.equalTo(24)
         }
@@ -114,7 +127,7 @@ class UserInfoInputView: UIView {
         
         nextButton.snp.makeConstraints {
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
-            $0.horizontalEdges.equalToSuperview().inset(24) 
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
     }
 }
