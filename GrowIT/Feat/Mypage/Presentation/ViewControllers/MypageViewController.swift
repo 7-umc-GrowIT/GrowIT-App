@@ -117,7 +117,7 @@ class MypageViewController: UIViewController {
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "마이페이지",
-            textColor: .black
+            textColor: .gray900
         )
         
         if let navBar = navigationController?.navigationBar {
