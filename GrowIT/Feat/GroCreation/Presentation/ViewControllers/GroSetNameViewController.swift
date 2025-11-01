@@ -45,7 +45,7 @@ class GroSetNameViewController: UIViewController {
             guard let self = self else { return }
             
             switch result {
-            case .success(let data):
+            case .success(_):
                 // 캐시까지 리프레시
                 GroImageCacheManager.shared.refreshGroImage { _ in
                     print("✅ Gro 캐시 갱신 완료")
@@ -54,7 +54,8 @@ class GroSetNameViewController: UIViewController {
                         let homeVC = CustomTabBarController(initialIndex: 1)
                         let navigationController = UINavigationController(rootViewController: homeVC)
                         
-                        if let window = UIApplication.shared.windows.first {
+                        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let window = scene.windows.first {
                             window.rootViewController = navigationController
                             window.makeKeyAndVisible()
                         }
@@ -63,7 +64,8 @@ class GroSetNameViewController: UIViewController {
             case .failure(let error):
                 switch error {
                 case .serverError(_, let message):
-                    if message == "이미 사용 중인 닉네임입니다." {
+                    if case .serverError(let statusCode, _) = error,
+                       statusCode == 409 {
                         groSetNameView.nickNameTextField.setState(.error("다른 닉네임과 중복되는 닉네임입니다"))
                     }
                 default:

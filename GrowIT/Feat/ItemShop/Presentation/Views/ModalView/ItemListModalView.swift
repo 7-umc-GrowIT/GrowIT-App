@@ -26,6 +26,7 @@ class ItemListModalView: UIView {
         $0.scrollDirection = .vertical
     }).then {
         $0.isScrollEnabled = true
+        $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = false
         $0.register(ItemCollectionViewCell.self, forCellWithReuseIdentifier: ItemCollectionViewCell.identifier)
         $0.register(MyItemCollectionViewCell.self, forCellWithReuseIdentifier: MyItemCollectionViewCell.identifier)

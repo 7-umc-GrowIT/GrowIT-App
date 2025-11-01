@@ -57,7 +57,7 @@ class VoiceDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryEr
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "",
-            textColor: .black
+            textColor: .gray900
         )
     }
     

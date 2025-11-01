@@ -38,7 +38,7 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "직접 일기 작성하기",
-            textColor: .black
+            textColor: .gray900
         )
     }
     

@@ -67,7 +67,7 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "직접 일기 작성하기",
-            textColor: .black
+            textColor: .gray900
         )
     }
     
