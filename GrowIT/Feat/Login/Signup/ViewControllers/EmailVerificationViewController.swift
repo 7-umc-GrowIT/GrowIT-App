@@ -253,7 +253,7 @@ class EmailVerificationViewController: UIViewController {
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "내 계정",
-            textColor: .black
+            textColor: .gray900
         )
         
         if let navBar = navigationController?.navigationBar {

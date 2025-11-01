@@ -61,6 +61,10 @@ class TermsAgreeViewController: UIViewController, UITableViewDelegate {
             action: #selector(prevVC)
         )
         
+        navigationBarManager.setOpaqueNavigationBar(
+            navigationController!.navigationBar
+        )
+        
         // 네비게이션 바 스타일 설정
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()

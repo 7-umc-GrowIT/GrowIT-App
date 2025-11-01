@@ -53,7 +53,7 @@ class VoiceDiaryLoadingViewController: UIViewController {
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "",
-            textColor: .black
+            textColor: .gray900
         )
     }
 

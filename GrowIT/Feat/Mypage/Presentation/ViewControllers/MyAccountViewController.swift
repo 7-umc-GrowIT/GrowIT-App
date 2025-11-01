@@ -144,7 +144,7 @@ class MyAccountViewController: UIViewController {
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "내 계정",
-            textColor: .black
+            textColor: .gray900
         )
         
         if let navBar = navigationController?.navigationBar {
@@ -218,4 +218,12 @@ extension MyAccountViewController: UITableViewDataSource, UITableViewDelegate {
         default: return nil
         }
     }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        if let header = view as? UITableViewHeaderFooterView {
+            header.textLabel?.textColor = .gray600 
+            header.textLabel?.font = .body2Medium()
+        }
+    }
+
 }

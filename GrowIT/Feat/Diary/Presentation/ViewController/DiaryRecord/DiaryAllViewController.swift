@@ -46,7 +46,7 @@ class DiaryAllViewController: UIViewController, UITableViewDelegate {
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "나의 일기 기록",
-            textColor: .black
+            textColor: .gray900
         )
     }
     
