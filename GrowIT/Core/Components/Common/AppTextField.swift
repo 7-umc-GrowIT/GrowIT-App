@@ -21,6 +21,7 @@ class AppTextField: UIView {
     lazy var textField = UITextField().then {
         $0.font = .body1Medium()
         $0.textAlignment = .left
+        $0.textColor = .gray900
         $0.backgroundColor = .white
         $0.autocorrectionType = .no
         $0.autocapitalizationType = .none

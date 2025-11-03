@@ -37,7 +37,7 @@ class VoiceDiaryDateSelectViewController: UIViewController, DiaryCalendarControl
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "",
-            textColor: .black
+            textColor: .gray900
         )
     }
     

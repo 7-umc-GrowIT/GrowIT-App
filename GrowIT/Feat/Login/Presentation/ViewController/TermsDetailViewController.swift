@@ -60,6 +60,10 @@ class TermsDetailViewController: UIViewController, UITextViewDelegate {
             target: self,
             action: #selector(prevVC)
         )
+        
+        navigationBarManager.setOpaqueNavigationBar(
+            navigationController!.navigationBar
+        )
     }
     
     private func setupActions() {

@@ -62,7 +62,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "",
-            textColor: .black
+            textColor: .gray900
         )
     }
     

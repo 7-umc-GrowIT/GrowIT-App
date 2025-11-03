@@ -80,7 +80,11 @@ class TermsOfServiceViewController: UIViewController {
         navigationBarManager.setTitle(
             to: navigationItem,
             title: navigationBarTitle,
-            textColor: .black
+            textColor: .gray900
+        )
+        
+        navigationBarManager.setOpaqueNavigationBar(
+            navigationController!.navigationBar
         )
         
         if let navBar = navigationController?.navigationBar {
