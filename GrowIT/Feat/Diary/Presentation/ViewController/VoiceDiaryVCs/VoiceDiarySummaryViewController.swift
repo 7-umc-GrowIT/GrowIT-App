@@ -111,7 +111,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
             self?.diaryContent = updatedText
         }
         let navController = UINavigationController(rootViewController: nextVC)
-        presentSheet(navController, heightRatio: 0.6)
+        presentSheet(navController, heightRatio: 560/932, fixedHeight: 560)
     }
     
     func didTapExitButton() {

@@ -35,6 +35,7 @@ class DiaryPostFixViewController: UIViewController {
         setupDelegate()
         setupActions()
         setupKeyboardNotifications()
+        setupDismissKeyboardGesture()
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false // 터치 이벤트가 다른 뷰에도 전달되도록 함
@@ -88,7 +89,14 @@ class DiaryPostFixViewController: UIViewController {
         }
     }
 
-    @objc func dismissKeyboard() {
+    /// 바깥 영역 터치 시 키보드 숨기기
+    private func setupDismissKeyboardGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
     

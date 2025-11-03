@@ -27,6 +27,9 @@ class VoiceDiarySummaryView: UIView {
     }
     
     // MARK: UI Components
+    let scrollView = UIScrollView()
+    let contentView = UIView()
+    
     private let label1 = UILabel().then {
         $0.text = "당신의 이야기를\n일기로 정리했어요"
         $0.font = .subTitle1()
@@ -95,45 +98,63 @@ class VoiceDiarySummaryView: UIView {
     
     // MARK: Setup UI
     private func setupUI() {
-        addSubview(label1)
-        label1.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
-            make.top.equalTo(safeAreaLayoutGuide).offset(32)
+        self.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubview(label1)
+        contentView.addSubview(emoLabel)
+        contentView.addSubview(emoStackView)
+        contentView.addSubview(todayDiaryLabel)
+        contentView.addSubview(textView)
+        
+        textView.addSubview(dateLabel)
+        textView.addSubview(diaryTextView)
+        textView.addSubview(aiLabel)
+        
+        contentView.addSubview(saveButton)
+        contentView.addSubview(descriptionLabel)
+        
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         
-        addSubview(emoLabel)
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalTo(scrollView.snp.width)
+        }
+
+        label1.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(24)
+            make.top.equalToSuperview().offset(32)
+        }
+        
         emoLabel.snp.makeConstraints { make in
             make.leading.equalTo(label1.snp.leading)
             make.top.equalTo(label1.snp.bottom).offset(28)
         }
         
-        addSubview(emoStackView)
         emoStackView.snp.makeConstraints { make in
             make.leading.equalTo(emoLabel.snp.leading)
             make.top.equalTo(emoLabel.snp.bottom).offset(8)
         }
         
-        addSubview(todayDiaryLabel)
         todayDiaryLabel.snp.makeConstraints { make in
             make.leading.equalTo(emoStackView.snp.leading)
             make.top.equalTo(emoStackView.snp.bottom).offset(40)
         }
         
-        addSubview(textView)
         textView.snp.makeConstraints { make in
             make.leading.equalTo(todayDiaryLabel.snp.leading)
             make.top.equalTo(todayDiaryLabel.snp.bottom).offset(8)
             make.centerX.equalToSuperview()
         }
         
-        textView.addSubview(dateLabel)
         dateLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(20)
             make.top.equalToSuperview().offset(28)
             make.centerX.equalToSuperview()
         }
         
-        textView.addSubview(diaryTextView)
         diaryTextView.snp.makeConstraints { make in
             make.leading.equalTo(dateLabel.snp.leading)
             make.centerX.equalToSuperview()
@@ -141,7 +162,6 @@ class VoiceDiarySummaryView: UIView {
             make.height.equalTo(Constants.Screen.ScreenHeight * (216 / 932))
         }
         
-        textView.addSubview(aiLabel)
         aiLabel.snp.makeConstraints { make in
             make.leading.equalTo(diaryTextView.snp.leading)
             make.top.equalTo(diaryTextView.snp.bottom).offset(24)
@@ -149,17 +169,16 @@ class VoiceDiarySummaryView: UIView {
             make.bottom.equalToSuperview().offset(-28)
         }
         
-        addSubview(saveButton)
         saveButton.snp.makeConstraints { make in
             make.top.equalTo(textView.snp.bottom).offset(43)
             make.leading.equalToSuperview().offset(24)
             make.centerX.equalToSuperview()
         }
         
-        addSubview(descriptionLabel)
         descriptionLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(saveButton.snp.bottom).offset(8)
+            make.bottom.equalToSuperview().offset(-40) // 하단 여백 40pt
         }
     }
     
