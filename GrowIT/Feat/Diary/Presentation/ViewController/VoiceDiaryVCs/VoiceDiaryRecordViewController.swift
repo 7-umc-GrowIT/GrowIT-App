@@ -26,23 +26,23 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
     private var audioRecorder: AVAudioRecorder?
     private var audioPlayer: AVAudioPlayer?
-    private var isRecording = false // 녹음 진행 여부 확인
-    private var hasPlayedWelcomeMessage = false // 웰컴 메시지 재생 여부 확인
-    private var isPlayingWelcomeMessage = false // 웰컴 메시지 재생 중 여부 (추가)
+    private var isRecording = false
+    private var hasPlayedWelcomeMessage = false
+    private var isPlayingWelcomeMessage = false
 
     // 대화 상태 관리
-    private var isConversationActive = false // 대화 진행 여부 확인
-    private var isProcessingAudio = false // 서버 전송/응답 여부 확인
-    private var isSpeaking = false  // TTS 재생 여부 확인
+    private var isConversationActive = false
+    private var isProcessingAudio = false
+    private var isSpeaking = false
     private var conversationTurnCount = 0
-    private var hasSpokenBefore = false // 사용자가 이전에 대화했는지 여부
+    private var hasSpokenBefore = false
 
     // 음성 감지 관련
     private var silenceTimer: Timer?
     private var audioLevelTimer: Timer?
     private var speechDetected = false
-    private var silenceThreshold: Float = -40.0  // dB 임계값
-    private var silenceDuration: TimeInterval = 1.0  // 침묵 지속 시간 (초)
+    private var silenceThreshold: Float = -40.0
+    private var silenceDuration: TimeInterval = 1.0
     private var currentSilenceDuration: TimeInterval = 0.0
     
     // 이어 말하기 관련
@@ -51,7 +51,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     private var isManualRecording = false
     private var suppressRestartListening = false
     private var suppressAutoProcessing = false
-
 
     private let diaryService = DiaryService()
 
@@ -77,25 +76,95 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         observeRemainingTime()
         requestMicrophonePermission()
         setupAudioSession()
+        observeAudioRouteChanges()
     }
 
+    // MARK: - Audio Session Setup
+    
     private func setupAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
+            // 에어팟/이어폰 연결 여부에 따라 자동으로 라우팅
             try audioSession.setCategory(
                 .playAndRecord,
-                mode: .measurement,
-                options: [.defaultToSpeaker]
+                mode: .voiceChat,
+                options: [.allowBluetooth, .allowBluetoothA2DP]
             )
             try audioSession.setActive(true)
-            try audioSession.overrideOutputAudioPort(.none)
-            print("오디오 세션 및 라우팅 설정 완료")
+            
+            // 현재 오디오 라우트 확인
+            configureAudioRouting()
+            
             print("오디오 세션 초기화 완료")
         } catch {
             print("오디오 세션 초기화 실패: \(error)")
         }
     }
-
+    
+    // 오디오 라우팅 설정
+    private func configureAudioRouting() {
+        let audioSession = AVAudioSession.sharedInstance()
+        let currentRoute = audioSession.currentRoute
+        
+        // 현재 출력 장치 확인
+        var hasBluetoothOutput = false
+        var hasHeadphones = false
+        
+        for output in currentRoute.outputs {
+            switch output.portType {
+            case .bluetoothA2DP, .bluetoothLE, .bluetoothHFP:
+                hasBluetoothOutput = true
+                print("블루투스 장치 연결됨: \(output.portName)")
+            case .headphones:
+                hasHeadphones = true
+                print("유선 이어폰 연결됨: \(output.portName)")
+            default:
+                break
+            }
+        }
+        
+        do {
+            if hasBluetoothOutput || hasHeadphones {
+                // 에어팟/이어폰이 연결된 경우: 자동으로 해당 장치로 라우팅
+                print("외부 오디오 장치로 라우팅")
+            } else {
+                // 연결된 장치가 없는 경우: 기기 스피커 사용
+                try audioSession.overrideOutputAudioPort(.speaker)
+                print("기기 스피커로 라우팅")
+            }
+        } catch {
+            print("오디오 라우팅 설정 실패: \(error)")
+        }
+    }
+    
+    // 오디오 라우트 변경 감지
+    private func observeAudioRouteChanges() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAudioRouteChange),
+            name: AVAudioSession.routeChangeNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func handleAudioRouteChange(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+            return
+        }
+        
+        switch reason {
+        case .newDeviceAvailable:
+            print("새 오디오 장치 연결됨")
+            configureAudioRouting()
+        case .oldDeviceUnavailable:
+            print("오디오 장치 연결 해제됨")
+            configureAudioRouting()
+        default:
+            break
+        }
+    }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -104,7 +173,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        // 웰컴 메시지 재생 후 대화 시작
         if !hasPlayedWelcomeMessage {
             playWelcomeMessage()
             hasPlayedWelcomeMessage = true
@@ -115,20 +183,21 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         super.viewWillDisappear(animated)
         stopAllInteractions()
         cleanupOnViewDisappear()
+        
+        // Observer 제거
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
     }
 
-    // 화면이 사라질 때 완전 정리
     private func cleanupOnViewDisappear() {
         stopConversation()
-        voiceDiaryRecordView.stopConversationTimer() // 타이머 완전 정지
-        voiceDiaryRecordView.onRemainingTimeChanged = nil // 콜백 제거
+        voiceDiaryRecordView.stopConversationTimer()
+        voiceDiaryRecordView.onRemainingTimeChanged = nil
     }
 
     private func observeRemainingTime() {
         voiceDiaryRecordView.onRemainingTimeChanged = { [weak self] remainingTime in
             guard let self = self else { return }
 
-            // 현재 화면이 활성 상태인지 확인
             guard self.isViewLoaded && self.view.window != nil else {
                 print("화면이 비활성 상태 - 토스트 표시 안함")
                 return
@@ -141,7 +210,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
                     font: .heading3SemiBold()
                 )
             } else if remainingTime <= 0 {
-                // 시간 종료 시 대화 자동 종료
                 self.finishConversation()
             }
         }
@@ -170,7 +238,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             make.edges.equalToSuperview()
         }
 
-        // 기존 버튼들 숨김 (대화식으로 변경)
         voiceDiaryRecordView.recordButton.isHidden = true
         voiceDiaryRecordView.loadingButton.isHidden = true
         voiceDiaryRecordView.addLabel.isHidden = true
@@ -183,7 +250,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
     // MARK: @objc methods
     @objc func prevVC() {
-        
         let prevVC = VoiceDiaryRecordErrorViewController()
         prevVC.delegate = self
         let navController = UINavigationController(rootViewController: prevVC)
@@ -236,14 +302,12 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         }
     }
 
-    
     func startManualRecording() {
-        // AVAudioRecorder 설정 및 녹음 시작 (기존 startAutoRecording과 거의 유사)
-        
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker])
+            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .allowBluetoothA2DP])
             try audioSession.setActive(true)
+            configureAudioRouting()
 
             let settings: [String: Any] = [
                 AVFormatIDKey: Int(kAudioFormatLinearPCM),
@@ -277,19 +341,16 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         isRecording = false
         print("수동 녹음 중지")
         
-        // 로딩 버튼 표시
         DispatchQueue.main.async {
-            self.voiceDiaryRecordView.loadingButton.isHidden = false  // 서버 응답 대기중임을 표시
+            self.voiceDiaryRecordView.loadingButton.isHidden = false
             self.voiceDiaryRecordView.addLabel.text = "할 말이 더 있어요"
-            self.voiceDiaryRecordView.addLabel.isHidden = false // 핢 말 더 있어요 버튼 표시
-
+            self.voiceDiaryRecordView.addLabel.isHidden = false
         }
     }
 
     func didTapExitButton() {
         if let navigationController = self.navigationController {
             let viewControllers = navigationController.viewControllers
-            // 루트 다음 뷰컨트롤러 인덱스는 1
             if viewControllers.count > 1 {
                 let targetVC = viewControllers[1]
                 navigationController.setViewControllers([viewControllers[0], targetVC], animated: true)
@@ -312,7 +373,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
         print("대화 시작 - 타이머 시작됨")
 
-        // 웰컴 메시지 재생 완료 후 바로 녹음 시작
         startAutoRecording()
     }
 
@@ -322,7 +382,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         stopCurrentAudio()
         stopAllInteractions()
 
-
         voiceDiaryRecordView.stopConversationTimer()
 
         print("대화 중단")
@@ -331,7 +390,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     private func finishConversation() {
         stopConversation()
 
-        // 기존 로직 유지
         let remainingTime = voiceDiaryRecordView.remainingTime
         if remainingTime > 120 {
             CustomToast(containerWidth: 225).show(
@@ -369,8 +427,9 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker])
+            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .allowBluetoothA2DP])
             try audioSession.setActive(true)
+            configureAudioRouting()
 
             let settings: [String: Any] = [
                 AVFormatIDKey: Int(kAudioFormatLinearPCM),
@@ -388,7 +447,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
             audioRecorder = try AVAudioRecorder(url: audioFileURL, settings: settings)
             audioRecorder?.delegate = self
-            audioRecorder?.isMeteringEnabled = true  // 음성 레벨 측정 활성화
+            audioRecorder?.isMeteringEnabled = true
             audioRecorder?.record()
 
             isRecording = true
@@ -397,7 +456,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
             print("자동 녹음 시작")
 
-            // 음성 레벨 모니터링 시작
             startAudioLevelMonitoring()
 
         } catch {
@@ -415,12 +473,10 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
         print("자동 녹음 중지")
 
-        // 로딩 버튼 표시
         DispatchQueue.main.async {
-            self.voiceDiaryRecordView.loadingButton.isHidden = false  // 서버 응답 대기중임을 표시
+            self.voiceDiaryRecordView.loadingButton.isHidden = false
             self.voiceDiaryRecordView.addLabel.text = "할 말이 더 있어요"
-            self.voiceDiaryRecordView.addLabel.isHidden = false // 핢 말 더 있어요 버튼 표시
-
+            self.voiceDiaryRecordView.addLabel.isHidden = false
         }
     }
 
@@ -438,16 +494,14 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         recorder.updateMeters()
         let averagePower = recorder.averagePower(forChannel: 0)
 
-        // 음성 감지
         if averagePower > silenceThreshold {
             if !speechDetected {
                 speechDetected = true
-                hasSpokenBefore = true // 사용자가 말했음을 기록
+                hasSpokenBefore = true
                 print("음성 감지됨 (레벨: \(averagePower) dB)")
             }
             currentSilenceDuration = 0.0
         } else {
-            // 침묵 감지
             if speechDetected {
                 currentSilenceDuration += 0.1
 
@@ -458,7 +512,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             }
         }
 
-        // 최대 녹음 시간 제한 (30초)
         if recorder.currentTime > 30.0 {
             print("최대 녹음 시간 도달 - 녹음 종료")
             stopAutoRecording()
@@ -470,37 +523,27 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         audioLevelTimer = nil
         silenceTimer?.invalidate()
         silenceTimer = nil
-        
     }
     
-    // 모든 인터랙션·작업 즉시 중단용 메서드
     func stopAllInteractions() {
-        // 1. 오디오 녹음 중단
         audioRecorder = nil
         isRecording = false
         
-        // 2. 오디오 재생(스피커) 중단
-        stopCurrentAudio() // 내부에서 audioPlayer?.stop() 호출해야 함
+        stopCurrentAudio()
         audioPlayer = nil
         isSpeaking = false
 
-        // 3. 음성 레벨/침묵 감지 타이머 해제
-        stopAllTimers() // audioLevelTimer, silenceTimer 등 모두 중지
+        stopAllTimers()
 
-        // 4. 대화(로직) 타이머 해제
         voiceDiaryRecordView.stopConversationTimer()
         
-        // 5. 뷰 hidden 처리
         voiceDiaryRecordView.loadingButton.isHidden = true
         voiceDiaryRecordView.addLabel.isHidden = true
 
-        // 6. 인터렉션 중단 (UI 잠금 등 필요하면)
-        view.isUserInteractionEnabled = false // 터치 비활성화 (선택)
+        view.isUserInteractionEnabled = false
         
-        // 7. 콜백/클로저 메모리 정리
         voiceDiaryRecordView.onRemainingTimeChanged = nil
 
-        // 8. 상태 변수 초기화
         isConversationActive = false
         isProcessingAudio = false
         isSpeaking = false
@@ -508,7 +551,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         hasPlayedWelcomeMessage = false
         isPlayingWelcomeMessage = false
     }
-
 
     // MARK: - AVAudioRecorderDelegate
     
@@ -535,7 +577,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         }
     }
 
-
     // MARK: - Audio Processing
 
     private func processAudioFile(audioFilePath: URL) {
@@ -545,7 +586,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             return
         }
         
-        // 오디오 데이터가 너무 작으면 무시 (0.5초 미만)
         if audioData.count < 4000 {
             print("오디오 데이터가 너무 작음 - 무시")
             restartListening(withMessage: "다시 한 번 더 말씀해 주세요.")
@@ -560,11 +600,9 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             guard let self = self else { return }
             
             do {
-                // 백그라운드에서 STT 처리
                 let recognizedText = try await self.speechToTextUseCase.execute(audioData: audioData)
                 let trimmedText = recognizedText.trimmingCharacters(in: .whitespacesAndNewlines)
                 
-                // 음성 인식 결과가 비어있거나 너무 짧을 경우
                 if trimmedText.isEmpty || trimmedText.count < 2 {
                     await MainActor.run {
                         self.isProcessingAudio = false
@@ -575,8 +613,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
                     return
                 }
                 
-                // 백그라운드에서 서버 통신
-                
                let responseText = try await self.getSTTResponseUseCase.execute(
                    data: DiaryVoiceRequestDTO(
                        isNewConversation: self.isNewConversation,
@@ -585,7 +621,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
                    )
                )
                 
-                // 결과만 메인 스레드로
                 await MainActor.run {
                     print("서버 응답: \(responseText)")
                     self.conversationTurnCount += 1
@@ -599,7 +634,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
                             self.isNewConversation = false
                             await self.synthesizeSpeech(text: responseText)
                         }
-    
                     }
                 }
             } catch {
@@ -643,7 +677,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             let data = try await textToSpeechUseCase.execute(text: text)
             print("TTS 변환 완료, 재생 시작")
 
-            // 메인 스레드에서 오디오 재생
             playAudio(data: data)
 
         } catch {
@@ -652,11 +685,14 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         }
     }
 
-    private func playAudio(data: Data) { // TTS 재생
+    private func playAudio(data: Data) {
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .allowBluetoothA2DP])
             try audioSession.setActive(true)
+            
+            // 오디오 재생 전에도 라우팅 설정
+            configureAudioRouting()
 
             stopCurrentAudio()
 
@@ -679,7 +715,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     private func finishSpeaking() {
         isSpeaking = false
 
-        // 응답 완료 후 다시 듣기 시작
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.startAutoRecording()
         }
@@ -688,7 +723,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     // MARK: - Welcome Message
 
     private func playWelcomeMessage() {
-        // 웰컴 메시지 재생 시작 상태를 명확히 설정
         isPlayingWelcomeMessage = true
         let welcomeText = welcomeMessageManager.getRandomWelcomeMessage()
         print("웰컴 메시지: \(welcomeText)")
@@ -698,22 +732,11 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
         }
     }
 
-    // MARK: - UI State Management
-
-    enum ConversationState {
-        case idle
-        case listening
-        case speaking
-        case processing
-        case responding
-    }
-
     // MARK: - Error Handling
 
     private func showRecordingError(message: String) {
         let alert = UIAlertController(title: "오류", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
-            // 에러 후 대화 재시작
             self.restartListening()
         })
         present(alert, animated: true)
@@ -751,7 +774,6 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
     private func callPostVoiceDiaryDate() async throws -> Diary{
         let date = UserDefaults.standard.string(forKey: "VoiceDate") ?? ""
-
         return try await postVoiceDiaryDateUseCase.execute(date: date)
     }
 }
@@ -763,14 +785,12 @@ extension VoiceDiaryRecordViewController: AVAudioPlayerDelegate {
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         print("오디오 재생 완료 (성공 여부: \(flag))")
 
-        // 웰컴 메시지 재생이 완료되면 대화 시작
         if isPlayingWelcomeMessage {
             print("웰컴 메시지 재생 완료. 대화 시작.")
-            isPlayingWelcomeMessage = false // 상태 초기화
-            isSpeaking = false // TTS 재생이 끝났으므로 false로 명확히 설정
+            isPlayingWelcomeMessage = false
+            isSpeaking = false
             startConversation()
         } else {
-            // 일반 AI 응답이 완료된 경우
             finishSpeaking()
         }
     }
@@ -781,7 +801,6 @@ extension VoiceDiaryRecordViewController: AVAudioPlayerDelegate {
         }
 
         isSpeaking = false
-        // 오류가 나더라도 대화는 계속
         if isPlayingWelcomeMessage {
             isPlayingWelcomeMessage = false
             startConversation()
