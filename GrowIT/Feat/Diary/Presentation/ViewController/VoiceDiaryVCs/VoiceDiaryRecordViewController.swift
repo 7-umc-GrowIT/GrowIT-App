@@ -130,6 +130,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             } else {
                 // 연결된 장치가 없는 경우: 기기 스피커 사용
                 try audioSession.overrideOutputAudioPort(.speaker)
+                try audioSession.setPreferredOutputNumberOfChannels(2)
                 print("기기 스피커로 라우팅")
             }
         } catch {
@@ -265,7 +266,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     @objc func helpTapped() {
         let accountInquiryVC = AccountInquiryViewController()
         accountInquiryVC.setDarkMode()
-        presentSheet(accountInquiryVC, heightRatio: 0.336)
+        presentSheet(accountInquiryVC, heightRatio: 314/932, fixedHeight: 314)
     }
     
     @objc func addTapped() {
@@ -691,21 +692,31 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .allowBluetoothA2DP])
             try audioSession.setActive(true)
             
-            // 오디오 재생 전에도 라우팅 설정
             configureAudioRouting()
 
             stopCurrentAudio()
-
-            audioPlayer = try AVAudioPlayer(data: data)
-            audioPlayer?.volume = 1.0
+            
+            // 스피커/이어폰 구분하여 볼륨 설정
+            let currentRoute = audioSession.currentRoute
+            let isUsingSpeaker = currentRoute.outputs.contains { output in
+                output.portType == .builtInSpeaker
+            }
+            
+            let audioData = isUsingSpeaker ? (amplifyWavData(data, gainFactor: 10.0) ?? data) : data
+            
+            audioPlayer = try AVAudioPlayer(data: audioData)
+            
+            audioPlayer?.volume = isUsingSpeaker ? 1.0 : 0.8  // 스피커: 최대, 이어폰: 80%
             audioPlayer?.delegate = self
             audioPlayer?.play()
-            print("응답 음성 재생 시작")
+            print("응답 음성 재생 시작 (볼륨: \(audioPlayer?.volume ?? 0))")
         } catch {
             print("음성 파일 재생 실패: \(error.localizedDescription)")
             finishSpeaking()
         }
     }
+    
+    
 
     private func stopCurrentAudio() {
         audioPlayer?.stop()
@@ -717,6 +728,33 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.startAutoRecording()
+        }
+    }
+    
+    private func amplifyWavData(_ data: Data, gainFactor: Float = 1.5) -> Data? {
+        var audioData = data
+        let headerSize = 44 // ⭐️ WAV 헤더 크기
+        
+        // 헤더 크기보다 데이터가 작으면 증폭 불가
+        guard audioData.count > headerSize else { return nil }
+
+        let sampleCount = (audioData.count - headerSize) / MemoryLayout<Int16>.size
+        let byteCount = audioData.count
+        
+        return audioData.withUnsafeMutableBytes { (samples: UnsafeMutableRawBufferPointer) -> Data? in
+            guard let baseAddress = samples.baseAddress else { return nil }
+            
+            // ⭐️ 헤더 크기(44바이트)만큼 오프셋을 적용한 포인터
+            let int16Pointer = (baseAddress + headerSize).assumingMemoryBound(to: Int16.self)
+            
+            for i in 0..<sampleCount {
+                let sample = Float(int16Pointer[i])
+                let amplified = sample * gainFactor
+                let clamped = max(Float(Int16.min), min(Float(Int16.max), amplified))
+                int16Pointer[i] = Int16(clamped)
+            }
+            
+            return Data(bytes: baseAddress, count: byteCount)
         }
     }
 

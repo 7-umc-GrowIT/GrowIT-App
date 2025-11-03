@@ -199,7 +199,7 @@ class EmailLoginViewController: UIViewController {
     
     @objc func didTapFindEmail() {
         let accountInquiryVC = AccountInquiryViewController()
-        presentSheet(accountInquiryVC, heightRatio: 0.336)
+        presentSheet(accountInquiryVC, heightRatio: 314/932, fixedHeight: 314)
     }
     
     // 이메일 저장

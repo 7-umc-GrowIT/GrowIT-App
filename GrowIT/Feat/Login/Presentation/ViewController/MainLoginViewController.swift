@@ -100,7 +100,7 @@ class MainLoginViewController: UIViewController {
     @objc
     func findAccountTapped() {
         let accountInquiryVC = AccountInquiryViewController()
-        presentSheet(accountInquiryVC, heightRatio: 0.336)
+        presentSheet(accountInquiryVC, heightRatio: 314/932, fixedHeight: 314)
     }
     
     // MARK: - 서버 요청 로직

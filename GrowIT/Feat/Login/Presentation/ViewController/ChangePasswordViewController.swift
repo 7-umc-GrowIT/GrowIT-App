@@ -299,7 +299,7 @@ class ChangePasswordViewController: UIViewController {
             let changePwdErrorVC = ChangePasswordErrorViewController()
             let navController = UINavigationController(rootViewController: changePwdErrorVC)
             navController.modalPresentationStyle = .pageSheet
-            presentSheet(navController, heightRatio: 0.37)
+            presentSheet(navController, heightRatio: 314/932, fixedHeight: 314)
         } else {
             if let nav = navigationController {
                 nav.popViewController(animated: true)

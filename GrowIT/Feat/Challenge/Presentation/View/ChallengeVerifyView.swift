@@ -28,11 +28,14 @@ class ChallengeVerifyView: UIView {
         $0.showsVerticalScrollIndicator = false
         $0.showsHorizontalScrollIndicator = false
         $0.contentOffset = CGPoint(x: 0, y: 0)
-        //$0.contentSize = contentView.bounds.size
+        $0.keyboardDismissMode = .onDrag
+        $0.contentSize = contentView.bounds.size
+        $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
     public lazy var contentView = UIView().then{
         $0.backgroundColor = .clear
+        $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
     private lazy var challengeIcon = UIImageView().then{
@@ -165,6 +168,7 @@ class ChallengeVerifyView: UIView {
         scrollView.addSubview(contentView)
         self.addSubview(challengeVerifyButton)
         
+        
         [imageUploadLabel, imageContainer].forEach(imageStack.addArrangedSubview)
         [oneLineReviewLabel, reviewTextView].forEach(reviewStack.addArrangedSubview)
         imageContainer.addSubview(imageUploadStack)
@@ -174,14 +178,21 @@ class ChallengeVerifyView: UIView {
     }
     
     private func constraints(){
+        challengeVerifyButton.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom).inset(20)
+            $0.height.equalTo(60)
+        }
+        
         scrollView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.horizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(challengeVerifyButton.snp.top).offset(-16)
         }
         
         contentView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview()
+            $0.edges.equalToSuperview()
             $0.width.equalTo(scrollView.snp.width)
-            $0.bottom.equalTo(challengeVerifyButton.snp.top)
+            // height 제약 제거 - 내부 컨텐츠에 따라 자동으로 결정되도록
         }
         
         challengeIcon.snp.makeConstraints{
@@ -202,6 +213,7 @@ class ChallengeVerifyView: UIView {
         
         imageContainer.snp.makeConstraints{
             $0.height.equalTo(72)
+            $0.horizontalEdges.equalToSuperview() // 좌우 제약 추가
         }
         
         imageUploadIcon.snp.makeConstraints{
@@ -212,14 +224,13 @@ class ChallengeVerifyView: UIView {
             $0.center.equalToSuperview()
         }
         
-        
         imageStack.snp.makeConstraints{
             $0.top.equalTo(challengeContent.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         reviewTextView.snp.makeConstraints{
-            $0.height.equalTo(140)
+            $0.height.greaterThanOrEqualTo(140) // equalTo 대신 greaterThanOrEqualTo 사용
         }
         
         reviewStack.snp.makeConstraints {
@@ -230,12 +241,14 @@ class ChallengeVerifyView: UIView {
         reviewHintText.snp.makeConstraints{
             $0.top.equalTo(reviewStack.snp.bottom).offset(4)
             $0.left.equalToSuperview().offset(24)
+            $0.bottom.equalTo(contentView.snp.bottom).offset(-20) // contentView 하단 제약 추가
         }
-        
-        challengeVerifyButton.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
-            $0.height.equalTo(60)
-        }
+    }
+    
+    public func updateContentSize() {
+        // contentView의 실제 높이 계산
+        contentView.layoutIfNeeded()
+        let height = reviewHintText.frame.maxY + 20 // 마지막 요소 + 여백
+        scrollView.contentSize = CGSize(width: scrollView.bounds.width, height: height)
     }
 }

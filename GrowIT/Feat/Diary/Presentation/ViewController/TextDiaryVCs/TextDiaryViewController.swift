@@ -23,9 +23,60 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
         setupUI()
         setupNavigationBar()
         setupActions()
+        setupDismissKeyboardGesture()
         navigationController?.navigationBar.isHidden = false
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        addKeyboardObservers()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeKeyboardObservers()
+    }
+
+    // MARK: - Keyboard Handling
+    private func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+
+    private func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+        let keyboardHeight = keyboardFrame.height
+
+        // scrollView bottom inset 조정
+        UIView.animate(withDuration: 0.25) {
+            self.textDiaryView.scrollView.contentInset.bottom = keyboardHeight + 16
+            self.textDiaryView.scrollView.verticalScrollIndicatorInsets.bottom = keyboardHeight
+        }
+    }
+
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        UIView.animate(withDuration: 0.25) {
+            self.textDiaryView.scrollView.contentInset.bottom = 0
+            self.textDiaryView.scrollView.verticalScrollIndicatorInsets.bottom = 0
+        }
+    }
     //MARK: - Setup Navigation Bar
     private func setupNavigationBar() {
         navigationBarManager.addBackButton(
@@ -56,6 +107,16 @@ class TextDiaryViewController: UIViewController, DiaryCalendarControllerDelegate
         textDiaryView.saveButton.addTarget(self, action: #selector(nextVC), for: .touchUpInside)
         textDiaryView.dropDownStack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showCalendarOverlay))
         )
+    }
+    
+    private func setupDismissKeyboardGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     //MARK: - @objc methods

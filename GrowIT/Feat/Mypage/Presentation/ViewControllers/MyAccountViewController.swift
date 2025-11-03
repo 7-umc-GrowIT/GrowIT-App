@@ -92,14 +92,14 @@ class MyAccountViewController: UIViewController {
             )
         }
         
-        presentSheet(editNameVC, heightRatio: 0.32)
+        presentSheet(editNameVC, heightRatio: 303/932, fixedHeight: 303)
     }
     
     @objc
     func didTapLogout() {
         let logoutVC = LogoutModalViewController()
         logoutVC.modalPresentationStyle = .pageSheet
-        presentSheet(logoutVC, heightRatio: 0.27)
+        presentSheet(logoutVC, heightRatio: 0.27, minHeight: 256)
     }
     
     @objc private func navigateToWithdraw() {
@@ -116,7 +116,7 @@ class MyAccountViewController: UIViewController {
         let withDrawModalVC = WithdrawModalViewController()
         withDrawModalVC.modalPresentationStyle = .pageSheet
         
-        presentSheet(withDrawModalVC, heightRatio: 0.34)
+        presentSheet(withDrawModalVC, heightRatio: 322/932, fixedHeight: 322)
     }
     
     @objc
@@ -199,7 +199,7 @@ extension MyAccountViewController: UITableViewDataSource, UITableViewDelegate {
                
                 let modalVC = CannotChangePasswordViewController()
                 modalVC.modalPresentationStyle = .pageSheet
-                presentSheet(modalVC, heightRatio: 0.36)
+                presentSheet(modalVC, heightRatio: 314/932, fixedHeight: 314)
             }
         case (1, 0):
             didTapTermsOfService("개인정보 수집•이용 동의")

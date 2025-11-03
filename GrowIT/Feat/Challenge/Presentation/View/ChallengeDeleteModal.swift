@@ -42,7 +42,9 @@ class ChallengeDeleteModal: UIView {
     public lazy var deleteBtn = makeButton(title: "삭제하기", textColor: .white, bgColor: .negative400)
     
     // MARK: - Stack
-    private lazy var btnStack = makeStack(axis: .horizontal, spacing: 8)
+    private lazy var btnStack = makeStack(axis: .horizontal, spacing: 8).then {
+        $0.distribution = .fill
+    }
     
     // MARK: - Func
     private func makeLabel(title:String, color: UIColor, font: UIFont) -> UILabel {
@@ -95,24 +97,22 @@ class ChallengeDeleteModal: UIView {
         
         title1.snp.makeConstraints{
             $0.top.equalTo(challengeDeleteIcon.snp.bottom).offset(8)
-            $0.left.equalToSuperview().offset(24)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         title2.snp.makeConstraints {
             $0.top.equalTo(title1.snp.bottom).offset(16)
-            $0.left.equalToSuperview().offset(24)
-            $0.height.equalTo(80)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
         
         exitBtn.snp.makeConstraints{
             $0.width.equalTo(88)
         }
-        
-        btnStack.snp.makeConstraints{
-            $0.top.equalTo(title2.snp.bottom).offset(20)
-            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
-            $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.height.equalTo(60)
+
+        btnStack.snp.makeConstraints { make in
+            make.top.equalTo(title2.snp.bottom).offset(20)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(60)
         }
         
     }

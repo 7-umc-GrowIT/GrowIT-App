@@ -25,12 +25,11 @@ class ChallengeVerifyViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view = challengeVerifyView
         view.backgroundColor = .gray50
         
-        setupNavigationBar() // 네비게이션 바 설정 함수
-        openImagePicker() // 이미지 선택 관련 함수
-        setupDismissKeyboardGesture() // 키보드 해제 함수
+        setupNavigationBar()
+        openImagePicker()
+        setupDismissKeyboardGesture()
         
         challengeVerifyView.reviewTextView.delegate = self
         challengeVerifyView.challengeVerifyButton.addTarget(self, action: #selector(challengeVerifyButtonTapped), for: .touchUpInside)
@@ -54,6 +53,16 @@ class ChallengeVerifyViewController: UIViewController {
             name: UIResponder.keyboardWillHideNotification,
             object: nil
         )
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // 레이아웃이 완료된 후 contentSize 업데이트
+        challengeVerifyView.updateContentSize()
+    }
+    
+    override func loadView() {
+        view = challengeVerifyView
     }
     
     init(challenge: UserChallenge?){
@@ -147,27 +156,43 @@ class ChallengeVerifyViewController: UIViewController {
     }
     
     @objc private func keyboardWillShow(_ notification: Notification) {
-        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        let scrollView = challengeVerifyView.scrollView
-        let bottomInset = keyboardFrame.height + 30 // 버튼과 간격 여유
-
-        scrollView.contentInset.bottom = bottomInset
-        scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
-
-        // TextView가 가려지지 않게 스크롤
-        let textViewFrame = challengeVerifyView.reviewTextView.convert(challengeVerifyView.reviewTextView.bounds, to: scrollView)
-        scrollView.scrollRectToVisible(textViewFrame, animated: true)
-    }
-
-    @objc private func keyboardWillHide(_ notification: Notification) {
-        let scrollView = challengeVerifyView.scrollView
-        UIView.animate(withDuration: 0.25) {
-            scrollView.contentInset.bottom = 0
-            scrollView.verticalScrollIndicatorInsets.bottom = 0
+        guard
+            let userInfo = notification.userInfo,
+            let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+            let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
+        else { return }
+        
+        let keyboardHeight = keyboardFrame.height
+        let contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardHeight, right: 0)
+        
+        UIView.animate(withDuration: duration) {
+            self.challengeVerifyView.scrollView.contentInset = contentInset
+            self.challengeVerifyView.scrollView.scrollIndicatorInsets = contentInset
+            
+            // 텍스트뷰가 보이도록 스크롤
+            if self.challengeVerifyView.reviewTextView.isFirstResponder {
+                let textViewFrame = self.challengeVerifyView.reviewTextView.convert(
+                    self.challengeVerifyView.reviewTextView.bounds,
+                    to: self.challengeVerifyView.scrollView
+                )
+                let visibleHeight = self.challengeVerifyView.scrollView.bounds.height - keyboardHeight
+                
+                if textViewFrame.maxY > visibleHeight {
+                    let scrollPoint = CGPoint(x: 0, y: textViewFrame.maxY - visibleHeight + 20)
+                    self.challengeVerifyView.scrollView.setContentOffset(scrollPoint, animated: false)
+                }
+            }
         }
     }
 
-
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else { return }
+        
+        UIView.animate(withDuration: duration) {
+            self.challengeVerifyView.scrollView.contentInset = .zero
+            self.challengeVerifyView.scrollView.scrollIndicatorInsets = .zero
+        }
+    }
 
 
 

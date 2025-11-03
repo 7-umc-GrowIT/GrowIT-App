@@ -11,7 +11,9 @@ extension UIViewController: @retroactive UISheetPresentationControllerDelegate {
     func presentSheet(
         _ viewController: UIViewController,
         heightRatio: CGFloat,
-        useLargeOnly: Bool = false
+        useLargeOnly: Bool = false,
+        minHeight: CGFloat? = nil,    // 최소 높이 옵션
+        fixedHeight: CGFloat? = nil   // 고정 높이 옵션 추가
     ) {
         viewController.modalPresentationStyle = .pageSheet
             
@@ -20,8 +22,25 @@ extension UIViewController: @retroactive UISheetPresentationControllerDelegate {
                 if useLargeOnly {
                     sheet.detents = [.large()]
                 } else {
-                    // 기본 높이는 custom, 사용자가 끌면 large까지 확장 가능
-                    sheet.detents = [.custom { _ in UIScreen.main.bounds.height * heightRatio }, .large()]
+                    let screenHeight = UIScreen.main.bounds.height
+                    let calculatedHeight = fixedHeight ?? (screenHeight * heightRatio)
+                    
+                    // minHeight가 지정되었다면 그 이상으로 보장
+                    let finalHeight: CGFloat
+                    if let minHeight = minHeight {
+                        finalHeight = max(minHeight, calculatedHeight)
+                    } else {
+                        finalHeight = calculatedHeight
+                    }
+                    
+                    // 화면의 95%를 넘지 않도록 제한
+                    let maxHeight = screenHeight * 0.95
+                    let constrainedHeight = min(finalHeight, maxHeight)
+                    
+                    sheet.detents = [
+                        .custom { _ in constrainedHeight },
+                        .large()
+                    ]
                 }
             } else {
                 sheet.detents = [.medium(), .large()]
@@ -32,8 +51,9 @@ extension UIViewController: @retroactive UISheetPresentationControllerDelegate {
             }
             
             sheet.delegate = self
-            sheet.prefersGrabberVisible = false // 사용자가 끌기 쉽게 그랩퍼를 보이도록
-            sheet.prefersScrollingExpandsWhenScrolledToEdge = true // 스크롤 시 확장 허용
+            sheet.prefersGrabberVisible = false
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = true
+            sheet.largestUndimmedDetentIdentifier = nil
         }
         
         present(viewController, animated: true, completion: nil)
