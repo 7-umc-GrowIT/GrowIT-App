@@ -265,7 +265,7 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
     @objc func helpTapped() {
         let accountInquiryVC = AccountInquiryViewController()
         accountInquiryVC.setDarkMode()
-        presentSheet(accountInquiryVC, heightRatio: 0.336)
+        presentSheet(accountInquiryVC, heightRatio: 314/932, fixedHeight: 314)
     }
     
     @objc func addTapped() {

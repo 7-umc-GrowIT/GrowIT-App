@@ -221,7 +221,7 @@ class HomeViewController: UIViewController {
         // 바텀 시트 설정
         modalVC.modalPresentationStyle = .pageSheet
         
-        presentSheet(modalVC, heightRatio: 0.33)
+        presentSheet(modalVC, heightRatio: 314/932, fixedHeight: 314)
     }
         
     //MARK: Notification

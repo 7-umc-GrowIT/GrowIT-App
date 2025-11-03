@@ -119,7 +119,6 @@ class ChallengeVerifyModal: UIView {
         
         deleteBtn.snp.makeConstraints{
             $0.top.equalTo(btnStack.snp.bottom).offset(15.5)
-            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
             $0.centerX.equalToSuperview()
         }
     }

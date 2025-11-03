@@ -93,8 +93,8 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
         let prevVC = TextDiaryErrorViewController()
         prevVC.delegate = self
         prevVC.diaryId = diaryId
-        let navController = UINavigationController(rootViewController: prevVC)
-        presentSheet(navController, heightRatio: 0.35)
+        //let navController = UINavigationController(rootViewController: prevVC)
+        presentSheet(prevVC, heightRatio: 314/932, fixedHeight: 314)
     }
     
     @objc func nextVC() {
@@ -144,7 +144,12 @@ class TextDiaryRecommendChallengeViewController: UIViewController, VoiceDiaryErr
     }
     
     func didTapExitButton() {
-        navigationController?.popToRootViewController(animated: true)
+        let tabBarController = CustomTabBarController(initialIndex: 0)
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        
+        window.rootViewController = UINavigationController(rootViewController: tabBarController)
+        window.makeKeyAndVisible()
     }
     
     func getSelectedChallenges() -> [SelectedChallengeDTO] {

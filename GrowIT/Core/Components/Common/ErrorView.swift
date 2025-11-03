@@ -104,6 +104,7 @@ class ErrorView: UIView {
             $0.top.equalTo(label2.snp.bottom).offset(40)
             $0.leading.equalTo(exitButton.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().inset(24)
+            
             $0.bottom.equalTo(safeAreaLayoutGuide)
         }
     }

@@ -27,9 +27,9 @@ class ChallengeVerifyModalController: UIViewController {
         if let id = challengeId{
             nextVC.challengeId = id
         }
-        nextVC.modalPresentationStyle = .pageSheet
-        
-        presentSheet(nextVC, heightRatio: 0.35)
+        presentSheet(nextVC, heightRatio: 314/932, fixedHeight: 314)
+
+        //present(nextVC, animated: true)
     }
     
     @objc private func dismissModal() {
