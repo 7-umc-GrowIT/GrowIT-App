@@ -94,7 +94,6 @@ class AccountInquiryModalView: UIView {
         confirmBtn.snp.makeConstraints {
             $0.top.equalTo(subTitle.snp.bottom).offset(40)
             $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
             $0.height.equalTo(60)
         }
     }

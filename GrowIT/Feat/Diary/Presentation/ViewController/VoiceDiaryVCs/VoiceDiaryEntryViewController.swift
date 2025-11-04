@@ -38,7 +38,7 @@ class VoiceDiaryEntryViewController: UIViewController {
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "",
-            textColor: .black
+            textColor: .gray900
         )
     }
     
@@ -74,7 +74,7 @@ class VoiceDiaryEntryViewController: UIViewController {
         let nextVC = VoiceDiaryTipViewController()
         nextVC.modalPresentationStyle = .pageSheet
         
-        presentSheet(nextVC, heightRatio: 0.7)
+        presentSheet(nextVC, heightRatio: 642/932, fixedHeight: 642)
     }
     
     private func checkHasVoiceDiary() {

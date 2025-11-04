@@ -81,8 +81,8 @@ class VoiceDiaryEntryView: UIView {
         
         addSubview(postImage)
         postImage.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(label2.snp.bottom).offset(30)
+            make.center.equalToSuperview()
+            //make.top.equalTo(label2.snp.bottom).offset(30)
         }
         
         addSubview(recordButton)

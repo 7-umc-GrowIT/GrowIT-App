@@ -62,7 +62,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         navigationBarManager.setTitle(
             to: navigationItem,
             title: "",
-            textColor: .black
+            textColor: .gray900
         )
     }
     
@@ -89,7 +89,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
         prevVC.diaryId = diaryId
         let navController = UINavigationController(rootViewController: prevVC)
         navController.modalPresentationStyle = .fullScreen
-        presentSheet(navController, heightRatio: 0.37)
+        presentSheet(navController, heightRatio: 314/932, fixedHeight: 314)
     }
     
     @objc func nextVC() {
@@ -111,7 +111,7 @@ class VoiceDiarySummaryViewController: UIViewController, VoiceDiaryErrorDelegate
             self?.diaryContent = updatedText
         }
         let navController = UINavigationController(rootViewController: nextVC)
-        presentSheet(navController, heightRatio: 0.6)
+        presentSheet(navController, heightRatio: 560/932, fixedHeight: 560)
     }
     
     func didTapExitButton() {

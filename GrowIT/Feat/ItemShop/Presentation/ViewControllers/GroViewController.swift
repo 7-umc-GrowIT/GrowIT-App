@@ -269,7 +269,7 @@ class GroViewController: UIViewController, ItemListDelegate {
         )
         
         purchaseModalVC.modalPresentationStyle = .pageSheet
-        presentSheet(purchaseModalVC, heightRatio: 0.33)
+        presentSheet(purchaseModalVC, heightRatio: 314/932, fixedHeight: 330)
     }
     
     //MARK: - UI 업데이트 함수

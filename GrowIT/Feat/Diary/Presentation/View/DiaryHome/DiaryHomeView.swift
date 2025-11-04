@@ -78,7 +78,7 @@ class DiaryHomeView: UIView {
         diaryHomeScrollView.snp.makeConstraints{
             $0.top.equalTo(diaryHomeNavbar.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(100)
         }
         
         contentView.snp.makeConstraints {

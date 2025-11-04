@@ -34,13 +34,69 @@ class DiaryPostFixViewController: UIViewController {
         setupUI()
         setupDelegate()
         setupActions()
+        setupKeyboardNotifications()
+        setupDismissKeyboardGesture()
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false // 터치 이벤트가 다른 뷰에도 전달되도록 함
         view.addGestureRecognizer(tapGesture)
+    
     }
     
-    @objc func dismissKeyboard() {
+    deinit {
+        NotificationCenter.default.removeObserver(self) // ✅ 메모리 누수 방지
+    }
+    
+    private func setupKeyboardNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        guard
+            let userInfo = notification.userInfo,
+            let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+            let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
+        else { return }
+
+        // 이미 올려져 있으면 중복 방지
+        if view.transform == .identity {
+            UIView.animate(withDuration: duration) {
+                // 키보드 높이만큼 올리되, safeArea를 고려해서 약간 빼줌
+                self.view.transform = CGAffineTransform(translationX: 0, y: -keyboardFrame.height + self.view.safeAreaInsets.bottom)
+            }
+        }
+    }
+
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        guard
+            let userInfo = notification.userInfo,
+            let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
+        else { return }
+
+        UIView.animate(withDuration: duration) {
+            self.view.transform = .identity
+        }
+    }
+
+    /// 바깥 영역 터치 시 키보드 숨기기
+    private func setupDismissKeyboardGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
     

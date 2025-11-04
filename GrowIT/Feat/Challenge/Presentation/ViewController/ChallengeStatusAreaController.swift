@@ -194,7 +194,7 @@ extension ChallengeStatusAreaController: UITableViewDelegate, UITableViewDataSou
         } else {
             let challengeVerifyModalVC = ChallengeVerifyModalController()
             challengeVerifyModalVC.modalPresentationStyle = .pageSheet
-            presentSheet(challengeVerifyModalVC, heightRatio: 0.4)
+            presentSheet(challengeVerifyModalVC, heightRatio: 0.4, fixedHeight: 358)
             challengeVerifyModalVC.challengeId = selectedChallenge!.id
         }
     }

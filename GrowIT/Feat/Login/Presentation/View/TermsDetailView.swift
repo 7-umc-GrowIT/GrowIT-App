@@ -23,6 +23,7 @@ class TermsDetailView: UIView {
     let contentTextView = UITextView().then {
         $0.font = .body2Regular()
         $0.textColor = .gray800
+        $0.backgroundColor = .clear
         $0.isEditable = false
         $0.isScrollEnabled = true
     }

@@ -53,7 +53,7 @@ extension SpeechAPI: TargetType {
                     "ssmlGender": "FEMALE"       // Despina는 여성 음성
                 ],
                 "audioConfig": [
-                    "audioEncoding": "MP3",
+                    "audioEncoding": "LINEAR16",
                     "speakingRate": 1.1,        // 속도 (0.25~4.0)
                     "volumeGainDb": 0.0          // 볼륨 (-96.0~16.0)
                 ]

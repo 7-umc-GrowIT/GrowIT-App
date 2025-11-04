@@ -108,6 +108,10 @@ class VoiceDiaryRecordView: UIView {
     
     
     // MARK: UI Components
+    let scrollView = UIScrollView()
+    
+    let contentView = UIView()
+    
     private let label1 = UILabel().then {
         $0.text = "편하게 말해보세요\n당신의 이야기를 듣고 있어요"
         $0.font = .subTitle1()
@@ -122,7 +126,7 @@ class VoiceDiaryRecordView: UIView {
     }
     
     var chatImage = LottieAnimationView(name: "Conversation").then {
-        $0.frame = CGRect(x: 0, y: 0, width: 175, height: 100)
+        $0.frame = CGRect(x: 0, y: 0, width: 175, height: 167)
         $0.loopMode = .loop
     }
     
@@ -131,10 +135,7 @@ class VoiceDiaryRecordView: UIView {
         $0.layer.cornerRadius = 40
         $0.clipsToBounds = true
     }
-    
-//    let tipView = ToolTipView().then {
-//        $0.configure(text: "AI와의 대화를 시작해 보세요!")
-//    }
+
     
     let tipView2 = ToolTipView().then {
         $0.configure(text: "AI와의 대답이 끝나면 눌러 주세요")
@@ -192,83 +193,86 @@ class VoiceDiaryRecordView: UIView {
     // MARK: Setup UI
     private func setupUI() {
         backgroundColor = .gray700
-        addSubview(label1)
-        label1.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(24)
-            make.top.equalTo(safeAreaLayoutGuide).offset(32)
+        
+        self.addSubview(scrollView)
+        self.addSubview(helpLabel)
+        self.addSubview(endButton)
+        
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubview(label1)
+        contentView.addSubview(label2)
+        contentView.addSubview(chatImage)
+        contentView.addSubview(timeLabel)
+        contentView.addSubview(recordButton)
+        contentView.addSubview(addLabel)
+        contentView.addSubview(loadingButton)
+        contentView.addSubview(clockIcon)
+    
+        helpLabel.snp.makeConstraints { make in
+            make.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom).inset(10) // 여백 조정
+            make.centerX.equalToSuperview()
+            make.height.equalTo(36)
         }
         
-        addSubview(label2)
+        endButton.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.bottom.equalTo(helpLabel.snp.top).offset(-5) // 5pt 간격
+        }
+    
+        scrollView.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+            // 하단은 endButton 위에 고정
+            make.bottom.equalTo(endButton.snp.top).offset(-16)
+        }
+
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalTo(scrollView.snp.width)
+        }
+        
+        label1.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(24)
+            make.top.equalToSuperview().offset(32) // contentView.top에 offset
+        }
+        
         label2.snp.makeConstraints { make in
             make.leading.equalTo(label1.snp.leading)
             make.top.equalTo(label1.snp.bottom).offset(12)
         }
         
-        addSubview(chatImage)
         chatImage.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(label2.snp.bottom).offset(-100)
+            make.top.equalToSuperview().offset(40)
         }
         
-        addSubview(helpLabel)
-        helpLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(36)
-        }
-        
-        addSubview(endButton)
-        endButton.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(24)
-            make.bottom.equalTo(helpLabel.snp.top).offset(-5)
-        }
-        
-        addSubview(timeLabel)
         timeLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(endButton.snp.top).offset(-180)
+            make.top.equalTo(chatImage.snp.bottom).inset(100)// chatImage 아래에 위치하도록 수정
             make.centerX.equalToSuperview()
         }
+
+        clockIcon.snp.makeConstraints { make in
+            make.right.equalTo(timeLabel.snp.left).offset(-8)
+            make.centerY.equalTo(timeLabel)
+        }
         
-        addSubview(recordButton)
         recordButton.snp.makeConstraints { make in
-            make.top.equalTo(timeLabel.snp.bottom).offset(60)
+            make.top.equalTo(timeLabel.snp.bottom).offset(20)
             make.centerX.equalToSuperview()
             make.width.height.equalTo(80)
         }
-//        addSubview(tipView)
-//        tipView.snp.makeConstraints { make in
-//            make.bottom.equalTo(recordButton.snp.top).offset(-10)
-//            make.centerX.equalTo(recordButton)
-//        }
         
-//        addSubview(tipView2)
-//        tipView2.snp.makeConstraints { make in
-//            make.bottom.equalTo(recordButton.snp.top).offset(-10)
-//            make.centerX.equalTo(recordButton)
-//        }
-        
-        
-        addSubview(addLabel)
-        addLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.height.equalTo(36)
-            make.bottom.equalTo(endButton.snp.top).offset(-30)
-        }
-        
-        addSubview(loadingButton)
         loadingButton.snp.makeConstraints { make in
             make.bottom.equalTo(addLabel.snp.top).offset(-12)
             make.centerX.equalToSuperview()
             make.width.height.equalTo(80)
         }
         
-        
-        addSubview(clockIcon)
-        clockIcon.snp.makeConstraints { make in
-            make.trailing.equalTo(timeLabel.snp.leading).offset(-8)
-            make.centerY.equalTo(timeLabel)
+        addLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.height.equalTo(36)
+            make.top.equalTo(recordButton.snp.bottom).offset(20)
+            make.bottom.equalToSuperview().offset(-20)
         }
-        
-        
     }
 }

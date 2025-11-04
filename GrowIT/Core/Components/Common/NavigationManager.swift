@@ -51,4 +51,21 @@ class NavigationManager {
             $0.bottom.equalToSuperview()
         }
     }
+    
+    // MARK: - 스크롤 시 네비게이션바 불투명 고정
+    func setOpaqueNavigationBar(_ navigationBar: UINavigationBar, backgroundColor: UIColor = .white) {
+        if #available(iOS 15.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground() // 항상 불투명
+            appearance.backgroundColor = backgroundColor
+            appearance.shadowColor = UIColor.black.withAlphaComponent(0.05)
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+            
+            navigationBar.standardAppearance = appearance
+            navigationBar.scrollEdgeAppearance = appearance
+        } else {
+            navigationBar.isTranslucent = false
+            navigationBar.barTintColor = backgroundColor
+        }
+    }
 }

@@ -84,6 +84,8 @@ class VoiceDiaryTipView: UIView {
         exitButton.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview().inset(24)
             make.top.equalTo(contentView.snp.bottom).offset(40)
+            let bottomInset = max(self.safeAreaInsets.bottom, 20)
+            make.bottom.equalToSuperview().offset(-bottomInset)
         }
     }
 

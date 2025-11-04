@@ -22,6 +22,9 @@ class TextDiaryView: UIView, UITextViewDelegate {
     }
     
     // MARK: - UI Components
+    let scrollView = UIScrollView()
+    
+    let contentView = UIView()
     
     private let dateView = UIView().then {
         $0.backgroundColor = .gray50
@@ -115,16 +118,30 @@ class TextDiaryView: UIView, UITextViewDelegate {
     
     // MARK: - Setup UI
     private func setupUI() {
-        addSubview(dateView)
+        addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        addSubview(saveButton)
+        
+        scrollView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(saveButton.snp.top).offset(-16)
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
+        }
+        
+        // 구성 요소 추가
+        contentView.addSubviews([dateView, diaryTextField, helpLabel])
+        dropDownStack.addArrangedSubViews([dateLabel, dropDownButton])
+        dateView.addSubviews([dayLabel, dropDownStack])
+        
         dateView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide)
+            make.top.equalToSuperview()
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(109)
         }
-        
-        dropDownStack.addArrangedSubViews([dateLabel, dropDownButton])
-        
-        dateView.addSubviews([dayLabel, dropDownStack])
         
         dayLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
@@ -137,7 +154,6 @@ class TextDiaryView: UIView, UITextViewDelegate {
             $0.bottom.equalToSuperview().inset(20)
         }
         
-        addSubview(diaryTextField)
         diaryTextField.snp.makeConstraints { make in
             make.top.equalTo(dateView.snp.bottom).offset(24)
             make.leading.equalToSuperview().offset(24)
@@ -145,17 +161,17 @@ class TextDiaryView: UIView, UITextViewDelegate {
             make.height.equalTo(360)
         }
         
-        addSubview(helpLabel)
         helpLabel.snp.makeConstraints { make in
             make.top.equalTo(diaryTextField.snp.bottom).offset(4)
             make.leading.equalTo(diaryTextField.snp.leading)
+            make.bottom.equalToSuperview().offset(-20) // 콘텐츠 하단 기준
         }
         
-        addSubview(saveButton)
         saveButton.snp.makeConstraints { make in
-            make.leading.equalTo(diaryTextField)
-            make.centerX.equalTo(diaryTextField)
-            make.bottom.equalToSuperview().offset(-40)
+            make.leading.equalToSuperview().offset(24)
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide).inset(20)
+            make.height.equalTo(60)
         }
     }
     
