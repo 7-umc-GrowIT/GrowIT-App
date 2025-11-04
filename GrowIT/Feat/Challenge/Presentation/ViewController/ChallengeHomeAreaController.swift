@@ -229,7 +229,7 @@ extension ChallengeHomeAreaController: UICollectionViewDelegate, UICollectionVie
         } else {
             let verifyModalVC = ChallengeVerifyModalController()
             verifyModalVC.challengeId = challenge.id
-            presentSheet(verifyModalVC, heightRatio: 0.4)
+            presentSheet(verifyModalVC, heightRatio: 0.4, fixedHeight: 358)
         }
     }
     

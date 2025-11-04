@@ -18,7 +18,7 @@ class NavigationManager {
     func addBackButton(to navigationItem: UINavigationItem, target: Any?, action: Selector, tintColor: UIColor = .label) {
         let backButton = UIButton(type: .system)
         backButton.setImage(UIImage(systemName: "chevron.left"), for: .normal)
-        backButton.tintColor = .gray900
+        backButton.tintColor = tintColor
         backButton.addTarget(target, action: action, for: .touchUpInside)
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
