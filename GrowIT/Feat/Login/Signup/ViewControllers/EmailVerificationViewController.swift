@@ -162,7 +162,7 @@ class EmailVerificationViewController: UIViewController {
         let emailErrorVC = EmailVerificationErrorViewController()
         let navController = UINavigationController(rootViewController: emailErrorVC)
         navController.modalPresentationStyle = .pageSheet
-        presentSheet(navController, heightRatio: 314/932)
+        presentSheet(navController, heightRatio: 314/932, fixedHeight: 314)
     }
     
     @objc
