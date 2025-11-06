@@ -35,6 +35,11 @@ class VoiceDiaryEndViewController: UIViewController {
             title: "",
             textColor: .white
         )
+        
+        navigationBarManager.setOpaqueNavigationBar(
+            navigationController!.navigationBar,
+            backgroundColor: .clear
+        )
     }
     
     //MARK: - Setup UI

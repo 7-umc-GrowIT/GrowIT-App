@@ -56,7 +56,7 @@ class NavigationManager {
     func setOpaqueNavigationBar(_ navigationBar: UINavigationBar, backgroundColor: UIColor = .white) {
         if #available(iOS 15.0, *) {
             let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground() // 항상 불투명
+            appearance.configureWithTransparentBackground()
             appearance.backgroundColor = backgroundColor
             appearance.shadowColor = UIColor.black.withAlphaComponent(0.05)
             appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
