@@ -230,6 +230,11 @@ class VoiceDiaryRecordViewController: UIViewController, VoiceDiaryErrorDelegate,
             title: "",
             textColor: .gray900
         )
+        
+        navigationBarManager.setOpaqueNavigationBar(
+            navigationController!.navigationBar,
+            backgroundColor: .clear
+        )
     }
 
     // MARK: Setup UI
